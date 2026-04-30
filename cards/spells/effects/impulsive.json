@@ -1,0 +1,9 @@
+{
+    "effects": [
+        {
+            "effect": "draw",
+            "value": 4,
+            "target": "self_hero"
+        }
+    ]
+}

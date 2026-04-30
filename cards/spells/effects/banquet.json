@@ -1,0 +1,9 @@
+{
+    "effects": [
+        {
+            "effect": "runes",
+            "value": 2,
+            "target": "self_hero"
+        }
+    ]
+}

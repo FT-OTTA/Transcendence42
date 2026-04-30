@@ -195,7 +195,7 @@ export function resolveEffect(player: Hero, eff: Effect, target: Hero | Card, ta
                 return false;
             target.armor += eff.value;
             break;
-        case "mana":
+        case "runes":
             if (target.kind === "card")
                 return false;
             target.curRunes += eff.value;

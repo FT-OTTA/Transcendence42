@@ -1,0 +1,16 @@
+{
+    "effects": [
+        {
+            "effect": "draw",
+            "value": 8
+        },
+        {
+            "effect": "armor",
+            "value": 8
+        },
+        {
+            "effect": "runes",
+            "value": 8
+        }
+    ]
+}

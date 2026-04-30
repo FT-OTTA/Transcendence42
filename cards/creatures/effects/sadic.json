@@ -1,0 +1,9 @@
+{
+    "effects": [
+        {
+            "effect": "armor",
+            "value": -8,
+            "target": "self_hero"
+        }
+    ]
+}

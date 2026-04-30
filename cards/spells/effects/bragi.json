@@ -1,0 +1,8 @@
+{
+    "effects": [
+        {
+            "effect": "destroy?",
+            "targetType": "building"
+        }
+    ]
+}

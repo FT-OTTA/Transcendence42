@@ -1,0 +1,18 @@
+{
+    "effects": [
+        {
+            "effect": "dmg",
+            "value": 1
+        },
+        {
+            "effect": "draw",
+            "value": 1,
+            "target": "self_hero"
+        },
+        {
+            "effect": "armor",
+            "value": 1,
+            "target": "self_hero"
+        }
+    ]
+}

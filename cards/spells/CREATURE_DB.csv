@@ -1,0 +1,9 @@
+;Name;Rune Cost;Effect (string);Effect (json path);Class;Illustration (.png);CollectionID;
+;Banquet festif;0;« Vous gagnez deux runes. »;banquet.json;common;;201;
+;Impulsivité frénétique;2;« Vous piochez 4 cartes »;impulsive.json;common;;202;
+;Eclair foudroyant d’Odin;1;« Vous infligez 3 dégâts a n’importe quelle cible »;bolt.json;common;;203;
+;Tempête déflagrante du chaos;5;«  Vous infligez 5 dégâts a une cible, 4 dégâts a une autre, et 3 dégâts a une dernière cible. »;tempest.json;common;;204;
+;Gorgée revigorante de la source de Baldir;3;« Piochez une carte, gagnez une rune, gagnez 3 d’armure. »;baldir.json;common;;205;
+;Apocalypse selon Vidar;7;« Détruisez toutes les créatures. »;vidar.json;common;;206;
+;Traitrise de Loki;2;« La créature ciblée gagne -1/-1, puis vous infligez des dégâts égal a sa force a son contrôleur. » ;loki.json;common;;207;
+;Pamphlet de Bragi;3;« Détruisez le bâtiment ciblé. »;bragi.json;common;;208;

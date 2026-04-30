@@ -1,0 +1,12 @@
+{
+    "effects": [
+        {
+            "effect": "ad_mod",
+            "value": 1
+        },
+        {
+            "effect": "def_mod",
+            "value": 1
+        }
+    ]
+}

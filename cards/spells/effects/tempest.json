@@ -1,0 +1,17 @@
+{
+    "effects": [
+        {
+            "effect": "dmg",
+            "value": 5
+        },
+        {
+            "effect": "dmg",
+            "value": 4
+        },
+        {
+            "effect": "dmg",
+            "value": 3
+
+        }
+    ]
+}

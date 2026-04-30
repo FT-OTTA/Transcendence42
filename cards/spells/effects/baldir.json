@@ -1,0 +1,21 @@
+{
+    "effects": [
+        {
+            "effect": "runes",
+            "value": 1,
+            "target": "self_hero"
+        },
+        {
+            "effect": "draw",
+            "value": 2,
+            "target": "self_hero"
+
+        },
+        {
+            "effect": "armor",
+            "value": 3,
+            "target": "self_hero"
+
+        }
+    ]
+}

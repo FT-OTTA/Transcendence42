@@ -1,9 +1,0 @@
-;Name;Rune Cost;Force;Endurance;Effect (string);Effect (json path);Class;Illustration;CollectionID;
-;Basic;1;1;1;« Quand vous jouez cette carte, vous mettez 1 degat a une cible, piochez 1 carte, gagnez 1 d’armure. »;basic.json;common;card_image_exemple1.png;1;
-;Swap;2;1;2;« Quand vous jouez cette carte, vous pouvez échanger 2 cibles de votre champ de bataille. »;swap.json;common;card_image_exemple2.png;2;
-;Vanilla;3;3;1;« … »;vanilla.json;common;card_image_exemple3.png;3;
-;Pretre suceur de sang;2;0;1;« Quand vous jouez cette carte, la creature ciblee gagne -1/-1 »;priest.json;common;card_image_exemple4.png;4;
-;Caillou de runes animé;3;0;5;« Quand vous jouez cette carte, vous gagnez 1 rune »;rune_rock.json;common;card_image_exemple5.png;5;
-;Auto-flagelleur sadique;3;8;8;« Quand vous jouez cette carte, vous perdez 8 d’armure »;sadic.json;common;card_image_exemple6.png;6;
-;Sniper incontrôlé;4;3;2;« Quand vous jouez cette carte, détruisez la créature ciblée »;sniper.json;common;card_image_exemple7.png;7;
-;Teddy;0;8;8;« Quand vous jouez cette carte, gagnez la partie instantanement »;inspiration_faible.json;common;card_image_exemple8.png;8;

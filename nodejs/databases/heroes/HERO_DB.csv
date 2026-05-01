@@ -1,0 +1,3 @@
+;Class;BaseArmor;Description;PassiveEffect;Picture;Id;
+;Warrior;10;« Au début du tour, gagnez 3 d’armure »;h001.json;h001.png;h001;
+;Druid;5;« Au début du tour, gagnez 1 rune »;h002.json;h002.png;h002;

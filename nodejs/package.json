@@ -19,11 +19,15 @@
     "start": "node src/server.js"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.22.3",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6"
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }

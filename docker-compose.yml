@@ -11,7 +11,7 @@ services:
     depends_on:
       - nodejs
     networks:
-      - tcg
+      - otta
     restart: unless-stopped
 
   nodejs:
@@ -20,26 +20,32 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - mysql
+        mysql:
+            condition: service_healthy
     networks:
-      - tcg
+      - otta
     restart: unless-stopped
 
   mysql:
-    image: mysql:latest
+    build: ./mysql
     container_name: mysql
     volumes:
       - db_data:/var/lib/mysql
     env_file:
       - ./.env
     networks:
-      - tcg
+      - otta
     restart: unless-stopped
+    healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+        interval: 5s
+        timeout: 5s
+        retries: 10
 
 volumes:
   db_data:
     name: db_data
 
 networks:
-  tcg:
+  otta:
     driver: bridge

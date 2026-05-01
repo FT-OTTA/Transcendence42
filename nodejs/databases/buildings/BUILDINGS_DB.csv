@@ -1,0 +1,9 @@
+;Name;Rune Cost;Life;Effect (string);Effect (json path);Class;Illustration;CollectionID;
+;Alfheim;4;10;« Au début de votre tour, vous gagnez 5 d’armure »;b001.json;common;b001.png;b001;
+;Asgaro;4;10;« Au début de votre tour, piochez deux carte » ;b002.json;common;b002.png;b002;
+;Jotunheim;3;101;« Au début de votre tour, infligez 3 dégâts »;b003.json;common;b003.png;b003;
+;Miogaro;5;1;« Au début de votre tour, vous pouvez échanger deux permanents cibles sur le champ de bataille » ;b004.json;common;b004.png;b004;
+;Muspellheim;6;1;« Au début de votre tour, vous pouvez gagnez 3 runes »;b005.json;common;b005.png;b005;
+;Nidavellir;3;1;« Au début de votre tour, vous pouvez mettre -1/-1 a une créature ciblée»;b006.json;common;b006.png;b006;
+;Niflheim;7;110;« Au début de votre tour,  détruisez la créature ciblée» ;b007.json;common;b007.png;b007;
+;Val’alla;8;88888888;« Au début de votre tour, piochez 8 cartes, vous gagnez 8 d’armure, vous gagnez 8 runes. »;b008.json;common;b008.png;b008;

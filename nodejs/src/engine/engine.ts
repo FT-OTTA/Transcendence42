@@ -25,7 +25,6 @@ export function startTurn(game: Game): void {
         resolveEffect(player, player.passive, player);
         resolveBuildings(game);
         checkBoardState(game);
-
     }
 }
 
@@ -106,22 +105,22 @@ export function resolveBuildings(game:Game) {
         const zone = `bf${i}` as BfZone;
         for (const player of game.players)
             {
-            const card0 = player.battlefield[zone];
-            if (card0 && card0.type === "building") {
-                for (const effect of card0.effects){
+            const building = player.battlefield[zone];
+            if (building && building.type === "building") {
+                for (const effect of building.effects){
                     switch (effect.target) {
                         case "self_hero":
-                            resolveEffect(player, effect, player);
+                            resolveEffect(player, effect, { cardId: 0, target: player });
                             break;       
                         case "opponent_hero":
                             for (const oppo of game.players)
                             {
                                 if (oppo !== player)
-                                    resolveEffect(player, effect, oppo);
+                                    resolveEffect(player, effect, { cardId: 0, target: oppo });
                             }
                             break;  
                         case "self":
-                            resolveEffect(player, effect, card0);
+                            resolveEffect(player, effect, { cardId: building.idInGame, target: building });
                             break;          
                         case "left_neighbor":
                             if (i === 1)
@@ -129,7 +128,7 @@ export function resolveBuildings(game:Game) {
                             const zoneLeftTarget = `bf${i - 1}` as BfZone;
                             const leftTarget = player.battlefield[zoneLeftTarget];
                             if (leftTarget)
-                                resolveEffect(player, effect, leftTarget);
+                                resolveEffect(player, effect, { cardId: building.idInGame, target: leftTarget });
                             break; 
                         case "right_neighbor":
                             if (i === 8)
@@ -137,7 +136,7 @@ export function resolveBuildings(game:Game) {
                             const zoneRightTarget = `bf${i + 1}` as BfZone;
                             const rightTarget = player.battlefield[zoneRightTarget];
                             if (rightTarget)
-                                resolveEffect(player, effect, rightTarget);
+                                resolveEffect(player, effect, { cardId: building.idInGame, target: rightTarget });
                             break;
                         case "all_allies":
                             for (let j = 1 ; j <= 8; j++)
@@ -147,19 +146,19 @@ export function resolveBuildings(game:Game) {
                                 const nezo = `bf${j}` as BfZone;
                                 const ally = player.battlefield[nezo];
                                 if (ally)
-                                    resolveEffect(player, effect, ally);
+                                    resolveEffect(player, effect, { cardId: building.idInGame, target: ally });
                             }
                             break;
                         case "all_enemies":
                             for (let j = 1 ; j <= 8; j++)
                             {
-                                const enemyBf = `bf${i}` as BfZone;
+                                const enemyBf = `bf${j}` as BfZone;
                                 for (const oppo of game.players){
                                     if (oppo === player)
                                         continue;
                                     const enemy = oppo.battlefield[enemyBf];
                                     if (enemy)
-                                        resolveEffect(oppo, effect, enemy);
+                                        resolveEffect(oppo, effect, { cardId: building.idInGame, target: enemy });
 
                                 }
                             }
@@ -198,13 +197,7 @@ export function resolveEffect(
             if (payload.target.kind === "hero")
                 dealsDmg(player, payload.target, eff.value);
             if (payload.target.kind === "card")
-            {
                 payload.target.currEndurance -= eff.value;
-                if (payload.target.currEndurance < 0)
-                {
-                    payload.target.zone = "graveyard"
-                }
-            }
             break;
         case "armor":
             if (payload.target.kind === "card")

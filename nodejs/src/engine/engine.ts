@@ -22,7 +22,7 @@ export function startTurn(game: Game): void {
     for (const player of game.players) {
         player.curRunes = fibonacci(game.turnNumber);
         playerDraw(player, 8 - player.hand.length);
-        resolveEffect(player, player.passive, player);
+        resolveEffect(player, player.passive, { cardId: 0, target: player});
         resolveBuildings(game);
         checkBoardState(game);
     }

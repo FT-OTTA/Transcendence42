@@ -33,6 +33,6 @@ export type Effect = {
     effect: EffectType;
     value: number;
     target: EffectTarget;
-    targetType: TargetType;
+    targetType?: TargetType;
 }
 

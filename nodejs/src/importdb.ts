@@ -1,17 +1,6 @@
 import fs from 'fs'
-// import path from 'path'
-import mysql from 'mysql2/promise'
+import { prisma } from '../prisma/prisma.ts'
 
-const connection = await mysql.createConnection({
-    host: 'mysql',
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-})
-
-console.log('MySQL connecté ✅')
-
-// Parse un CSV avec ; comme séparateur
 function parseCSV(filePath: string): Record<string, string>[] {
     const content = fs.readFileSync(filePath, 'utf-8')
     const lines = content.split('\n').filter(l => l.trim() !== '')
@@ -22,105 +11,109 @@ function parseCSV(filePath: string): Record<string, string>[] {
         const row: Record<string, string> = {}
         headers.forEach((h, i) => row[h] = values[i] ?? '')
         return row
-    }).filter(row => row['CollectionID'] !== '')
+    }).filter(row => row['CollectionID'] !== '' && row['CollectionID'] !== undefined || row['Id'] !== '')
 }
 
-// Import des créatures
+// methode .upsert = mix de update et insert, insert l'entree 
+// update en cas de duplicate.
+
 async function importCreatures() {
     const rows = parseCSV('/app/databases/creatures/CREATURE_DB.csv')
     for (const row of rows) {
-        await connection.execute(
-            `INSERT INTO cards (id, name, type, class, rune_cost, base_force, base_endurance, effect_text, effect_json_path, illustration, collection_id)
-             VALUES (?, ?, 'creature', ?, ?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE name = VALUES(name)`,
-            [
-                row['CollectionID'],
-                row['Name'],
-                row['Class'],
-                parseInt(row['Rune Cost']),
-                parseInt(row['Force']),
-                parseInt(row['Endurance']),
-                row['Effect (string)'],
-                row['Effect (json path)'],
-                row['Illustration'],
-                row['CollectionID']
-            ]
-        )
-        console.log(`Créature importée : ${row['Name']} (${row['CollectionID']})`)
+        await prisma.card.upsert({
+            where: { id: row['CollectionID'] },
+            update: { name: row['Name'] }, // Si elle existe, on met à jour le nom
+            create: {
+                id: row['CollectionID'],
+                name: row['Name'],
+                type: 'creature',
+                class: row['Class'],
+                rune_cost: parseInt(row['Rune Cost']),
+                force: parseInt(row['Force']),
+                endurance: parseInt(row['Endurance']),
+                effect_text: row['Effect (string)'],
+                effect_json_path: row['Effect (json path)'],
+                illustration: row['Illustration'],
+            }
+        })
+        console.log(`Créature importée : ${row['Name']}`)
     }
 }
 
-// Import des bâtiments
 async function importBuildings() {
     const rows = parseCSV('/app/databases/buildings/BUILDINGS_DB.csv')
     for (const row of rows) {
-        await connection.execute(
-            `INSERT INTO cards (id, name, type, class, rune_cost, base_endurance, effect_text, effect_json_path, illustration, collection_id)
-             VALUES (?, ?, 'building', ?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE name = VALUES(name)`,
-            [
-                row['CollectionID'],
-                row['Name'],
-                row['Class'],
-                parseInt(row['Rune Cost']),
-                parseInt(row['Life']),
-                row['Effect (string)'],
-                row['Effect (json path)'],
-                row['Illustration'],
-                row['CollectionID']
-            ]
-        )
-        console.log(`Bâtiment importé : ${row['Name']} (${row['CollectionID']})`)
+        await prisma.card.upsert({
+            where: { id: row['CollectionID'] },
+            update: { name: row['Name'] },
+            create: {
+                id: row['CollectionID'],
+                name: row['Name'],
+                type: 'building',
+                class: row['Class'],
+                rune_cost: parseInt(row['Rune Cost']),
+                endurance: parseInt(row['Life']), // On mappe "Life" vers endurance
+                effect_text: row['Effect (string)'],
+                effect_json_path: row['Effect (json path)'],
+                illustration: row['Illustration'],
+            }
+        })
+        console.log(`Bâtiment importé : ${row['Name']}`)
     }
 }
 
-// Import des sorts
 async function importSpells() {
     const rows = parseCSV('/app/databases/spells/SPELLS_DB.csv')
     for (const row of rows) {
-        await connection.execute(
-            `INSERT INTO cards (id, name, type, class, rune_cost, effect_text, effect_json_path, illustration, collection_id)
-             VALUES (?, ?, 'sortilege', ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE name = VALUES(name)`,
-            [
-                row['CollectionID'],
-                row['Name'],
-                row['Class'],
-                parseInt(row['Rune Cost']),
-                row['Effect (string)'],
-                row['Effect (json path)'],
-                row['Illustration (.png)'],
-                row['CollectionID']
-            ]
-        )
-        console.log(`Sort importé : ${row['Name']} (${row['CollectionID']})`)
+        await prisma.card.upsert({
+            where: { id: row['CollectionID'] },
+            update: { name: row['Name'] },
+            create: {
+                id: row['CollectionID'],
+                name: row['Name'],
+                type: 'spell',
+                class: row['Class'],
+                rune_cost: parseInt(row['Rune Cost']),
+                effect_text: row['Effect (string)'],
+                effect_json_path: row['Effect (json path)'],
+                illustration: row['Illustration (.png)'],
+            }
+        })
+        console.log(`Sort importé : ${row['Name']}`)
     }
 }
 
 async function importHeroes() {
     const rows = parseCSV('/app/databases/heroes/HERO_DB.csv')
     for (const row of rows) {
-        await connection.execute(
-            `INSERT INTO heroes (id, name, base_armor, passive_text, passive_json_path, illustration)
-             VALUES (?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE name = VALUES(name)`,
-            [
-                row['Id'],
-                row['Class'],
-                parseInt(row['BaseArmor']),
-                row['Description'],
-                row['PassiveEffect'],
-                row['Picture']
-            ]
-        )
-        console.log(`Héros importé : ${row['Class']} (${row['Id']})`)
+        await prisma.hero.upsert({
+            where: { id: row['Id'] },
+            update: { name: row['Class'] },
+            create: {
+                id: row['Id'],
+                name: row['Class'],
+                base_armor: parseInt(row['BaseArmor']),
+                passive_text: row['Description'],
+                passive_json_path: row['PassiveEffect'],
+                illustration: row['Picture']
+            }
+        })
+        console.log(`Héros importé : ${row['Class']}`)
     }
 }
 
-await importCreatures()
-await importBuildings()
-await importSpells()
-await importHeroes()
+async function main() {
+    try {
+        await importCreatures()
+        await importBuildings()
+        await importSpells()
+        await importHeroes()
+        console.log('Import terminé ✅')
+    } catch (e) {
+        console.error("Erreur d'import :", e)
+    } finally {
+        await prisma.$disconnect()
+    }
+}
 
-console.log('Import terminé ✅')
-await connection.end()
+main()

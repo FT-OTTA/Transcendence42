@@ -1,12 +1,15 @@
 FROM node:lts-alpine
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
+COPY prisma ./prisma/
+RUN npx prisma generate
+
 COPY . .
 
 EXPOSE 3000
-
-CMD node src/importdb.ts && node src/server.ts
+CMD ["sh", "-c", "npx prisma db push && node src/importdb.ts && node src/server.ts"]

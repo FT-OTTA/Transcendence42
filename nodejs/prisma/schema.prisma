@@ -1,0 +1,54 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Card {
+  id String @id
+  name String
+  type String
+  class String
+  force Int?
+  endurance Int?
+  rune_cost Int
+  effect_text String
+  effect_json_path String
+  illustration String
+}
+
+model Hero {
+  id String @id
+  name String
+  base_armor Int
+  passive_text String
+  passive_json_path String
+  illustration String
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  username      String @unique
+  passwordHash  String  @map("password_hash")
+  role      Role?     @default(USER)
+  // posts     Post[]
+}
+// C PAS UN BLOG OU QUOI
+// model Post {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   published Boolean  @default(false)
+//   title     String   @db.VarChar(255)
+//   author    User     @relation(fields: [authorId], references: [id])
+//   authorId  Int
+// }
+
+enum Role {
+  USER
+  ADMIN
+}

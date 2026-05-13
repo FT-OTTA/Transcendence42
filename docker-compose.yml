@@ -41,6 +41,14 @@ services:
         interval: 5s
         timeout: 5s
         retries: 10
+  front:
+    build: ./front
+    container_name: front
+    env_file:
+      - ./.env
+    networks:
+      - otta
+    restart: unless-stopped
 
 volumes:
   db_data:

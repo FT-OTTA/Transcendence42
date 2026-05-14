@@ -16,10 +16,8 @@ const MenuBurger = clsx
 	"fixed inset-0 z-50",
 	"overflow-hidden",
 	"bg-black/40 backdrop-blur-sm",
-
 	"flex flex-col",
 	"justify-center items-end",
-
 	"gap-8",
 	"pr-10"
 )
@@ -35,16 +33,20 @@ export default function MobileNavbar()
 			</button>
 
 			{isOpen && (
-				<div className={ MenuBurger }>
+				<div className={ MenuBurger } onClick={() => setIsOpen(false)}>
 					<button
 						onClick={() => setIsOpen(false)}
 						className="absolute top-2 right-4 text-4xl text-blue-200">
 						✕
 					</button>
-
-					<MobileNavItem text="Home" />
-					<MobileNavItem text="Community" />
-					<MobileNavItem text="Rooms" />
+					
+					<div onClick={(e) => e.stopPropagation()}
+						className="fixed z-50 overflow-hidden flex flex-col justify-center items-end gap-8"
+					>
+						<MobileNavItem text="Home" href="/" />
+						<MobileNavItem text="Community" href="/community" />
+						<MobileNavItem text="Rooms" href="/lobby" />
+					</div>
 				</div>
 			)}
 		</div>

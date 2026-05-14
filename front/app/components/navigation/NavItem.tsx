@@ -12,7 +12,7 @@ const NavItemClass = clsx
 	"hover:text-blue-100 hover:opacity-100"
 )
 
-type NavItemProps = {
+export type NavItemProps = {
   text: string;
   href: string;
 };

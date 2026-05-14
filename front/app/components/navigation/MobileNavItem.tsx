@@ -1,5 +1,8 @@
 import clsx from "clsx";
+import Link from "next/link";
+import { NavItemProps } from "./NavItem"
 import { bellefair } from "@/app/fonts";
+
 const NavItemClass = clsx
 (
 	bellefair.className,
@@ -8,14 +11,12 @@ const NavItemClass = clsx
 	"transition",
 )
 
-type NavItemProps = {
-	text: string;
-};
-
-export default function NavItem({ text }: NavItemProps)
+export default function NavItem({ text, href }: NavItemProps)
 {
 
 	return (
-		<button className={ NavItemClass }> { text } </button>
+		<Link href={href} className={NavItemClass}>
+		  {text}
+		</Link>
 	);
 }

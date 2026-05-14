@@ -3,9 +3,9 @@ import { bellefair } from "@/app/fonts";
 const NavItemClass = clsx
 (
 	bellefair.className,
-	"text-3xl text-blue-200",
+	"text-4xl text-blue-200",
 	"opacity-70 hover:opacity-100",
-	"transition py-3",
+	"transition",
 )
 
 type NavItemProps = {

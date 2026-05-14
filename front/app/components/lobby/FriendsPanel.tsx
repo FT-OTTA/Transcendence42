@@ -9,7 +9,6 @@ type Friend = {
 
 const friends: Friend[] = [
   { name: "Poman",      status: "online", message: "test"},
-  { name: "Poman",      status: "online", message: "test"},  
   { name: "El Teddy",   status: "offline", message: "test"},
   { name: "Tonyo",      status: "playing", message: "test"},
   { name: "Big Rat 27", status: "in room", message: "test"},
@@ -18,7 +17,7 @@ const friends: Friend[] = [
 export default function FriendsPanel() {
 
     return (
-        <div className="h-full p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm h-2/3">
+        <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm h-2/3">
             
         
             <h2 className="text-xl mb-2 text-center py-2">Friends</h2>
@@ -29,7 +28,7 @@ export default function FriendsPanel() {
                 + Add a friend
             </button>
             
-            <div className="flex flex-col gap-2 flex-1 py-6">
+            <div className="flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1">
                 {friends.map((friend_list) => (
                     <div
                         key={friend_list.name}

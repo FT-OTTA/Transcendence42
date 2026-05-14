@@ -23,7 +23,7 @@ export default function RoomsPanel() {
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de rooms, mais moche si il y en a pas bcp */}
             
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1">
                 {rooms.map((room) => (
                     <div
                         key={room.id}

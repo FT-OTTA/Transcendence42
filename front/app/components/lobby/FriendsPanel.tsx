@@ -4,13 +4,15 @@ type FriendStatus = "online" | "offline" | "in room" | "playing" ;
 type Friend = {
     name : string;
     status : FriendStatus;
+    message : string;
 };
 
 const friends: Friend[] = [
-  { name: "Poman",      status: "online"},
-  { name: "El Teddy",   status: "offline"},
-  { name: "Tonyo",      status: "playing"},
-  { name: "Big Rat 27", status: "in room"},
+  { name: "Poman",      status: "online", message: "test"},
+  { name: "Poman",      status: "online", message: "test"},  
+  { name: "El Teddy",   status: "offline", message: "test"},
+  { name: "Tonyo",      status: "playing", message: "test"},
+  { name: "Big Rat 27", status: "in room", message: "test"},
 ];
 
 export default function FriendsPanel() {
@@ -23,8 +25,11 @@ export default function FriendsPanel() {
 
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de rooms, mais moche si il y en a pas bcp */}
+            <button className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition">
+                + Add a friend
+            </button>
             
-            <div className="flex flex-col gap-2 flex-1">
+            <div className="flex flex-col gap-2 flex-1 py-6">
                 {friends.map((friend_list) => (
                     <div
                         key={friend_list.name}
@@ -41,10 +46,6 @@ export default function FriendsPanel() {
                     </div>
             ))}
             </div>
-
-            <button className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition">
-                + Add a friend
-            </button>
 
         </div>
 

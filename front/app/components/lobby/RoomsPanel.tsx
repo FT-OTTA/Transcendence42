@@ -2,9 +2,15 @@
 const rooms = [
   { id: 1, p1: "Alice", p2: "Bob" },
   { id: 2, p1: "Poman", p2: "Tonio" },
-  { id: 3, p1: "Teddy", p2: null },
-  { id: 4, p1: "You", p2: null },
-  { id: 5, p1: null, p2: null },
+  { id: 3, p1: "Alice", p2: "Bob" },
+  { id: 4, p1: "Poman", p2: "Tonio" },
+  { id: 5, p1: "Alice", p2: "Bob" },
+  { id: 6, p1: "Poman", p2: "Tonio" },
+  { id: 7, p1: "Alice", p2: "Bob" },
+  { id: 8, p1: "Poman", p2: "Tonio" },
+  { id: 9, p1: "Teddy", p2: null },
+  { id: 10, p1: "You", p2: null },
+  { id: 11, p1: null, p2: null },
 ];
 
 export default function RoomsPanel() {
@@ -12,7 +18,7 @@ export default function RoomsPanel() {
     return (
         <div className="h-full border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col gap-3">
 
-            <h2 className="text-xl mb-2 text-center">Rooms</h2>
+            <h2 className="text-xl mb-2 text-center ">Rooms</h2>
 
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de rooms, mais moche si il y en a pas bcp */}
@@ -24,7 +30,7 @@ export default function RoomsPanel() {
                         className="grid grid-cols-4 gap-2 items-center border border-blue-300/40 p-2"
                     >
                         {/* Room ID */}
-                        <div>Room #{room.id}</div>
+                        <div> #{room.id}</div>
 
                         {/* Player 1 (should always be there since creator) */}
                         <div>

@@ -52,10 +52,10 @@ export default function LobbyPage() {
             </div>
 
           </div>
-          
+
           {activePanel && (
             <div
-              className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50"
+              className="fixed overflow-y-auto top-0 inset-0 flex bg-black/40 backdrop-blur-sm z-50"
               onClick={() => setActivePanel(null)}
             >
               {activePanel == "friends" && (

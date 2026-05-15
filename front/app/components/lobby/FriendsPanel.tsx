@@ -12,6 +12,7 @@ const friends: Friend[] = [
   { name: "El Teddy",   status: "offline", message: "test"},
   { name: "Tonyo",      status: "playing", message: "test"},
   { name: "Big Rat 27", status: "in room", message: "test"},
+
 ];
 
 export default function FriendsPanel() {

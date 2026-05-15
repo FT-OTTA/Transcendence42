@@ -7,14 +7,14 @@ const statBox = clsx
 	"border border-sky-600/30 rounded-xl",
 	"transition duration-300",
 	"hover:border-sky-600/40 hover:shadow-[0_0_5px_rgba(100,100,255,0.2)]",
-	"hover:text-sky-200",
+	"text-white/70 hover:text-sky-200",
 	"min-w-xs md:min-w-sm"
 	
 );
 
 const labelClass = clsx
 (
-	"text-sm uppercase tracking-wider opacity-70",
+	"font-bold text-sm uppercase tracking-wider opacity-70",
 )
 
 type StatCardProps = {

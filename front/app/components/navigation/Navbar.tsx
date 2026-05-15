@@ -29,7 +29,7 @@ export default function Navbar()
 					<NavItem text="community" href="/community" />
 					<NavItem text="lobby" href="/lobby" />
 				</nav>
-				<div className={ NavLine }/>
+				{/* <div className={ NavLine }/> */}
 			</div>
 
 		<MobileNavbar />

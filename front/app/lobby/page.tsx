@@ -15,7 +15,7 @@ export default function LobbyPage() {
 
     return (
     <main
-      className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen p-4">
+      className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen p-4 text-white/80">
         
         <Navbar />
         

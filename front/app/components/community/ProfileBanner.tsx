@@ -19,7 +19,7 @@ const userName = clsx
 
 const moodText = clsx
 (
-	" text-sm flex opacity-60 italic",
+	" text-sm flex text-white opacity-60 italic",
 );
 
 type ProfileBannerProps = {
@@ -48,7 +48,7 @@ export default function ProfileBanner({username, mood, isOnline}: ProfileBannerP
 				<h2 className={ moodText }> { mood } </h2>
 			</div>
 
-			<div className={ onlineStatus }>
+			<div className={clsx(onlineStatus, isOnline ? "text-green-100" : "text-red-400")}>
 				● { isOnline ? "Online" : "Offline" }
 			</div>
 

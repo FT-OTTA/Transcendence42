@@ -1,6 +1,13 @@
 
 type FriendStatus = "online" | "offline" | "in room" | "playing" ;
 
+const statusStyles: Record<FriendStatus, string> = {
+    online: "text-blue-300 border-blue-300/40 shadow-[0_0_8px_rgba(96,165,250,0.2)]",
+    offline: "text-gray-400 border-gray-500/30",
+    "in room": "text-green-300 border-green-300/40 shadow-[0_0_8px_rgba(34,197,94,0.2)]",
+    playing: "text-red-300 border-red-300/40",
+};
+
 type Friend = {
     name : string;
     status : FriendStatus;
@@ -8,10 +15,10 @@ type Friend = {
 };
 
 const friends: Friend[] = [
-  { name: "Poman",      status: "online", message: "test"},
-  { name: "El Teddy",   status: "offline", message: "test"},
-  { name: "Tonyo",      status: "playing", message: "test"},
-  { name: "Big Rat 27", status: "in room", message: "test"},
+  { name: "Poman",      status: "online", message: "Je suis dans article"},
+  { name: "El Teddy",   status: "offline", message: "KIcked to heaven"},
+  { name: "Tonyo",      status: "playing", message: "cpp is fun"},
+  { name: "Big Rat 27", status: "in room", message: "nyooooooom"},
 
 ];
 
@@ -33,15 +40,38 @@ export default function FriendsPanel() {
                 {friends.map((friend_list) => (
                     <div
                         key={friend_list.name}
-                        className="grid grid-cols-2 gap-2 items-center border border-blue-300/40 p-2"
+                        className="grid grid-cols-3 gap-2 items-center border border-blue-300/40 p-2"
                     >
-                        {/* Room ID */}
-                        <div>{friend_list.name}</div>
+                        <div className="font-semibold text-blue-100">
+                            {friend_list.name}</div>
 
-                        {/* Player 1 (should always be there since creator) */}
-                        <div>
+                        <div className={`text-xs px-2 py-1 border rounded-sm w-fit ${statusStyles[friend_list.status]}`}>
                             {friend_list.status}
                         </div>
+
+                        <div className="flex gap-2 justify-end">
+
+                                {friend_list.status === "in room" &&(
+                                <button className="text-xs border border-blue-300 px-2 py-1 text-green-300 hover:bg-green-300 hover:text-black">
+                                    Join
+                                </button>
+                            )}
+                            
+                            {friend_list.status === "playing" && (
+                                <button className="text-xs border border-blue-400 px-2 py-1 text-blue-300 hover:bg-blue-300 hover:text-black">
+                                    Spectate
+                                </button>
+                            )}
+
+                                <button className="text-xs border border-blue-300 px-2 py-1 hover:bg-blue-300 hover:text-black">
+                                    DM
+                                </button>
+                        
+                        </div>
+
+                        <p className="text-xs italic text-blue-200/40 mt-1">
+                            {friend_list.message}
+                        </p>
 
                     </div>
             ))}

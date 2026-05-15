@@ -1,15 +1,16 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { bellefair } from "@/app/fonts";
+import { cinzel } from "@/app/fonts";
 const NavItemClass = clsx
 (
-	bellefair.className,
-	"relative px-7 py-1",
-	"text-2xl md:text-3xl lg:text-4xl",
+	cinzel.className,
+	"relative py-2 px-4",
+	"text-xl",
 	"text-blue-300 opacity-60",
 	"transition duration-200",
 	"hover:text-shadow-[0_0_20px_rgba(255,255,255,0.8)]",
-	"hover:text-blue-100 hover:opacity-100"
+	"hover:text-blue-100 hover:opacity-100",
+	"tracking-[0.10em]"
 )
 
 export type NavItemProps = {

@@ -11,22 +11,20 @@ export default function Community()
 
 	return (
 		<main
-		className=" overflow-x-hidden md:overflow-y-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen p-4">
+		className=" overflow-x-hidden md:overflow-y-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
 			
-			<div className="md:py-5" />
 			<Navbar />
+			<div className="md:py-5" />
 
-			<ProfileSearchBar />
-			
-			<section>
+			<div className="max-w-6xl mx-auto px-4 py-4">
+				<ProfileSearchBar />
 				<ProfileBanner username="Poman" mood="J'arrive ratale sur le beat, fatale est m..." isOnline={false} />
-			</section>
+			</div>
 
-			<section className="h-full grid grid-cols-1 md:grid-cols-2 gap-4 pt-16">
+			<section className="max-w-6xl mx-auto h-full grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
 				<ProfileStats />
 				<MatchHistory />
 			</section>
-
 		</main>
 	);
 };

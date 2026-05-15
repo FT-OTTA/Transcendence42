@@ -1,10 +1,4 @@
 import StatCard from "./StatCard";
-import clsx from "clsx";
-
-const profileStats = clsx
-(
-	"flex flex-col"
-);
 
 export default function ProfileStats()
 {

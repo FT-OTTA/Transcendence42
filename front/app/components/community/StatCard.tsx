@@ -1,12 +1,11 @@
 import clsx from "clsx";
-import { stat } from "fs";
 
 const statBox = clsx
 (
 	"p-2 md:p-4 flex flex-row items-center gap-4 p-2",
 	"bg-black/20 backdrop-blur-sm",
 	"border border-sky-600/30 rounded-xl",
-	"transition duration:300",
+	"transition duration-300",
 	"hover:border-sky-600/40 hover:shadow-[0_0_5px_rgba(100,100,255,0.2)]",
 	"hover:text-sky-200",
 	"min-w-xs md:min-w-sm"

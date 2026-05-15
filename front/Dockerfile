@@ -7,8 +7,7 @@ RUN npm i
 
 COPY . .
 
-# Default port for next (will need to be changed somewhere)
-EXPOSE 3000
+EXPOSE 3001
 
 # This runs the dev server, it's not meant for production.
 # Prod would build when the image is built then run npm start instead.

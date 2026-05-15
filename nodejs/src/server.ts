@@ -7,6 +7,7 @@ import { prisma } from '../prisma/prisma.ts'
 import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
 import authRouter from './routes/auth.ts'
+import usersRouter from './routes/users.ts'
 
 const app = express()
 const httpServer = createServer(app)
@@ -21,22 +22,7 @@ app.use(express.json())
 app.use('/cards', cardsRouter)
 app.use('/heroes', heroesRouter)
 app.use('/auth', authRouter)
-
-// Ta route users migrée sur Prisma
-app.get('/users', async (req, res) => {
-    try {
-        const users = await prisma.user.findMany({
-            select: {
-                id: true,
-                username: true,
-                createdAt: true,
-            }
-        })
-        res.json(users)
-    } catch (error) {
-        res.status(500).json({ error: "Erreur lors de la récup des users" })
-    }
-})
+app.use('/users', usersRouter)
 
 app.get('/', (req, res) => {
     res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')

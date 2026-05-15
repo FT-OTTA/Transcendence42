@@ -37,6 +37,7 @@ model User {
   role      Role?     @default(USER)
   // posts     Post[]
 }
+
 // C PAS UN BLOG OU QUOI
 // model Post {
 //   id        Int      @id @default(autoincrement())

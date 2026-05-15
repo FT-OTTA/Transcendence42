@@ -14,6 +14,9 @@ down:
 build:
 	docker compose up -d --build
 
+node:
+	docker compose up -d --build nodejs
+
 ## Affiche les logs en live
 logs:
 	docker compose logs -f

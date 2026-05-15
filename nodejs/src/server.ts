@@ -1,37 +1,31 @@
 import express from 'express'
-import mysql from 'mysql2/promise'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { initSocket } from './socket/game.ts'
+import { prisma } from '../prisma/prisma.ts'
+
 import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
 import authRouter from './routes/auth.ts'
-import { authMiddleware } from './routes/auth.ts'
-
+import usersRouter from './routes/users.ts'
 
 const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, { cors: { origin: "*" } })
 
-export const connection = await mysql.createConnection({
-    host: 'mysql',
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-})
-console.log('MySQL OK ✅')
+// PLUS BESOIN de mysql.createConnection ici ! 
+// Prisma gère la connexion tout seul dès que tu fais ton premier appel.
+console.log('Prisma Engine prêt ✅')
 
 app.use(express.json())
+
 app.use('/cards', cardsRouter)
 app.use('/heroes', heroesRouter)
 app.use('/auth', authRouter)
-app.get('/users', authMiddleware, async (req, res) => {
-    const [rows] = await connection.query('SELECT id, username, created_at FROM users')
-    res.json(rows)
-})
+app.use('/users', usersRouter)
 
 app.get('/', (req, res) => {
-    res.send('TCG Dev Edition — API OK ✅')
+    res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')
 })
 
 initSocket(io)

@@ -8,6 +8,7 @@ import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
 import authRouter from './routes/auth.ts'
 import usersRouter from './routes/users.ts'
+import friendRouter from './routes/friends.ts'
 
 import cors from "cors";
 
@@ -30,6 +31,7 @@ app.use('/cards', cardsRouter)
 app.use('/heroes', heroesRouter)
 app.use('/auth', authRouter)
 app.use('/users', usersRouter)
+app.use('/friends', friendRouter)
 
 app.get('/', (req, res) => {
     res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')

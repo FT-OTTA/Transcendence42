@@ -41,6 +41,8 @@ services:
   nodejs:
     build: ./nodejs
     container_name: nodejs
+    ports:
+    - "3000:3000"
     env_file:
       - ./.env
     depends_on:
@@ -53,6 +55,8 @@ services:
   mysql:
     build: ./mysql
     container_name: mysql
+    ports:
+      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     env_file:

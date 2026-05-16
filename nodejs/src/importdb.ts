@@ -102,12 +102,57 @@ async function importHeroes() {
     }
 }
 
+async function importUsers() {
+    const rows = parseCSV('/app/databases/users/users.csv')
+
+    for (const row of rows) {
+        await prisma.user.upsert({
+            where: { id: parseInt(row['Id']) },
+            update: {
+                username: row['Username'],
+                passwordHash: row['PasswordHash'],
+            },
+            create: {
+                id: parseInt(row['Id']),
+                username: row['Username'],
+                passwordHash: row['PasswordHash'],
+            }
+        })
+
+        console.log(`User importé : ${row['Username']}`)
+    }
+}
+
+async function importFriendships() {
+    const rows = parseCSV('/app/databases/friends/friends.csv')
+
+    for (const row of rows) {
+        await prisma.friendship.upsert({
+            where: {
+                userId_friendId: {
+                    userId: parseInt(row['UserId']),
+                    friendId: parseInt(row['FriendId']),
+                }
+            },
+            update: {},
+            create: {
+                userId: parseInt(row['UserId']),
+                friendId: parseInt(row['FriendId']),
+            }
+        })
+
+        console.log(`Friendship importée: ${row['UserId']} -> ${row['FriendId']}`)
+    }
+}
+
 async function main() {
     try {
         await importCreatures()
         await importBuildings()
         await importSpells()
         await importHeroes()
+        await importUsers()
+        await importFriendships()
         console.log('Import terminé ✅')
     } catch (e) {
         console.error("Erreur d'import :", e)

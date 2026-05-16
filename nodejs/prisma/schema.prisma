@@ -1,6 +1,6 @@
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = "mysql://user:prout@mysql:3306/otta"
 }
 
 generator client {
@@ -35,7 +35,25 @@ model User {
   username      String @unique
   passwordHash  String  @map("password_hash")
   role      Role?     @default(USER)
+
+  // people I added
+  friends       Friendship[] @relation("UserFriends")
+
+  // people who added me
+  friendOf      Friendship[] @relation("FriendOf")
+
   // posts     Post[]
+}
+
+model Friendship {
+  id        Int @id @default(autoincrement())
+  userId    Int
+  friendId  Int
+
+  user      User @relation("UserFriends", fields: [userId], references: [id])
+  friend    User @relation("FriendOf", fields: [friendId], references: [id])
+
+  @@unique([userId, friendId], name: "userId_friendId")
 }
 
 // C PAS UN BLOG OU QUOI

@@ -9,6 +9,8 @@ import heroesRouter from './routes/heroes.ts'
 import authRouter from './routes/auth.ts'
 import usersRouter from './routes/users.ts'
 
+import cors from "cors";
+
 const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, { cors: { origin: "*" } })
@@ -16,6 +18,11 @@ const io = new Server(httpServer, { cors: { origin: "*" } })
 // PLUS BESOIN de mysql.createConnection ici ! 
 // Prisma gère la connexion tout seul dès que tu fais ton premier appel.
 console.log('Prisma Engine prêt ✅')
+
+app.use(cors({
+    origin: "http://localhost:3001",
+    credentials: true,
+}));
 
 app.use(express.json())
 

@@ -4,6 +4,8 @@ import ProfileBanner from "../components/community/ProfileBanner"
 import ProfileStats from "../components/community/ProfileStats"
 import MatchHistory from "../components/community/MatchHistory"
 import ProfileSearchBar from "../components/community/ProfileSearchBar"
+import LoggedInBadge from "../components/login/LoggedInBadge"
+
 
 
 export default function Community()
@@ -15,6 +17,9 @@ export default function Community()
 			
 			<Navbar />
 			<div className="md:py-5" />
+	
+			<LoggedInBadge/>
+	
 
 			<div className="max-w-6xl mx-auto px-4 py-4">
 				<ProfileSearchBar />

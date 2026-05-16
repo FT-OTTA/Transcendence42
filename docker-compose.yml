@@ -71,7 +71,12 @@ services:
     env_file:
       - ./.env
     ports:
-      - "3001:3001" # Why do I need that when the nodejs container doesnt?
+      - "3001:3001"
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
     networks:
       - otta
     restart: unless-stopped

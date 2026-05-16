@@ -5,6 +5,7 @@ import FriendsPanel from "../components/lobby/FriendsPanel";
 import ProfilePanel from "../components/lobby/ProfilePanel";
 import RoomsPanel from "../components/lobby/RoomsPanel";
 import Navbar from "../components/navigation/Navbar";
+import LoggedInBadge from "../components/login/LoggedInBadge";
 import { useState } from "react";
 
 type ActivePanel = "friends" | "chat" | null;
@@ -19,6 +20,8 @@ export default function LobbyPage() {
         
         <Navbar />
         
+        <LoggedInBadge/>
+
           <div className="hidden md:grid h-screen overflow-hidden grid grid-cols-1 md:grid-cols-4 gap-4 pt-16">
 
             <div className="flex flex-col gap-4 h-full min-h-0">

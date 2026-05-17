@@ -103,7 +103,7 @@ async function importHeroes() {
 }
 
 async function importUsers() {
-    const rows = parseCSV('/app/databases/users/users.csv')
+    const rows = parseCSV('/app/databases/users/USERS.csv')
 
     for (const row of rows) {
         await prisma.user.upsert({
@@ -124,7 +124,7 @@ async function importUsers() {
 }
 
 async function importFriendships() {
-    const rows = parseCSV('/app/databases/friends/friends.csv')
+    const rows = parseCSV('/app/databases/friends/FRIENDS.csv')
 
     for (const row of rows) {
         await prisma.friendship.upsert({
@@ -145,6 +145,48 @@ async function importFriendships() {
     }
 }
 
+async function importRooms() {
+    const rows = parseCSV('/app/databases/rooms/ROOMS_DB.csv')
+
+    for (const row of rows) {
+
+        const p1 = await prisma.user.findUnique({
+            where: {
+                username: row['Player1']
+            }
+        })
+
+        if (!p1) {
+            console.log(`User not found: ${row['Player1']}`)
+            continue
+        }
+
+        let p2 = null
+
+        if (row['Player2']) {
+            p2 = await prisma.user.findUnique({
+                where: {
+                    username: row['Player2']
+                }
+            })
+        }
+
+        await prisma.room.create({
+            data: {
+                player1Id: p1.id,
+                player2Id: p2?.id,
+                status: row['Status'] || 'waiting',
+            }
+        })
+
+        console.log(
+            `Room imported: ${p1.username} vs ${
+                p2?.username ?? 'empty'
+            }`
+        )
+    }
+}
+
 async function main() {
     try {
         await importCreatures()
@@ -153,6 +195,7 @@ async function main() {
         await importHeroes()
         await importUsers()
         await importFriendships()
+        await importRooms()
         console.log('Import terminé ✅')
     } catch (e) {
         console.error("Erreur d'import :", e)

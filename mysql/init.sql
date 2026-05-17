@@ -61,3 +61,19 @@ CREATE TABLE if NOT EXISTS friendships (
     FOREIGN KEY (friend_id) REFERENCES users(id),
     UNIQUE KEY unique_pair (user_id, friend_id)
 );
+
+CREATE TABLE if NOT EXISTS rooms (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    
+    player1_id INT NOT NULL,
+    player2_id INT NULL,
+
+    status ENUM('waiting', 'playing', 'finished')
+    DEFAULT 'waiting',
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (player1_id) REFERENCES users(id),
+    FOREIGN KEY (player2_id) REFERENCES users(id)
+
+);

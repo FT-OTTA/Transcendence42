@@ -10,20 +10,84 @@ type Room = {
 
 export default function RoomPanel() {
 
-    const [roomDetails, setroomDetails] = useState(initialRooms);
+    const [roomDetails, setRoomDetails] = useState<Room[]>([]);
+
+    useEffect(() => {
+        fetchRooms();
+    }, []);
+
+    async function fetchRooms() {
+    
+        const res = await fetch(
+            "http://localhost:3000/rooms"
+        );
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.error);
+            return;
+        }
+    
+        const data = await res.json();
+    
+        const formatted = data.map((room: any) => ({
+            id: room.id,
+            p1: room.player1.username,
+            p2: room.player2?.username ?? null,
+        }));
+    
+        setRoomDetails(formatted);
+    }
+
+    async function createRoom() {
+
+        const username =
+            localStorage.getItem("username");
+
+        const res = await fetch(
+            "http://localhost:3000/rooms/create",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json",
+                },
+                body: JSON.stringify({
+                    username
+                }),
+            }
+        );
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.error);
+            return;
+        }
 
 
-    function createRoom() 
-    {
+        fetchRooms();
+    }
 
-        const newMessage = {
-            id: Date.now(),
-            p1: "You",
-            p2: null,
-        };
+    async function joinRoom(roomId: number) {   
 
-        setroomDetails((prev) => [...prev, newMessage]);
+        const username =
+            localStorage.getItem("username");
 
+        await fetch(
+            `http://localhost:3000/rooms/${roomId}/join`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json",
+                },
+                body: JSON.stringify({
+                    username
+                }),
+            }
+        );
+
+        fetchRooms();
     }
 
     return (

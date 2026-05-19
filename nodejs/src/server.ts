@@ -12,10 +12,8 @@ import usersRouter from './routes/users.ts'
 import friendRouter from './routes/friends.ts'
 import roomRouter from './routes/rooms.ts'
 
-import cors from "cors";
-
 const app = express()
-app.use(cors({ origin: '*' }))
+// app.use(cors({ origin: '*' }))
 const httpServer = createServer(app)
 const io = new Server(httpServer, { cors: { origin: "*" } })
 

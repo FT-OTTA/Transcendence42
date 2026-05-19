@@ -187,6 +187,39 @@ async function importRooms() {
     }
 }
 
+async function importMessages() {
+    const rows = parseCSV('/app/databases/messages/MESSAGES_DB.csv')
+
+    for (const row of rows) {
+
+        const  sender = await prisma.user.findUnique({
+            where: {
+                id: Number(row['sender_id'])
+            }
+        })
+
+        if (!sender) {
+            console.log
+                (`Sender: ${row['sender_id']} not found`);
+            continue;
+        }
+
+        await prisma.message.create({
+            data: {
+                senderId: sender.id,
+                roomId: row['room_id']
+                    ? Number(row['room_id'])
+                    : null,
+                content: row['content'],
+            }
+        });
+
+        console.log(
+            `Message imported: ${row['content']})`
+        );
+    }
+}
+
 async function main() {
     try {
         await importCreatures()
@@ -195,6 +228,7 @@ async function main() {
         await importHeroes()
         await importUsers()
         await importFriendships()
+        await importMessages()
         await importRooms()
         console.log('Import terminé ✅')
     } catch (e) {

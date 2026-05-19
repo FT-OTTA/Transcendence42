@@ -1,51 +1,113 @@
+"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Message = {
+    id: number;
     name: string;
     message: string;
     isSelf: boolean;
-}
+};
 
-const initialMessages: Message[] = [
-  { name: "Poman",      message: "Hello", isSelf: false},
-  { name: "El Teddy",   message: "What do you want?", isSelf: false},
-  { name: "You",      message: "No no dont fight guys", isSelf: true},
-  { name: "Big Rat 27", message: "hehehehehe ehehehheeh", isSelf: false},
-];
 
 export default function ChatPanel() {
 
-    const [chatMessages, setChatMessages] = useState(initialMessages);
+    const [chatMessages, setChatMessages] = useState<Message[]>([]);
     const [messageInput, setMessageInput] = useState("");
 
-    function sendMessage() 
+
+    async function fetchMessages() {
+
+        const username =
+            localStorage.getItem("username");
+        
+        const res = await fetch(
+            "http://localhost:3000/messages/global"
+        );
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.error);
+            return;
+        }
+
+        const data = await res.json();
+
+        console.log(data);
+
+        if (!Array.isArray(data)){
+            console.error("Expected array:",data);
+            return;
+        }
+
+        const formatted: Message[] =
+            data.map((msg: any) => ({
+                id: msg.id,
+                name: msg.sender.username,
+                message: msg.content,
+
+                isSelf: msg.sender.username === username,
+            }));
+        
+        setChatMessages(formatted);
+    }
+
+    async function sendMessage() 
     {
         if (!messageInput.trim())
             return;
+        const username = localStorage.getItem("username");
 
-        const newMessage = {
-            name: "You",
-            message: messageInput,
-            isSelf: true,
-        };
+        const res = await fetch(
+            "http://localhost:3000/messages",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"                    
+                },
+                body: JSON.stringify({
+                    username,
+                    content: messageInput,
+                    roomId: null,
+                }),
+            }
+        )
 
-        setChatMessages((prev) => [...prev, newMessage]);
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.error);
+            return;
+        }
 
         setMessageInput("");
+
+        fetchMessages();
     }
+
+    useEffect(() => {
+        fetchMessages();
+    }, []);
 
 
     return (
         <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm h-2/3">
-            <h2 className="text-xl mb-2 text-center py-2">Chat</h2>
+
+            <h2 className="text-xl mb-2 text-center py-2">
+                Chat
+            </h2>
 
             <div className="flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2">
+
                 {chatMessages.map((msg, index) => (
-                    <div 
-                        key={index} 
-                        className={`flex ${msg.isSelf ? "justify-end" : "justify-start"}`}
-                    >                       
+                    <div
+                        key={msg.id}
+                        className={`flex ${
+                            msg.isSelf
+                                ? "justify-end"
+                                : "justify-start"
+                        }`}
+                    >
                         <div
                             className={`
                                 max-w-[75%]
@@ -57,35 +119,36 @@ export default function ChatPanel() {
                                         ? "bg-blue-400/20 border-blue-300 text-blue-100"
                                         : "bg-black/40 border-blue-300/40 text-blue-200"
                                 }
-                                
                             `}
                         >
                             <p className="text-xs opacity-60 mb-1">
                                 {msg.name}
                             </p>
-                            
+
                             <p>
                                 {msg.message}
                             </p>
                         </div>
-
                     </div>
-            ))}
+                ))}
             </div>
 
             <div className="flex gap-2">
-                <input className="w-full p-2 border border-blue-300 bg-transparent text-blue-200 outline-none"
+
+                <input
+                    className="w-full p-2 border border-blue-300 bg-transparent text-blue-200 outline-none"
                     type="text"
                     value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
+                    onChange={(e) =>
+                        setMessageInput(e.target.value)
+                    }
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             sendMessage();
                         }
                     }}
                     placeholder="Type a message..."
-                >
-                </input>
+                />
 
                 <button
                     onClick={sendMessage}
@@ -93,8 +156,8 @@ export default function ChatPanel() {
                 >
                     Send
                 </button>
-            </div>
 
+            </div>
         </div>
     );
 }

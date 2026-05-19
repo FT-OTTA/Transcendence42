@@ -3,6 +3,7 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { initSocket } from './socket/game.ts'
 import { prisma } from '../prisma/prisma.ts'
+import cors from 'cors'
 
 import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
@@ -14,10 +15,11 @@ import roomRouter from './routes/rooms.ts'
 import cors from "cors";
 
 const app = express()
+app.use(cors({ origin: '*' }))
 const httpServer = createServer(app)
 const io = new Server(httpServer, { cors: { origin: "*" } })
 
-// PLUS BESOIN de mysql.createConnection ici ! 
+// PLUS BESOIN de mysql.createConnection ici !
 // Prisma gère la connexion tout seul dès que tu fais ton premier appel.
 console.log('Prisma Engine prêt ✅')
 

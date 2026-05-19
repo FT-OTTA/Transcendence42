@@ -10,84 +10,20 @@ type Room = {
 
 export default function RoomPanel() {
 
-    const [roomDetails, setRoomDetails] = useState<Room[]>([]);
-
-    useEffect(() => {
-        fetchRooms();
-    }, []);
-
-    async function fetchRooms() {
-    
-        const res = await fetch(
-            "http://localhost:3000/rooms"
-        );
-
-        if (!res.ok) {
-            const err = await res.json();
-            alert(err.error);
-            return;
-        }
-    
-        const data = await res.json();
-    
-        const formatted = data.map((room: any) => ({
-            id: room.id,
-            p1: room.player1.username,
-            p2: room.player2?.username ?? null,
-        }));
-    
-        setRoomDetails(formatted);
-    }
-
-    async function createRoom() {
-
-        const username =
-            localStorage.getItem("username");
-
-        const res = await fetch(
-            "http://localhost:3000/rooms/create",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify({
-                    username
-                }),
-            }
-        );
-
-        if (!res.ok) {
-            const err = await res.json();
-            alert(err.error);
-            return;
-        }
+    const [roomDetails, setroomDetails] = useState(initialRooms);
 
 
-        fetchRooms();
-    }
+    function createRoom() 
+    {
 
-    async function joinRoom(roomId: number) {   
+        const newMessage = {
+            id: Date.now(),
+            p1: "You",
+            p2: null,
+        };
 
-        const username =
-            localStorage.getItem("username");
+        setroomDetails((prev) => [...prev, newMessage]);
 
-        await fetch(
-            `http://localhost:3000/rooms/${roomId}/join`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify({
-                    username
-                }),
-            }
-        );
-
-        fetchRooms();
     }
 
     return (
@@ -95,9 +31,9 @@ export default function RoomPanel() {
 
             <h2 className="text-xl mb-2 text-center ">Rooms</h2>
 
-            {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
+            {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas,
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
-            
+
             <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1">
                 {roomDetails.map((room) => (
                     <div
@@ -111,7 +47,7 @@ export default function RoomPanel() {
                         <div>
                             {room.p1}
                         </div>
-                        
+
                         {/* Player 2 (if not there join button) */}
                         <div>
                             {room.p2 ?? (
@@ -130,7 +66,7 @@ export default function RoomPanel() {
             ))}
             </div>
 
-            <button 
+            <button
                 className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
                 onClick={createRoom}
             >

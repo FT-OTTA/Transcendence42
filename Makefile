@@ -4,7 +4,7 @@
 
 ## Lance tous les services
 up:
-	docker compose up -d
+	docker compose up -d --remove-orphans
 
 ## Stoppe tous les services
 down:
@@ -12,7 +12,7 @@ down:
 
 ## Rebuild et relance
 build:
-	docker compose up -d --build
+	docker compose up -d --remove-orphans --build
 
 node:
 	docker compose up -d --build nodejs
@@ -21,6 +21,8 @@ node:
 logs:
 	docker compose logs -f
 
+logstash-logs:
+	docker logs transcendence42-logstash-1 --tail 10 -f
 ## Stoppe et supprime les volumes (reset complet)
 clean:
 	docker compose down -v
@@ -28,7 +30,7 @@ clean:
 fclean: clean
 	docker system prune -af
 
-re: fclean build
+re: down build
 
 ## Génère des certificats SSL auto-signés pour le dev local
 certs:

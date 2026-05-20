@@ -1,27 +1,48 @@
 services:
-#   elasticsearch:
-#     image: elasticsearch:8.11.0
-#     environment:
-#       - discovery.type=single-node
-#       - xpack.security.enabled=false
-#     ports:
-#       - "9200:9200"
+  elasticsearch:
+    # On utilise le registre Elastic officiel qui gère parfaitement l'ARM64
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m" # Très important sur Mac !
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - otta
+    restart: unless-stopped
 
-  # logstash:
-  #   image: logstash:8.11.0
-  #   volumes:
-  #     - ./logstash/pipeline:/usr/share/logstash/pipeline
-  #   ports:
-  #     - "5044:5044"
-  #   depends_on:
-  #     - elasticsearch
-
-  # kibana:
-  #   image: kibana:8.11.0
-  #   ports:
-  #     - "5601:5601"
-  #   depends_on:
-  #     - elasticsearch
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m" # Évite que Logstash sature la VM
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"
+    depends_on:
+      - elasticsearch
+    networks:
+      - otta
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "timeout", "2", "bash", "-c", "</dev/tcp/localhost/5044"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://transcendence42-elasticsearch-1:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - otta
+    restart: unless-stopped
 
   nginx:
     image: nginx:alpine
@@ -37,6 +58,8 @@ services:
     networks:
       - otta
     restart: unless-stopped
+    labels:
+      collect_logs: "true"
 
   nodejs:
     build: ./nodejs
@@ -46,10 +69,13 @@ services:
     depends_on:
         mysql:
             condition: service_healthy
+        logstash:
+            condition: service_healthy
     networks:
       - otta
     restart: unless-stopped
-
+    labels:
+      collect_logs: "true"
   mysql:
     build: ./mysql
     container_name: mysql
@@ -65,6 +91,8 @@ services:
         interval: 5s
         timeout: 5s
         retries: 10
+    labels:
+      collect_logs: "true"
   front:
     build: ./front
     container_name: front
@@ -75,10 +103,14 @@ services:
     networks:
       - otta
     restart: unless-stopped
+    labels:
+      collect_logs: "true"
 
 volumes:
   db_data:
     name: db_data
+  elastic_data: # <-- AJOUTE CECI
+    name: elastic_data
 
 networks:
   otta:

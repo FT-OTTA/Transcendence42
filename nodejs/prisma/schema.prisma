@@ -41,6 +41,7 @@ model User {
 
   createdRooms  Room[] @relation("Player1")
   joinedRooms   Room[] @relation("Player2")
+  messages      Message[]
 }
 
 model Friendship {
@@ -66,8 +67,21 @@ model Room {
 
   player1     User @relation("Player1", fields: [player1Id], references: [id])
   player2     User? @relation("Player2", fields: [player2Id], references: [id])
+  messages    Message[]
 }
 
+model Message {
+  id          Int       @id @default(autoincrement())
+  content     String    @db.Text
+  createdAt   DateTime @default(now())
+
+  senderId  Int
+  sender     User @relation(fields: [senderId], references: [id])
+
+  roomId    Int?
+  room      Room? @relation(fields: [roomId], references: [id])
+
+}
 
 // C PAS UN BLOG OU QUOI
 // model Post {

@@ -19,7 +19,7 @@ router.get("/", async (_, res) => {
             player2: true,
         },
         orderBy: {
-            id: "desc"
+            id: "asc"
         }
     })
 

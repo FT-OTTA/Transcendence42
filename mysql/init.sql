@@ -75,5 +75,23 @@ CREATE TABLE if NOT EXISTS rooms (
 
     FOREIGN KEY (player1_id) REFERENCES users(id),
     FOREIGN KEY (player2_id) REFERENCES users(id)
+);
 
+CREATE TABLE IF NOT EXISTS messages(
+
+    id INT PRIMARY KEY AUTO_INCREMENT,
+
+    sender_id INT NOT NULL,
+
+    room_id INT NULL,
+
+    content TEXT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (sender_id)
+        REFERENCES users(id),
+
+    FOREIGN KEY (room_id)
+        REFERENCES rooms(id)
 );

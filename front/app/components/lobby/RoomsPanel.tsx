@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { requireAuth } from "../login/RequireAuth";
 
 type Room = {
 
@@ -11,10 +12,20 @@ type Room = {
 export default function RoomPanel() {
 
     const [roomDetails, setRoomDetails] = useState<Room[]>([]);
+    const [error, setError] = useState("");
+
 
     useEffect(() => {
         fetchRooms();
     }, []);
+
+    function showError(message: string) {
+        setError(message);
+
+        setTimeout(() => {
+            setError("");
+        }, 3000);
+    }
 
     async function fetchRooms() {
     
@@ -42,8 +53,13 @@ export default function RoomPanel() {
     async function createRoom() {
 
         const username =
-            localStorage.getItem("username");
-
+            await requireAuth();
+        
+        if (!username)
+        {
+            showError("You need to be logged in for this feature.");
+            return;
+        }
         const res = await fetch(
             "http://localhost:3000/rooms/create",
             {
@@ -70,8 +86,13 @@ export default function RoomPanel() {
 
     async function joinRoom(roomId: number) {   
 
-        const username =
-            localStorage.getItem("username");
+        const username = await requireAuth();
+
+        if (!username)
+        {
+            showError("You need to be logged in for this feature.");
+            return;
+        }
 
         await fetch(
             `http://localhost:3000/rooms/${roomId}/join`,
@@ -95,7 +116,12 @@ export default function RoomPanel() {
 
             <h2 className="text-xl mb-2 text-center ">Rooms</h2>
 
-            {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas,
+            {error && (
+                <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
+                    {error}
+                </p>
+            )}
+            {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
 
             <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1">

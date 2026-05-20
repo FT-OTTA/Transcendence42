@@ -11,6 +11,7 @@ import authRouter from './routes/auth.ts'
 import usersRouter from './routes/users.ts'
 import friendRouter from './routes/friends.ts'
 import roomRouter from './routes/rooms.ts'
+import messageRouter from './routes/messages.ts'
 
 const app = express()
 // app.use(cors({ origin: '*' }))
@@ -34,6 +35,7 @@ app.use('/auth', authRouter)
 app.use('/users', usersRouter)
 app.use('/friends', friendRouter)
 app.use('/rooms', roomRouter)
+app.use('/messages', messageRouter)
 
 app.get('/', (req, res) => {
     res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')

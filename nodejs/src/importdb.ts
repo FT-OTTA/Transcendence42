@@ -105,17 +105,18 @@ async function importHeroes() {
 async function importDefaultUsers() {
     const rows = parseCSV('/app/databases/users/DFT_USERS.csv')
     for (const row of rows) {
-        await prisma.users.upsert({
-            where: { id: row['Id'] },
+        await prisma.user.upsert({
+            where: { id: Number(row['id']) },
+            update: { username: row['username'] },
             create: {
-                id: row['Id'],
-                createdAt: row['Created_at'],
+                id: Number(row['id']),
+                createdAt: new Date(),
                 username: row['username'],
                 passwordHash: row['passwordhash'],
                 role: row['role']
             }
         })
-        console.log(`Héros importé : ${row['Class']}`)
+        console.log(`User importé : ${row['username']}`)
     }
 }
 

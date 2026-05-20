@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { requireAuth } from "../login/requireAuth";
+import { requireAuth } from "../login/RequireAuth";
 
 type Room = {
 
@@ -18,6 +18,14 @@ export default function RoomPanel() {
     useEffect(() => {
         fetchRooms();
     }, []);
+
+    function showError(message: string) {
+        setError(message);
+
+        setTimeout(() => {
+            setError("");
+        }, 3000);
+    }
 
     async function fetchRooms() {
     
@@ -48,8 +56,10 @@ export default function RoomPanel() {
             await requireAuth();
         
         if (!username)
+        {
+            showError("You need to be logged in for this feature.");
             return;
-
+        }
         const res = await fetch(
             "http://localhost:3000/rooms/create",
             {
@@ -80,7 +90,8 @@ export default function RoomPanel() {
 
         if (!username)
         {
-            setError("You need to be logged in for this feature.");
+            showError("You need to be logged in for this feature.");
+            return;
         }
 
         await fetch(
@@ -105,6 +116,11 @@ export default function RoomPanel() {
 
             <h2 className="text-xl mb-2 text-center ">Rooms</h2>
 
+            {error && (
+                <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
+                    {error}
+                </p>
+            )}
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
             
@@ -128,11 +144,6 @@ export default function RoomPanel() {
                                 <button
                                     onClick={() => joinRoom(room.id)} 
                                     className="text-green-300 hover:text-green-100">Join</button>
-                                {error && (
-                                    <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
-                                        {error}
-                                    </p>
-                                )}
                             )}
                         </div>
 

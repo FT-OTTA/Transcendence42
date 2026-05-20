@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { requireAuth } from "../login/RequireAuth";
 
 type Message = {
     id: number;
@@ -14,13 +15,21 @@ export default function ChatPanel() {
 
     const [chatMessages, setChatMessages] = useState<Message[]>([]);
     const [messageInput, setMessageInput] = useState("");
+    const [error, setError] = useState("");
 
+
+    function showError(message: string) {
+        setError(message);
+
+        setTimeout(() => {
+            setError("");
+        }, 3000);
+    }
 
     async function fetchMessages() {
 
-        const username =
-            localStorage.getItem("username");
-        
+        const username = localStorage.getItem("username");
+
         const res = await fetch(
             "http://localhost:3000/messages/global"
         );
@@ -56,7 +65,14 @@ export default function ChatPanel() {
     {
         if (!messageInput.trim())
             return;
-        const username = localStorage.getItem("username");
+
+        const username = await requireAuth();
+
+        if (!username)
+        {
+            showError("You must be logged in to use this feature.");
+            return;
+        }
 
         const res = await fetch(
             "http://localhost:3000/messages",
@@ -133,31 +149,39 @@ export default function ChatPanel() {
                 ))}
             </div>
 
-            <div className="flex gap-2">
+            <div>
+                {error && (
+                    <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 mb-2 rounded-sm">
+                        {error}
+                    </p>
+                )}
+                <div className="flex gap-2">
 
-                <input
-                    className="w-full p-2 border border-blue-300 bg-transparent text-blue-200 outline-none"
-                    type="text"
-                    value={messageInput}
-                    onChange={(e) =>
-                        setMessageInput(e.target.value)
-                    }
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            sendMessage();
+                    <input
+                        className="w-full p-2 border border-blue-300 bg-transparent text-blue-200 outline-none"
+                        type="text"
+                        value={messageInput}
+                        onChange={(e) =>
+                            setMessageInput(e.target.value)
                         }
-                    }}
-                    placeholder="Type a message..."
-                />
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                sendMessage();
+                            }
+                        }}
+                        placeholder="Type a message..."
+                    />
 
-                <button
-                    onClick={sendMessage}
-                    className="px-4 border border-blue-300 hover:bg-blue-300 hover:text-black transition"
-                >
-                    Send
-                </button>
+                    <button
+                        onClick={sendMessage}
+                        className="px-4 border border-blue-300 hover:bg-blue-300 hover:text-black transition"
+                    >
+                        Send
+                    </button>
 
+                </div>
             </div>
+
         </div>
     );
 }

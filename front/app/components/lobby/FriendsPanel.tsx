@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { requireAuth } from "../login/requireAuth";
+import { requireAuth } from "../login/RequireAuth";
 
 type FriendStatus = "online" | "offline" | "in room" | "playing";
 

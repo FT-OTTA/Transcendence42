@@ -53,7 +53,7 @@ router.post("/:id/join", async (req, res) => {
     const roomId = Number(req.params.id)
 
     const user = await requireUser(username);
-    
+
     if (!user) {
         return res.status(401).json({
             error: "You must be logged in to join a room"
@@ -72,8 +72,14 @@ router.post("/:id/join", async (req, res) => {
         })
     }
 
+    if (room.player1Id === user.id) {
+        return res.status(403).json({
+            error: "Player already in room"
+        })
+    }
+
     if (room.player2Id) {
-        return res.status(400).json({
+        return res.status(403).json({
             error: "Room already full"
         })
     }

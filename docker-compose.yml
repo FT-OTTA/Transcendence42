@@ -1,12 +1,14 @@
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    env_file:
+      - ./.env
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-    ports:
-      - "9200:9200"
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
     networks:
@@ -15,8 +17,11 @@ services:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.0
+    env_file:
+      - ./.env
     environment:
       - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
     ports:
@@ -33,16 +38,29 @@ services:
       retries: 10
   kibana:
     image: docker.elastic.co/kibana/kibana:8.11.0
+    env_file:
+      - ./.env
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
+      - ELASTICSEARCH_SERVICEACCOUNTTOKEN=${KIBANA_SERVICE_TOKEN}
+      - SERVER_BASEPATH=/kibana
+      - SERVER_REWRITEBASEPATH=true
     depends_on:
       - elasticsearch
     networks:
       - otta
     restart: unless-stopped
 
+  # kibana-setup:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - otta
+  #   restart: "no"
+  #   entrypoint: ["bash", "-c", "sleep 10 && curl -s -X POST -u elastic:$$ELASTIC_PASSWORD http://elasticsearch:9200/_security/service/elastic/kibana/credential/token/kibana_token"]
+  #   env_file:
+  #     - ./.env
   nginx:
     image: nginx:alpine
     container_name: nginx

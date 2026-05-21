@@ -32,6 +32,7 @@ app.use('/cards', cardsRouter)
 app.use('/heroes', heroesRouter)
 app.use('/auth', authRouter)
 app.use('/users', usersRouter)
+app.use('/finduser', findUserRouter)
 app.use('/friends', friendRouter)
 app.use('/rooms', roomRouter)
 

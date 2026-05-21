@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { prisma } from '../../prisma/prisma.ts'
+import { sendLog } from '../logs.ts'
 const router = Router()
 
 const JWT_SECRET = process.env.JWT_SECRET ?? 'changeme'
@@ -39,8 +40,10 @@ router.post('/register', async (req: Request, res: Response) => {
     } catch (error: any) {
         // Gestion spécifique de l'erreur "Unique constraint failed" de Prisma (P2002)
         if (error.code === 'P2002') {
+            sendLog({ action: "User:create", status: "ERROR", error: "username already taken" });
             return res.status(409).json({ error: 'Username déjà pris' })
         }
+        sendLog({ action: "User:create", status: "ERROR", error: "unknwown" });
         res.status(500).json({ error: 'Erreur lors de la création du compte' })
     }
 })

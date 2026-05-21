@@ -1,11 +1,10 @@
 services:
   elasticsearch:
-    # On utilise le registre Elastic officiel qui gère parfaitement l'ARM64
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m" # Très important sur Mac !
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
     ports:
       - "9200:9200"
     volumes:
@@ -17,7 +16,7 @@ services:
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.0
     environment:
-      - "LS_JAVA_OPTS=-Xms256m -Xmx256m" # Évite que Logstash sature la VM
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
     ports:
@@ -99,7 +98,7 @@ services:
     env_file:
       - ./.env
     ports:
-      - "3001:3001" # Why do I need that when the nodejs container doesnt?
+      - "3001:3001"
     networks:
       - otta
     restart: unless-stopped
@@ -109,7 +108,7 @@ services:
 volumes:
   db_data:
     name: db_data
-  elastic_data: # <-- AJOUTE CECI
+  elastic_data:
     name: elastic_data
 
 networks:

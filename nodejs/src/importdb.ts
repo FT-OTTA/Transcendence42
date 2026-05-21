@@ -102,12 +102,134 @@ async function importHeroes() {
     }
 }
 
+async function importUsers() {
+    const rows = parseCSV('/app/databases/users/USERS.csv')
+
+    for (const row of rows) {
+        await prisma.user.upsert({
+            where: { id: parseInt(row['Id']) },
+            update: {
+                username: row['Username'],
+                passwordHash: row['PasswordHash'],
+            },
+            create: {
+                id: parseInt(row['Id']),
+                username: row['Username'],
+                passwordHash: row['PasswordHash'],
+            }
+        })
+
+        console.log(`User importé : ${row['Username']}`)
+    }
+}
+
+async function importFriendships() {
+    const rows = parseCSV('/app/databases/friends/FRIENDS.csv')
+
+    for (const row of rows) {
+        await prisma.friendship.upsert({
+            where: {
+                userId_friendId: {
+                    userId: parseInt(row['UserId']),
+                    friendId: parseInt(row['FriendId']),
+                }
+            },
+            update: {},
+            create: {
+                userId: parseInt(row['UserId']),
+                friendId: parseInt(row['FriendId']),
+            }
+        })
+
+        console.log(`Friendship importée: ${row['UserId']} -> ${row['FriendId']}`)
+    }
+}
+
+async function importRooms() {
+    const rows = parseCSV('/app/databases/rooms/ROOMS_DB.csv')
+
+    for (const row of rows) {
+
+        const p1 = await prisma.user.findUnique({
+            where: {
+                username: row['Player1']
+            }
+        })
+
+        if (!p1) {
+            console.log(`User not found: ${row['Player1']}`)
+            continue
+        }
+
+        let p2 = null
+
+        if (row['Player2']) {
+            p2 = await prisma.user.findUnique({
+                where: {
+                    username: row['Player2']
+                }
+            })
+        }
+
+        await prisma.room.create({
+            data: {
+                player1Id: p1.id,
+                player2Id: p2?.id,
+                status: row['Status'] || 'waiting',
+            }
+        })
+
+        console.log(
+            `Room imported: ${p1.username} vs ${
+                p2?.username ?? 'empty'
+            }`
+        )
+    }
+}
+
+async function importMessages() {
+    const rows = parseCSV('/app/databases/messages/MESSAGES_DB.csv')
+
+    for (const row of rows) {
+
+        const  sender = await prisma.user.findUnique({
+            where: {
+                id: Number(row['sender_id'])
+            }
+        })
+
+        if (!sender) {
+            console.log
+                (`Sender: ${row['sender_id']} not found`);
+            continue;
+        }
+
+        await prisma.message.create({
+            data: {
+                senderId: sender.id,
+                roomId: row['room_id']
+                    ? Number(row['room_id'])
+                    : null,
+                content: row['content'],
+            }
+        });
+
+        console.log(
+            `Message imported: ${row['content']})`
+        );
+    }
+}
+
 async function main() {
     try {
         await importCreatures()
         await importBuildings()
         await importSpells()
         await importHeroes()
+        await importUsers()
+        await importFriendships()
+        await importMessages()
+        await importRooms()
         console.log('Import terminé ✅')
     } catch (e) {
         console.error("Erreur d'import :", e)

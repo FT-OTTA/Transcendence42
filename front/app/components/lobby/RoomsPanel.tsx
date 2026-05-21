@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { requireAuth } from "../login/RequireAuth";
 
 type Room = {
 
@@ -7,37 +8,107 @@ type Room = {
     p2: string | null;
 }
 
-const initialRooms: Room[] = [
-  { id: 1, p1: "Alice", p2: "Bob" },
-  { id: 2, p1: "Poman", p2: "Tonio" },
-  { id: 3, p1: "Alice", p2: "Bob" },
-  { id: 4, p1: "Poman", p2: "Tonio" },
-  { id: 5, p1: "Alice", p2: "Bob" },
-  { id: 6, p1: "Poman", p2: "Tonio" },
-  { id: 7, p1: "Alice", p2: "Bob" },
-  { id: 8, p1: "Poman", p2: "Tonio" },
-  { id: 9, p1: "Teddy", p2: null },
-  { id: 10, p1: "You", p2: null },
-];
-
-
 
 export default function RoomPanel() {
 
-    const [roomDetails, setroomDetails] = useState(initialRooms);
+    const [roomDetails, setRoomDetails] = useState<Room[]>([]);
+    const [error, setError] = useState("");
 
 
-    function createRoom() 
-    {
+    useEffect(() => {
+        fetchRooms();
+    }, []);
 
-        const newMessage = {
-            id: Date.now(),
-            p1: "You",
-            p2: null,
-        };
+    function showError(message: string) {
+        setError(message);
 
-        setroomDetails((prev) => [...prev, newMessage]);
+        setTimeout(() => {
+            setError("");
+        }, 3000);
+    }
 
+    async function fetchRooms() {
+    
+        const res = await fetch(
+            "http://localhost:3000/rooms"
+        );
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.error);
+            return;
+        }
+    
+        const data = await res.json();
+    
+        const formatted = data.map((room: any) => ({
+            id: room.id,
+            p1: room.player1.username,
+            p2: room.player2?.username ?? null,
+        }));
+    
+        setRoomDetails(formatted);
+    }
+
+    async function createRoom() {
+
+        const username =
+            await requireAuth();
+        
+        if (!username)
+        {
+            showError("You need to be logged in for this feature.");
+            return;
+        }
+        const res = await fetch(
+            "http://localhost:3000/rooms/create",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json",
+                },
+                body: JSON.stringify({
+                    username
+                }),
+            }
+        );
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.error);
+            return;
+        }
+
+
+        fetchRooms();
+    }
+
+    async function joinRoom(roomId: number) {   
+
+        const username = await requireAuth();
+
+        if (!username)
+        {
+            showError("You need to be logged in for this feature.");
+            return;
+        }
+
+        await fetch(
+            `http://localhost:3000/rooms/${roomId}/join`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json",
+                },
+                body: JSON.stringify({
+                    username
+                }),
+            }
+        );
+
+        fetchRooms();
     }
 
     return (
@@ -45,9 +116,14 @@ export default function RoomPanel() {
 
             <h2 className="text-xl mb-2 text-center ">Rooms</h2>
 
+            {error && (
+                <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
+                    {error}
+                </p>
+            )}
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
-            
+
             <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1">
                 {roomDetails.map((room) => (
                     <div
@@ -61,11 +137,13 @@ export default function RoomPanel() {
                         <div>
                             {room.p1}
                         </div>
-                        
+
                         {/* Player 2 (if not there join button) */}
                         <div>
                             {room.p2 ?? (
-                                <button className="text-green-300 hover:text-green-100">Join</button>
+                                <button
+                                    onClick={() => joinRoom(room.id)} 
+                                    className="text-green-300 hover:text-green-100">Join</button>
                             )}
                         </div>
 
@@ -78,7 +156,7 @@ export default function RoomPanel() {
             ))}
             </div>
 
-            <button 
+            <button
                 className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
                 onClick={createRoom}
             >

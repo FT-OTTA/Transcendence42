@@ -34,6 +34,8 @@ async function importCreatures() {
                 effect_text: row['Effect (string)'],
                 effect_json_path: row['Effect (json path)'],
                 illustration: row['Illustration'],
+                target_number: parseInt(row['Target Number']),
+                target_type: row['Target Type']
             }
         })
         console.log(`Créature importée : ${row['Name']}`)
@@ -77,6 +79,9 @@ async function importSpells() {
                 effect_text: row['Effect (string)'],
                 effect_json_path: row['Effect (json path)'],
                 illustration: row['Illustration (.png)'],
+                target_number: parseInt(row['Target Number']),
+                target_type: row['Target Type']
+
             }
         })
         console.log(`Sort importé : ${row['Name']}`)
@@ -95,7 +100,8 @@ async function importHeroes() {
                 base_armor: parseInt(row['BaseArmor']),
                 passive_text: row['Description'],
                 passive_json_path: row['PassiveEffect'],
-                illustration: row['Picture']
+                illustration: row['Picture'],
+                deck: row['Deck']
             }
         })
         console.log(`Héros importé : ${row['Class']}`)

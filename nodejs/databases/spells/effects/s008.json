@@ -1,7 +1,7 @@
 {
     "effects": [
         {
-            "effect": "destroy?",
+            "effect": "destroy",
             "targetType": "building"
         }
     ]

@@ -14,6 +14,12 @@ services:
     networks:
       - otta
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:$$ELASTIC_PASSWORD http://localhost:9200/_cluster/health | grep -v '\"status\":\"red\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.0
@@ -27,7 +33,8 @@ services:
     ports:
       - "5044:5044"
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
     networks:
       - otta
     restart: unless-stopped

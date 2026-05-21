@@ -27,7 +27,7 @@ function findById(game: Game, id: number): Hero | Card | undefined {
 }
 
 function resolveRound(session: GameSession): void {
-    if (session.timer !== null)
+    if (session.timer === null)
         session.sockets.forEach(s => s.emit('timeout', {}))
 
     clearTimeout(session.timer!)
@@ -214,16 +214,17 @@ export function initSocket(io: Server): void {
                     target2: target2
                 };
                 playCard(card, fullPayload);
-                session.sockets.forEach((s, id) => {
-                    const perspective = getPlayerPerspective(session.game, id);
-                    s.emit('game_update', { game: perspective });
-                });
             }
             else {
                 const existing = session.submittedCards.get(socket.id) ?? [];
                 existing.push(data);
                 session.submittedCards.set(socket.id, existing);
+                card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
+
             }
+            const perspective = getPlayerPerspective(session.game, playerIndex);
+            socket.emit('game_update', { game: perspective });
+
         })
 
         socket.on('end_turn', () => {
@@ -234,8 +235,14 @@ export function initSocket(io: Server): void {
 
             session.readyPlayers.add(socket.id)
 
-            if (session.readyPlayers.size === session.sockets.length)
+            if (session.readyPlayers.size === session.sockets.length){
                 resolveRound(session)
+                session.sockets.forEach((s, id) => {
+                    const perspective = getPlayerPerspective(session.game, id);
+                    s.emit('game_update', { game: perspective });
+                });
+
+            }
         })
 
         socket.on('disconnect', () => {

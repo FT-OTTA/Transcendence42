@@ -1,7 +1,8 @@
 {
     "effects": [
         {
-            "effect": "swap"
+            "effect": "swap",
+            "effectTarget": "self"
         }
     ]   
 }

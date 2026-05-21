@@ -53,5 +53,5 @@ To setup Kibana token for access to Elasticsearch, use a temporary container
   #     - ./.env
 
 paste this in the docker compose, then
-docker compose up kibana-setup --build && docker logs transcendence42-kibana-setup
+docker compose up kibana-setup --build && docker logs transcendence42-kibana-setup-1
 get the token and put it in .env

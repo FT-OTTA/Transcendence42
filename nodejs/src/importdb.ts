@@ -102,31 +102,12 @@ async function importHeroes() {
     }
 }
 
-async function importDefaultUsers() {
-    const rows = parseCSV('/app/databases/users/DFT_USERS.csv')
-    for (const row of rows) {
-        await prisma.user.upsert({
-            where: { id: Number(row['id']) },
-            update: { username: row['username'] },
-            create: {
-                id: Number(row['id']),
-                createdAt: new Date(),
-                username: row['username'],
-                passwordHash: row['passwordhash'],
-                role: row['role']
-            }
-        })
-        console.log(`User importé : ${row['username']}`)
-    }
-}
-
 async function main() {
     try {
         await importCreatures()
         await importBuildings()
         await importSpells()
         await importHeroes()
-        await importDefaultUsers()
         console.log('Import terminé ✅')
     } catch (e) {
         console.error("Erreur d'import :", e)

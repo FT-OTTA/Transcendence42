@@ -1,16 +1,19 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
 
 const searchBar = clsx
 (
-	"pt-3 py-2 items-center",
-	"flex flex-col md:flex-row"
+	"flex items-center justify-center",
+	"gap-2 pt-3 py-2",
 )
 
 const searchInput = clsx
 (
 	"rounded-xl focus:outline-none",
-	"bg-sky-900/10 w-3/4 md:w-sm px-3 mx-auto", 
+	"bg-sky-900/10 w-48 md:w-96 lg:w-128 md:w-sm px-3", 
 	"border focus:border-sky-600/70 border-sky-600/20 backdrop-blur-sm",
 	"text-md md:text-xl text-sky-200/70",
 	"placeholder:text-sky-200/30 text-center",
@@ -27,7 +30,14 @@ type SearchBarProps = {
 export default function ProfileSearchBar()
 {
 	const [search, setSearch] = useState("");
-	
+	const router = useRouter();
+
+	const handleSearch = () => {
+		if (!search.trim())
+			return;
+		router.push(`/community/${search.trim()}`);
+	};
+
 	return (
 		<section>
 			<div className={ searchBar }>
@@ -36,6 +46,11 @@ export default function ProfileSearchBar()
 					onChange={(e) => setSearch(e.target.value)
 					}
 					placeholder="Search player..."
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							handleSearch();
+						}
+					}}
 					/>
 			</div>
 		</section>

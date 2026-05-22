@@ -65,7 +65,7 @@ function resolveRound(session: GameSession): void {
     session.submittedCards.clear()
     session.readyPlayers.clear()
     session.game.turnNumber += 1
-
+    console.log("Tour actuel avant check :", session.game.turnNumber);
     if (session.game.turnNumber > 8) {
         checkVictory(session.game)
         session.sockets.forEach(s => s.emit('game_over', { game: session.game }))
@@ -78,9 +78,11 @@ function resolveRound(session: GameSession): void {
 }
 
 function launchGame(session: GameSession): void {
+    console.log("Lancement de game pour sockets", session.sockets.map(s => s.id));
     startTurn(session.game)
     session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
     session.sockets.forEach((s, id) => {
+        console.log(`Tentative d'émission 'game_start' vers ${s.id}`);
         s.emit('game_start', { 
             game: getPlayerPerspective(session.game, id),
             playerIndex: id  // ✅
@@ -210,7 +212,6 @@ export function initSocket(io: Server): void {
             if (waitingPlayers.length === 2) {
                 const players = [...waitingPlayers] // Copie pour éviter les effets de bord
                 waitingPlayers = [] // On vide tout de suite pour les suivants
-
         // 2. On attend la création de la game (DB + Passifs)
                 try {
                     const gameInstance = await instantiateGame(players)
@@ -222,7 +223,6 @@ export function initSocket(io: Server): void {
                         readyPlayers: new Set<string>(),
                         timer: null
                     }
-
                     sessions.push(newSession)
                     launchGame(newSession)
                 } catch (error) {
@@ -230,6 +230,7 @@ export function initSocket(io: Server): void {
                     socket.emit('error', { message: "Impossible de charger les données du héros" })
                 }
             }
+
         })
 
         socket.on('play_card', (data) => {

@@ -25,6 +25,7 @@ export type Card = {
     baseEndurance: number;
     currEndurance: number;
     cardName: string;
+    effectText: string;
     fullPicPath: string;
     smallPicPath: string;
     cardBackPath: string;

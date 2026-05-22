@@ -7,11 +7,12 @@ interface CardSlotProps {
   id: string;
   isHand?: boolean;
   isOpponentSlot?: boolean;
-  card?: Card;
-  onClick?: (card: Card | null) => void
+  showEffectText?: boolean;
+  card?: Card | null;
+  onClick?: (card: Card | null | undefined) => void
 }
 
-export default function CardSlot({ id, isHand = false, isOpponentSlot = false, card, onClick }: CardSlotProps) {
+export default function CardSlot({ id, isHand = false, isOpponentSlot = false, showEffectText = false, card, onClick }: CardSlotProps) {
   return (
     <div
       id={id}
@@ -25,23 +26,6 @@ export default function CardSlot({ id, isHand = false, isOpponentSlot = false, c
         ${isOpponentSlot ? 'opacity-80' : ''}
         flex flex-col items-center justify-center text-blue-300/40 text-xs
       `}
-      onDragStart={(e) => {
-        if (isHand && card) {
-          e.dataTransfer.effectAllowed = "move";
-          e.dataTransfer.setData("cardSlotId", id);
-          e.dataTransfer.setData("cardId", card.idInGame.toString());
-        }
-      }}
-      onDragOver={(e) => {
-        if (onDragOver) {
-          e.preventDefault();
-          onDragOver(e);
-        }
-      }}
-      onDrop={(e) => {
-        e.preventDefault();
-        if (onDrop) onDrop(e);
-      }}
     >
       {card ? (
         <>
@@ -50,6 +34,9 @@ export default function CardSlot({ id, isHand = false, isOpponentSlot = false, c
           <span className="text-[10px] text-yellow-200 mt-1">{card.runeCost} R</span>
           {card.currForce !== null && card.currEndurance !== null ? (
             <span className="text-[10px] text-red-200 mt-0.5">{card.currForce}/{card.currEndurance}</span>
+          ) : null}
+          {showEffectText && card.effectText ? (
+            <p className="text-[8px] text-slate-200 mt-1 leading-tight text-center line-clamp-2">{card.effectText}</p>
           ) : null}
         </>
       ) : (

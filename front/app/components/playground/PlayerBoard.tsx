@@ -21,12 +21,6 @@ export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
             key={slot}
             id={slot}
             card={cards[index] ?? undefined}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              const cardId = e.dataTransfer.getData("cardId");
-              if (!cardId) return;
-              if (onPlay) onPlay(parseInt(cardId, 10), index, false);
-            }}
           />
         ))}
       </div>

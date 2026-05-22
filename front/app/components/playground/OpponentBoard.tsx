@@ -22,12 +22,6 @@ export default function OpponentBoard({ cards, onPlay }: OpponentBoardProps) {
             id={slot}
             isOpponentSlot={true}
             card={cards[index] ?? undefined}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              const cardId = e.dataTransfer.getData("cardId");
-              if (!cardId) return;
-              if (onPlay) onPlay(cardId, index, true);
-            }}
           />
         ))}
       </div>

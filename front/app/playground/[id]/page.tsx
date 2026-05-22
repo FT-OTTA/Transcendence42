@@ -9,12 +9,12 @@ import PlayerHand from '../../components/playground/PlayerHand';
 import GameStats from '../../components/playground/GameStats';
 import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
-    import { useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import LargeCardView from '@/app/components/playground/LargeCardView';
 
-    export default function PlaygroundPage() {
-      const { id } = useParams();
-      console.log("Game ID from URL:", id);
+export default function PlaygroundPage() {
+  const { id } = useParams();
+  console.log("Game ID from URL:", id);
   const [selectedHero, setSelectedHero] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
 

@@ -148,6 +148,7 @@ async function buildHero(heroId: string): Promise<Hero> {
             idInGame: Math.floor(Math.random() * 100000),
             idInCollection: parseInt(c.id),
             cardName: c.name,
+            effectText: c.effect_text ?? '',
             type: c.type as CardType,
             class: c.class as CardClass,
             runeCost: c.rune_cost,

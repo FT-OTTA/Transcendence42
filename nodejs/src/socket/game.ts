@@ -1,8 +1,8 @@
 import { Server, Socket } from 'socket.io'
 import type { Hero } from '../types/hero.ts'
-import type { Card, CardClass } from '../types/card.ts'
+import type { Card, CardClass, CardType, CreatureState } from '../types/card.ts'
 import type { Game } from '../types/gamesession.ts'
-import type { Effect, EffectType, EffectTarget } from '../types/effects.ts'
+import type { Effect, EffectType, EffectTarget, EffectTime } from '../types/effects.ts'
 import type { BfZone } from '../types/zones.ts'
 import type { GameSession, WaitingPlayer } from '../types/gamesession.ts'
 import { startTurn, checkVictory, resolveCombat, resolveBuildings, checkBoardState, playCard, resolveEffect } from '../engine/engine.ts'
@@ -80,8 +80,12 @@ function resolveRound(session: GameSession): void {
 function launchGame(session: GameSession): void {
     startTurn(session.game)
     session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
-    session.sockets.forEach(s => s.emit('game_start', { game: session.game }))
-}
+    session.sockets.forEach((s, id) => {
+        s.emit('game_start', { 
+            game: getPlayerPerspective(session.game, id),
+            playerIndex: id  // ✅
+        })
+})}
 
 async function buildHero(heroId: string): Promise<Hero> {
 
@@ -120,7 +124,41 @@ async function buildHero(heroId: string): Promise<Hero> {
             console.error(`Erreur passif ${heroId}:`, err);
         }
     }
+    // Parsing du deck
+    let library: Card[] = []
 
+    if (hero.deck) {
+        const cardIds: string[] = JSON.parse(hero.deck)
+        const cards = await prisma.card.findMany({
+            where: { id: { in: cardIds } }
+        })
+        
+        console.log('hero.deck:', hero.deck)
+        console.log('cardIds:', cardIds)
+        console.log('cards found:', cards.length)
+
+        library = cards.map((c: typeof cards[0]): Card => ({
+            kind: "card",
+            idInGame: Math.floor(Math.random() * 100000),
+            idInCollection: parseInt(c.id),
+            cardName: c.name,
+            type: c.type as CardType,
+            class: c.class as CardClass,
+            runeCost: c.rune_cost,
+            baseForce: c.force ?? 0,
+            currForce: c.force ?? 0,
+            baseEndurance: c.endurance ?? 0,
+            currEndurance: c.endurance ?? 0,
+            effects: [],
+            zone: null as any,
+            owner: null as any,
+            timing: "normal" as EffectTime,
+            state: "alive" as CreatureState,
+            fullPicPath: c.illustration ?? '',
+            smallPicPath: c.illustration ?? '',
+            cardBackPath: ''
+        }))
+    }
     return {
         kind: "hero",
         idInGame: Math.floor(Math.random() * 100000),
@@ -130,7 +168,7 @@ async function buildHero(heroId: string): Promise<Hero> {
         dmgDealt: 0,
         curRunes: 0,
         battlefield: {},
-        library: [],
+        library: library,
         graveyard: [],
         hand: [],
         heroPicPath: hero.illustration

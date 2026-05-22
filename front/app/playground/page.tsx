@@ -9,6 +9,7 @@ import PlayerBoard from '../components/playground/PlayerBoard';
 import PlayerHand from '../components/playground/PlayerHand';
 import GameStats from '../components/playground/GameStats';
 import type { PlaygroundCard } from '../components/playground/types';
+import { io, Socket } from 'socket.io-client';
 
 function takeEight(cards: PlaygroundCard[], start: number): PlaygroundCard[] {
   return cards.slice(start, start + 8);
@@ -27,6 +28,9 @@ function shuffleCards<T>(arr: T[]): T[] {
 }
 
 export default function PlaygroundPage() {
+  const socket = io('http://localhost:3000');
+  const [game, setGame] = useState<any>(null);
+
   const [cards, setCards] = useState<PlaygroundCard[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -36,6 +40,59 @@ export default function PlaygroundPage() {
   const [playerSlots, setPlayerSlots] = useState<(PlaygroundCard | null)[]>(Array(8).fill(null));
   const [opponentSlots, setOpponentSlots] = useState<(PlaygroundCard | null)[]>(Array(8).fill(null));
   const [runes, setRunes] = useState(100);
+
+  useEffect(() => {
+    socket.emit('join_game', {
+      heroId: 'h001' // à remplacer par le vrai héros choisi
+    })
+
+    socket.on('game_start', (data) => {
+        console.log('Game started:', data.game)
+        setGame(data.game)
+        const me = data.game.players[data.playerIndex]
+        const opponent = data.game.players[1 - data.playerIndex]
+        setHand(me.hand)
+        setRunes(me.curRunes)
+        setPlayerSlots(Object.values(me.battlefield))
+        setOpponentSlots(Object.values(opponent.battlefield))
+        setIsLoading(false)
+        console.log('MA MAIN:', me.hand)
+    })
+
+    socket.on('game_update', (data) => {
+        console.log('Game update:', data.game)
+        setGame(data.game)
+        const me = data.game.players[0]
+        setHand(me.hand)
+        setRunes(me.curRunes)
+        setPlayerSlots(Object.values(me.battlefield))
+        const opponent = data.game.players[1]
+        setOpponentSlots(Object.values(opponent.battlefield))
+    })
+
+    socket.on('turn_start', (data) => {
+        console.log('Turn start:', data.game)
+        setGame(data.game)
+        const me = data.game.players[0]
+        setHand(me.hand)
+        setRunes(me.curRunes)
+        setPlayerSlots(Object.values(me.battlefield))
+        const opponent = data.game.players[1]
+        setOpponentSlots(Object.values(opponent.battlefield))
+    })
+
+    socket.on('game_over', (data) => {
+      console.log('Game over:', data.game)
+    })
+
+    socket.on('timeout', () => {
+      console.log('Timeout !')
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
 
   useEffect(() => {
     async function loadCards() {

@@ -19,7 +19,7 @@ export default function StartButton({setIsLogin}: StartButtonProps)
 {
 	return (
 	<button className={ startButton } onClick={() => setIsLogin(true)}>
-	  - get biffled -
+	  - get started -
 	</button>
 	);
 };

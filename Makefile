@@ -16,7 +16,8 @@ build:
 
 backend:
 	docker restart nodejs
-
+front:
+	docker restart front
 ## Affiche les logs en live
 logs:
 	docker compose logs -f

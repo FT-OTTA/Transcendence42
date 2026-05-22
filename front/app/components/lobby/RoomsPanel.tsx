@@ -28,7 +28,7 @@ export default function RoomPanel() {
     }
 
     async function fetchRooms() {
-    
+
         const res = await fetch(
             "http://localhost:3000/rooms"
         );
@@ -38,15 +38,15 @@ export default function RoomPanel() {
             alert(err.error);
             return;
         }
-    
+
         const data = await res.json();
-    
+
         const formatted = data.map((room: any) => ({
             id: room.id,
             p1: room.player1.username,
             p2: room.player2?.username ?? null,
         }));
-    
+
         setRoomDetails(formatted);
     }
 
@@ -54,7 +54,7 @@ export default function RoomPanel() {
 
         const username =
             await requireAuth();
-        
+
         if (!username)
         {
             showError("You need to be logged in for this feature.");
@@ -78,13 +78,18 @@ export default function RoomPanel() {
             const err = await res.json();
             alert(err.error);
             return;
+        } else {
+            const data = await res.json();
+            console.log("Room created with ID:", data.id);
+            let href = `/playground/${data.id}`;
+            window.location.href = href;
         }
 
 
         fetchRooms();
     }
 
-    async function joinRoom(roomId: number) {   
+    async function joinRoom(roomId: number) {
 
         const username = await requireAuth();
 
@@ -94,7 +99,7 @@ export default function RoomPanel() {
             return;
         }
 
-        await fetch(
+        const res = await fetch(
             `http://localhost:3000/rooms/${roomId}/join`,
             {
                 method: "POST",
@@ -107,6 +112,10 @@ export default function RoomPanel() {
                 }),
             }
         );
+        const data = await res.json();
+        console.log("Room created with ID:", data.id);
+        let href = `/playground/${data.id}`;
+        window.location.href = href;
 
         fetchRooms();
     }
@@ -121,7 +130,7 @@ export default function RoomPanel() {
                     {error}
                 </p>
             )}
-            {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
+            {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas,
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
 
             <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1">
@@ -142,7 +151,7 @@ export default function RoomPanel() {
                         <div>
                             {room.p2 ?? (
                                 <button
-                                    onClick={() => joinRoom(room.id)} 
+                                    onClick={() => joinRoom(room.id)}
                                     className="text-green-300 hover:text-green-100">Join</button>
                             )}
                         </div>

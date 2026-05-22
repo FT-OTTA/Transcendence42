@@ -3,31 +3,18 @@
 
 
 import { useEffect, useMemo, useState } from 'react';
-import Navbar from '../components/navigation/Navbar';
-import OpponentBoard from '../components/playground/OpponentBoard';
-import PlayerBoard from '../components/playground/PlayerBoard';
-import PlayerHand from '../components/playground/PlayerHand';
-import GameStats from '../components/playground/GameStats';
+import Navbar from '../../components/navigation/Navbar';
+import OpponentBoard from '../../components/playground/OpponentBoard';
+import PlayerBoard from '../../components/playground/PlayerBoard';
+import PlayerHand from '../../components/playground/PlayerHand';
+import GameStats from '../../components/playground/GameStats';
 import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
-
-function takeEight(cards: Card[], start: number): Card[] {
-  return cards.slice(start, start + 8);
-}
-
-// For testing, that's done in backend normally
-function shuffleCards<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const tmp = a[i];
-    a[i] = a[j];
-    a[j] = tmp;
-  }
-  return a;
-}
+import { useParams } from 'next/navigation';
 
 export default function PlaygroundPage() {
+  const { id } = useParams();
+  console.log("Game ID from URL:", id);
   const socket = io('http://localhost:3000');
   const [game, setGame] = useState<any>(null);
 

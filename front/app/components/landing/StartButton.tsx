@@ -33,7 +33,7 @@ export default function StartButton({setIsLogin}: StartButtonProps)
     }
   };
 	return (
-	<button className={ startButton } onClick={() => setIsLogin(true)}>
+	<button className={ startButton } onClick={() => HandleClick()}>
 	  - get started -
 	</button>
 	);

@@ -1,5 +1,8 @@
 import clsx from "clsx";
 import { cinzel } from "../../fonts"
+import { requireAuth } from "../login/requireAuth";
+import { useRouter } from "next/navigation";
+
 
 const startButton = clsx
 (
@@ -17,6 +20,18 @@ type StartButtonProps = {
 
 export default function StartButton({setIsLogin}: StartButtonProps)
 {
+
+  const router = useRouter();
+
+  async function HandleClick() {
+    const user = await requireAuth();
+    if (user) {
+      router.push("/lobby");
+    }
+    else {
+      setIsLogin(true);
+    }
+  };
 	return (
 	<button className={ startButton } onClick={() => setIsLogin(true)}>
 	  - get started -

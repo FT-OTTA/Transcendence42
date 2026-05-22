@@ -8,8 +8,9 @@ export async function requireAuth() {
 
     try {
         const res = await fetch(
-            `http://localhost:3000/user/${username}`);
-        
+            `http://localhost:3000/users/${username}`);
+
+        console.log(res);
         if (!res.ok)
         {
             localStorage.removeItem("token");

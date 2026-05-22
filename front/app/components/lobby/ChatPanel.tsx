@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
+import { customScrollBar } from "../scrollBar";
 
 type Message = {
     id: number;
@@ -113,7 +114,7 @@ export default function ChatPanel() {
                 Chat
             </h2>
 
-            <div className="flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2">
+            <div className={`${customScrollBar} flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2`}>
 
                 {chatMessages.map((msg, index) => (
                     <div

@@ -24,7 +24,7 @@ const [activePanel, setActivePanel] = useState<ActivePanel>(null);
 
         <LoggedInBadge/>
 
-          <div className="hidden md:grid h-screen overflow-hidden grid grid-cols-1 md:grid-cols-4 gap-4 pt-16">
+          <div className="hidden md:grid flex flex-col h-screen overflow-hidden min-h-0 overflow-hidden grid-cols-1 md:grid-cols-4 gap-4 pt-4">
 
             <div className="flex flex-col gap-4 h-full min-h-0">
                 <ProfilePanel />

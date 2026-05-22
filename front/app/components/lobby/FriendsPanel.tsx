@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
+import { customScrollBar } from "../scrollBar";
 
 type FriendStatus = "online" | "offline" | "in room" | "playing";
 
@@ -141,7 +142,7 @@ export default function FriendsPanel() {
                     + Add a friend
                 </button>
 
-                <div className="flex flex-col gap-2 flex-1 py-4 overflow-y-auto pr-1">
+                <div className={`${customScrollBar} flex flex-col gap-2 flex-1 py-4 overflow-y-auto pr-1`}>
 
                     {friends.length === 0 && (
                         <p className="text-center text-blue-200/50 text-sm mt-4">

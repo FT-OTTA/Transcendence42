@@ -1,4 +1,14 @@
 services:
+  # kibana-setup:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - otta
+  #   restart: "no"
+  #   entrypoint: ["bash", "-c", "sleep 10 && curl -s -X POST -u elastic:$$ELASTIC_PASSWORD http://elasticsearch:9200/_security/service/elastic/kibana/credential/token/kibana_token"]
+  #   env_file:
+  #     - ./.env
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     env_file:
@@ -58,16 +68,6 @@ services:
       - otta
     restart: unless-stopped
 
-  kibana-setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    depends_on:
-      - elasticsearch
-    networks:
-      - otta
-    restart: "no"
-    entrypoint: ["bash", "-c", "sleep 10 && curl -s -X POST -u elastic:$$ELASTIC_PASSWORD http://elasticsearch:9200/_security/service/elastic/kibana/credential/token/kibana_token"]
-    env_file:
-      - ./.env
   nginx:
     image: nginx:alpine
     container_name: nginx

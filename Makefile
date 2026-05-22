@@ -22,7 +22,11 @@ logs:
 	docker compose logs -f
 
 logstash-logs:
-	docker logs transcendence42-logstash-1 --tail 10 -f
+	docker logs transcendence42-logstash-1
+kibana-logs:
+	docker logs transcendence42-kibana-1
+elastic-logs:
+	docker logs transcendence42-elasticsearch-1
 ## Stoppe et supprime les volumes (reset complet)
 clean:
 	docker compose down -v

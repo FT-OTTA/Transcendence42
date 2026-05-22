@@ -10,15 +10,17 @@ import PlayerHand from '../../components/playground/PlayerHand';
 import GameStats from '../../components/playground/GameStats';
 import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
-import { useParams } from 'next/navigation';
+    import { useParams } from 'next/navigation';
+import LargeCardView from '@/app/components/playground/LargeCardView';
 
-export default function PlaygroundPage() {
-  const { id } = useParams();
-  console.log("Game ID from URL:", id);
+    export default function PlaygroundPage() {
+      const { id } = useParams();
+      console.log("Game ID from URL:", id);
   const socket = io('http://localhost:3000');
   const [game, setGame] = useState<any>(null);
 
   const [cards, setCards] = useState<Card[]>([]);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -144,21 +146,22 @@ export default function PlaygroundPage() {
 
       <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
         <div className="col-span-2 flex flex-col gap-4 min-h-0">
-          {/* <OpponentBoard cards={opponentBoardCards} onPlay={playToSlot} />
-          <PlayerBoard cards={playerBoardCards} onPlay={playToSlot} /> */}
-          <PlayerHand cards={playerHandCards} />
+          <OpponentBoard cards={opponentBoardCards} />
+          <PlayerBoard cards={playerBoardCards} />
+          <PlayerHand cards={playerHandCards} onClick={setSelectedCard} />
         </div>
-        <div className="max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
           <GameStats handCount={hand.filter(Boolean).length} loadedCards={cards.length} runes={runes} />
+          <LargeCardView card={selectedCard} />
         </div>
       </div>
 
 	  {/* Mobile Layout, stats to bottom */}
 	  {/*Maybe enforce landscape mode and make a cleaner layout */}
       <div className="md:hidden pt-16 flex flex-col gap-4 pb-4">
-        {/* <OpponentBoard cards={opponentBoardCards} onPlay={playToSlot} />
-        <PlayerBoard cards={playerBoardCards} onPlay={playToSlot} /> */}
-        <PlayerHand cards={playerHandCards} />
+        <OpponentBoard cards={opponentBoardCards} onPlay={playToSlot} />
+        <PlayerBoard cards={playerBoardCards} onPlay={playToSlot} />
+        <PlayerHand cards={playerHandCards} onClick={setSelectedCard} />
         <GameStats handCount={hand.filter(Boolean).length} loadedCards={cards.length} runes={runes} />
       </div>
     </main>

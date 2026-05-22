@@ -8,15 +8,14 @@ interface CardSlotProps {
   isHand?: boolean;
   isOpponentSlot?: boolean;
   card?: Card;
-  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
-  onDragOver?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onClick?: (card: Card | null) => void
 }
 
-export default function CardSlot({ id, isHand = false, isOpponentSlot = false, card, onDrop, onDragOver }: CardSlotProps) {
+export default function CardSlot({ id, isHand = false, isOpponentSlot = false, card, onClick }: CardSlotProps) {
   return (
     <div
       id={id}
-      draggable={isHand && Boolean(card)}
+      onClick={() => onClick?.(card)}
       className={`
         aspect-square rounded border transition-all cursor-pointer p-1
         ${isHand

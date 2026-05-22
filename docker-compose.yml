@@ -137,6 +137,9 @@ services:
     restart: unless-stopped
     labels:
       collect_logs: "true"
+    volumes:
+      - ./front:/app
+      - /app/node_modules  # protège node_modules
 
 volumes:
   db_data:

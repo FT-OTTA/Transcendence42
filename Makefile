@@ -1,6 +1,6 @@
 # TCG Dev Edition — Makefile
 
-.PHONY: up down build logs clean certs fclean re
+.PHONY: up down build logs clean certs fclean re backend front
 
 ## Lance tous les services
 up:
@@ -16,9 +16,6 @@ build:
 
 backend:
 	docker restart nodejs
-
-front:
-	docker compose down front && docker compose up -d front
 
 ## Affiche les logs en live
 logs:

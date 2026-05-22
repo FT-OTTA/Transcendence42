@@ -20,10 +20,7 @@ function parseCSV(filePath: string): Record<string, string>[] {
 async function importCreatures() {
     const rows = parseCSV('/app/databases/creatures/CREATURE_DB.csv')
     for (const row of rows) {
-        await prisma.card.upsert({
-            where: { id: row['CollectionID'] },
-            update: { name: row['Name'] }, // Si elle existe, on met à jour le nom
-            create: {
+        const data = {
                 id: row['CollectionID'],
                 name: row['Name'],
                 type: 'creature',
@@ -37,6 +34,10 @@ async function importCreatures() {
                 target_number: parseInt(row['Target Number']),
                 target_type: row['Target Type']
             }
+        await prisma.card.upsert({
+            where: { id: row['CollectionID'] },
+            update: data, // Si elle existe, on met à jour tout
+            create: data
         })
         console.log(`Créature importée : ${row['Name']}`)
     }
@@ -45,10 +46,7 @@ async function importCreatures() {
 async function importBuildings() {
     const rows = parseCSV('/app/databases/buildings/BUILDINGS_DB.csv')
     for (const row of rows) {
-        await prisma.card.upsert({
-            where: { id: row['CollectionID'] },
-            update: { name: row['Name'] },
-            create: {
+        const data = {
                 id: row['CollectionID'],
                 name: row['Name'],
                 type: 'building',
@@ -59,6 +57,10 @@ async function importBuildings() {
                 effect_json_path: row['Effect (json path)'],
                 illustration: row['Illustration'],
             }
+        await prisma.card.upsert({
+            where: { id: row['CollectionID'] },
+            update: data,
+            create: data
         })
         console.log(`Bâtiment importé : ${row['Name']}`)
     }
@@ -67,10 +69,7 @@ async function importBuildings() {
 async function importSpells() {
     const rows = parseCSV('/app/databases/spells/SPELLS_DB.csv')
     for (const row of rows) {
-        await prisma.card.upsert({
-            where: { id: row['CollectionID'] },
-            update: { name: row['Name'] },
-            create: {
+        const data = {
                 id: row['CollectionID'],
                 name: row['Name'],
                 type: 'spell',
@@ -83,6 +82,10 @@ async function importSpells() {
                 target_type: row['Target Type']
 
             }
+        await prisma.card.upsert({
+            where: { id: row['CollectionID'] },
+            update: data,
+            create: data
         })
         console.log(`Sort importé : ${row['Name']}`)
     }
@@ -91,10 +94,7 @@ async function importSpells() {
 async function importHeroes() {
     const rows = parseCSV('/app/databases/heroes/HERO_DB.csv')
     for (const row of rows) {
-        await prisma.hero.upsert({
-            where: { id: row['Id'] },
-            update: { name: row['Class'] },
-            create: {
+        const data = {
                 id: row['Id'],
                 name: row['Class'],
                 base_armor: parseInt(row['BaseArmor']),
@@ -103,6 +103,10 @@ async function importHeroes() {
                 illustration: row['Picture'],
                 deck: row['Deck']
             }
+        await prisma.hero.upsert({
+            where: { id: row['Id'] },
+            update: data,
+            create: data
         })
         console.log(`Héros importé : ${row['Class']}`)
     }

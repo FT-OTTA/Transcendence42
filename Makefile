@@ -14,8 +14,8 @@ down:
 build:
 	docker compose up -d --remove-orphans --build
 
-node:
-	docker compose up -d --build nodejs
+backend:
+	docker restart nodejs
 
 ## Affiche les logs en live
 logs:

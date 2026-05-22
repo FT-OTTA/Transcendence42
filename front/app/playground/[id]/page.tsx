@@ -52,7 +52,7 @@ import LargeCardView from '@/app/components/playground/LargeCardView';
     newSocket.on('game_start', (data) => {
         console.log('REÇU GAME START:', data);
         myPlayerIndexRef.current = data.playerIndex; // On sauvegarde l'index
-        
+
         const me = data.game.players[data.playerIndex];
         const opponent = data.game.players[1 - data.playerIndex];
 
@@ -103,12 +103,13 @@ return (
                 <PlayerBoard cards={playerSlots} onPlay={() => {}} />
                 <PlayerHand cards={playerHandCards} onClick={setSelectedCard}/>
               </div>
-              <div className="max-h-[calc(100vh-6rem)] overflow-y-auto">
-                <GameStats 
-                  handCount={hand.filter(Boolean).length} 
-                  loadedCards={0} 
-                  runes={runes} 
+              <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
+                <GameStats
+                  handCount={hand.filter(Boolean).length}
+                  loadedCards={0}
+                  runes={runes}
                 />
+                <LargeCardView card={selectedCard} />
               </div>
             </div>
           )}

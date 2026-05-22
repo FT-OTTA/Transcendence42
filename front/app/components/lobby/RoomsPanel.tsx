@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
+import { customScrollBar } from "../scrollBar";
+
 
 type Room = {
 
@@ -112,7 +114,7 @@ export default function RoomPanel() {
     }
 
     return (
-        <div className="h-full border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col gap-3">
+        <div className="h-full min-h-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
 
             <h2 className="text-xl mb-2 text-center ">Rooms</h2>
 
@@ -124,7 +126,7 @@ export default function RoomPanel() {
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
 
-            <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1">
+            <div className={`${customScrollBar} flex flex-1 min-h-0 overflow-y-auto`}>
                 {roomDetails.map((room) => (
                     <div
                         key={room.id}

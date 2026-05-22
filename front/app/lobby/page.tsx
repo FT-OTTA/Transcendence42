@@ -8,18 +8,20 @@ import Navbar from "../components/navigation/Navbar";
 import LoggedInBadge from "../components/login/LoggedInBadge";
 import { useState } from "react";
 
+
 type ActivePanel = "friends" | "chat" | null;
+
 
 export default function LobbyPage() {
 
-  const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+const [activePanel, setActivePanel] = useState<ActivePanel>(null);
 
     return (
     <main
       className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen p-4 text-white/80">
-        
+
         <Navbar />
-        
+
         <LoggedInBadge/>
 
           <div className="hidden md:grid h-screen overflow-hidden grid grid-cols-1 md:grid-cols-4 gap-4 pt-16">
@@ -33,8 +35,8 @@ export default function LobbyPage() {
               <RoomsPanel />
             </div>
 
-            <ChatPanel />          
-        
+            <ChatPanel />
+
           </div>
 
           <div className="md:hidden h-screen pt-16 flex flex-col gap-4">

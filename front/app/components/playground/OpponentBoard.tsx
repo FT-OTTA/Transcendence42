@@ -1,10 +1,10 @@
 "use client";
 
 import CardSlot from "./CardSlot";
-import type { PlaygroundCard } from "./types";
+import type { Card } from 'otta-shared-types/card';
 
 interface OpponentBoardProps {
-  cards: (PlaygroundCard | null)[];
+  cards: (Card | null)[];
   onPlay?: (cardId: string, targetIndex: number, isOpponent: boolean) => void;
 }
 

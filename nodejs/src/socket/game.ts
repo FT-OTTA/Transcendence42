@@ -87,6 +87,14 @@ function launchGame(session: GameSession): void {
         })
 })}
 
+function shuffle<T>(array: T[]): T[] {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 async function buildHero(heroId: string): Promise<Hero> {
 
     const hero = await prisma.hero.findUnique({
@@ -133,10 +141,6 @@ async function buildHero(heroId: string): Promise<Hero> {
             where: { id: { in: cardIds } }
         })
         
-        console.log('hero.deck:', hero.deck)
-        console.log('cardIds:', cardIds)
-        console.log('cards found:', cards.length)
-
         library = cards.map((c: typeof cards[0]): Card => ({
             kind: "card",
             idInGame: Math.floor(Math.random() * 100000),
@@ -158,12 +162,13 @@ async function buildHero(heroId: string): Promise<Hero> {
             smallPicPath: c.illustration ?? '',
             cardBackPath: ''
         }))
+        library = shuffle(library);
     }
     return {
         kind: "hero",
         idInGame: Math.floor(Math.random() * 100000),
         class: hero.name as CardClass,
-        passive: passiveEffect, // Là c'est carré, TS est content ✅
+        passive: passiveEffect,
         armor: hero.base_armor,
         dmgDealt: 0,
         curRunes: 0,

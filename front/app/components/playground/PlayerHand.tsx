@@ -1,10 +1,10 @@
 "use client";
 
 import CardSlot from "./CardSlot";
-import type { PlaygroundCard } from "./types";
+import type { Card } from 'otta-shared-types/card';
 
 interface PlayerHandProps {
-  cards: (PlaygroundCard | null)[];
+  cards: (Card | null)[];
 }
 
 export default function PlayerHand({ cards }: PlayerHandProps) {

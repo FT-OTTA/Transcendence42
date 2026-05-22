@@ -1,11 +1,11 @@
 "use client";
 
 import CardSlot from "./CardSlot";
-import type { PlaygroundCard } from "./types";
+import type { Card } from 'otta-shared-types/card';
 
 interface PlayerBoardProps {
-  cards: (PlaygroundCard | null)[];
-  onPlay?: (cardId: string, targetIndex: number, isOpponent: boolean) => void;
+  cards: (Card | null)[];
+  onPlay?: (cardId: number, targetIndex: number, isOpponent: boolean) => void;
 }
 
 export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
@@ -25,7 +25,7 @@ export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
             onDrop={(e) => {
               const cardId = e.dataTransfer.getData("cardId");
               if (!cardId) return;
-              if (onPlay) onPlay(cardId, index, false);
+              if (onPlay) onPlay(parseInt(cardId, 10), index, false);
             }}
           />
         ))}

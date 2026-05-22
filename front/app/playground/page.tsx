@@ -8,10 +8,10 @@ import OpponentBoard from '../components/playground/OpponentBoard';
 import PlayerBoard from '../components/playground/PlayerBoard';
 import PlayerHand from '../components/playground/PlayerHand';
 import GameStats from '../components/playground/GameStats';
-import type { PlaygroundCard } from '../components/playground/types';
+import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
 
-function takeEight(cards: PlaygroundCard[], start: number): PlaygroundCard[] {
+function takeEight(cards: Card[], start: number): Card[] {
   return cards.slice(start, start + 8);
 }
 
@@ -31,14 +31,14 @@ export default function PlaygroundPage() {
   const socket = io('http://localhost:3000');
   const [game, setGame] = useState<any>(null);
 
-  const [cards, setCards] = useState<PlaygroundCard[]>([]);
+  const [cards, setCards] = useState<Card[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Local game state for frontend-only play
-  const [hand, setHand] = useState<(PlaygroundCard | null)[]>(Array(8).fill(null));
-  const [playerSlots, setPlayerSlots] = useState<(PlaygroundCard | null)[]>(Array(8).fill(null));
-  const [opponentSlots, setOpponentSlots] = useState<(PlaygroundCard | null)[]>(Array(8).fill(null));
+  const [hand, setHand] = useState<(Card | null)[]>(Array(8).fill(null));
+  const [playerSlots, setPlayerSlots] = useState<(Card | null)[]>(Array(8).fill(null));
+  const [opponentSlots, setOpponentSlots] = useState<(Card | null)[]>(Array(8).fill(null));
   const [runes, setRunes] = useState(100);
 
   useEffect(() => {
@@ -94,49 +94,16 @@ export default function PlaygroundPage() {
     }
   }, [])
 
-  useEffect(() => {
-    async function loadCards() {
-      const endpoint = "http://localhost:3000/cards";
-        const response = await fetch(endpoint);
-
-        if (response.ok) {
-            const payload = (await response.json()) as PlaygroundCard[];
-            const shuffled = shuffleCards(payload);
-            setCards(shuffled);
-            const first8 = takeEight(shuffled, 0);
-            const next8 = takeEight(shuffled, 8);
-            setHand(() => {
-              const arr = Array(8).fill(null) as (PlaygroundCard | null)[];
-              first8.forEach((c, i) => (arr[i] = c));
-              return arr;
-            });
-            setOpponentSlots(() => {
-              const arr = Array(8).fill(null) as (PlaygroundCard | null)[];
-              next8.forEach((c, i) => (arr[i] = c));
-              return arr;
-            });
-            setErrorMessage(null);
-            setIsLoading(false);
-        }
-      else {
-        setCards([]);
-        setErrorMessage("Unable to load cards from API.");
-        setIsLoading(false);
-      }
-    }
-    loadCards();
-  }, []);
-
   const playerHandCards = useMemo(() => hand, [hand]);
   const playerBoardCards = useMemo(() => playerSlots, [playerSlots]);
   const opponentBoardCards = useMemo(() => opponentSlots, [opponentSlots]);
 
-  function canPlayById(cardId: string, targetIndex: number, targetIsOpponent: boolean) {
-    const handIndex = hand.findIndex((c) => c?.id === cardId);
+  function canPlayById(cardId: number, targetIndex: number, targetIsOpponent: boolean) {
+    const handIndex = hand.findIndex((c) => c?.idInGame === cardId);
     if (handIndex === -1) return false;
     const card = hand[handIndex];
     if (!card) return false;
-    if (card.rune_cost > runes) return false;
+    if (card.runeCost > runes) return false;
     const isSpell = card.type === 'spell';
     if (isSpell) {
       if (!targetIsOpponent) return false;
@@ -147,8 +114,8 @@ export default function PlaygroundPage() {
     return !Boolean(playerSlots[targetIndex]);
   }
 
-  function playToSlot(cardId: string, targetIndex: number, targetIsOpponent: boolean) {
-    const handIndex = hand.findIndex((c) => c?.id === cardId);
+  function playToSlot(cardId: number, targetIndex: number, targetIsOpponent: boolean) {
+    const handIndex = hand.findIndex((c) => c?.idInGame === cardId);
     if (handIndex === -1) return;
     const card = hand[handIndex];
     if (!card) return;
@@ -162,7 +129,7 @@ export default function PlaygroundPage() {
     });
 
     // deduct runes
-    setRunes((r) => r - card.rune_cost);
+    setRunes((r) => r - card.runeCost);
 
 	// Card go poof
     if (isSpell) {
@@ -190,8 +157,8 @@ export default function PlaygroundPage() {
 
       <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
         <div className="col-span-2 flex flex-col gap-4 min-h-0">
-          <OpponentBoard cards={opponentBoardCards} onPlay={playToSlot} />
-          <PlayerBoard cards={playerBoardCards} onPlay={playToSlot} />
+          {/* <OpponentBoard cards={opponentBoardCards} onPlay={playToSlot} />
+          <PlayerBoard cards={playerBoardCards} onPlay={playToSlot} /> */}
           <PlayerHand cards={playerHandCards} />
         </div>
         <div className="max-h-[calc(100vh-6rem)] overflow-y-auto">
@@ -202,8 +169,8 @@ export default function PlaygroundPage() {
 	  {/* Mobile Layout, stats to bottom */}
 	  {/*Maybe enforce landscape mode and make a cleaner layout */}
       <div className="md:hidden pt-16 flex flex-col gap-4 pb-4">
-        <OpponentBoard cards={opponentBoardCards} onPlay={playToSlot} />
-        <PlayerBoard cards={playerBoardCards} onPlay={playToSlot} />
+        {/* <OpponentBoard cards={opponentBoardCards} onPlay={playToSlot} />
+        <PlayerBoard cards={playerBoardCards} onPlay={playToSlot} /> */}
         <PlayerHand cards={playerHandCards} />
         <GameStats handCount={hand.filter(Boolean).length} loadedCards={cards.length} runes={runes} />
       </div>

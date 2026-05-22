@@ -1,13 +1,13 @@
 "use client";
 
 import type React from 'react';
-import type { PlaygroundCard } from "./types";
+import type { Card } from 'otta-shared-types/card';
 
 interface CardSlotProps {
   id: string;
   isHand?: boolean;
   isOpponentSlot?: boolean;
-  card?: PlaygroundCard;
+  card?: Card;
   onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragOver?: (e: React.DragEvent<HTMLDivElement>) => void;
 }
@@ -30,7 +30,7 @@ export default function CardSlot({ id, isHand = false, isOpponentSlot = false, c
         if (isHand && card) {
           e.dataTransfer.effectAllowed = "move";
           e.dataTransfer.setData("cardSlotId", id);
-          e.dataTransfer.setData("cardId", card.id);
+          e.dataTransfer.setData("cardId", card.idInGame.toString());
         }
       }}
       onDragOver={(e) => {
@@ -46,11 +46,11 @@ export default function CardSlot({ id, isHand = false, isOpponentSlot = false, c
     >
       {card ? (
         <>
-          <span className="text-[9px] text-blue-100/90 leading-tight text-center line-clamp-2">{card.name}</span>
+          <span className="text-[9px] text-blue-100/90 leading-tight text-center line-clamp-2">{card.cardName}</span>
           <span className="text-[9px] text-blue-200/70 uppercase mt-0.5">{card.type}</span>
-          <span className="text-[10px] text-yellow-200 mt-1">{card.rune_cost} R</span>
-          {card.force !== null && card.endurance !== null ? (
-            <span className="text-[10px] text-red-200 mt-0.5">{card.force}/{card.endurance}</span>
+          <span className="text-[10px] text-yellow-200 mt-1">{card.runeCost} R</span>
+          {card.currForce !== null && card.currEndurance !== null ? (
+            <span className="text-[10px] text-red-200 mt-0.5">{card.currForce}/{card.currEndurance}</span>
           ) : null}
         </>
       ) : (

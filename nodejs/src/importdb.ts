@@ -1,5 +1,6 @@
 import fs from 'fs'
 import { prisma } from '../prisma/prisma.ts'
+import bcrypt from 'bcrypt'
 
 function parseCSV(filePath: string): Record<string, string>[] {
     const content = fs.readFileSync(filePath, 'utf-8')
@@ -120,12 +121,12 @@ async function importUsers() {
             where: { id: parseInt(row['Id']) },
             update: {
                 username: row['Username'],
-                passwordHash: row['PasswordHash'],
+                passwordHash: await bcrypt.hash("prout", 10),
             },
             create: {
                 id: parseInt(row['Id']),
                 username: row['Username'],
-                passwordHash: row['PasswordHash'],
+                passwordHash: await bcrypt.hash("prout", 10),
             }
         })
 
@@ -180,15 +181,19 @@ async function importRooms() {
                 }
             })
         }
-
-        await prisma.room.create({
-            data: {
+        
+        await prisma.room.upsert({
+            where: { id: parseInt(row['id']) },
+            update: {
+                status: row['Status'] || 'waiting',
+            },
+            create: {
+                id: parseInt(row['id']),
                 player1Id: p1.id,
                 player2Id: p2?.id,
                 status: row['Status'] || 'waiting',
             }
         })
-
         console.log(
             `Room imported: ${p1.username} vs ${
                 p2?.username ?? 'empty'

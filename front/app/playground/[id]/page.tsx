@@ -9,17 +9,19 @@ import PlayerHand from '../../components/playground/PlayerHand';
 import GameStats from '../../components/playground/GameStats';
 import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
-import { useParams } from 'next/navigation'
+    import { useParams } from 'next/navigation';
+import LargeCardView from '@/app/components/playground/LargeCardView';
 
-export default function PlaygroundPage() {
-  const { id } = useParams();
-  console.log("Game ID from URL:", id);
-
-  // 1. État pour la sélection du héros
+    export default function PlaygroundPage() {
+      const { id } = useParams();
+      console.log("Game ID from URL:", id);
   const [selectedHero, setSelectedHero] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  
+
   const [game, setGame] = useState<any>(null);
+
+  const [cards, setCards] = useState<Card[]>([]);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -99,7 +101,7 @@ return (
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
                 <OpponentBoard cards={opponentSlots} onPlay={() => {}} />
                 <PlayerBoard cards={playerSlots} onPlay={() => {}} />
-                <PlayerHand cards={playerHandCards} />
+                <PlayerHand cards={playerHandCards} onClick={setSelectedCard}/>
               </div>
               <div className="max-h-[calc(100vh-6rem)] overflow-y-auto">
                 <GameStats 

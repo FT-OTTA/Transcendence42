@@ -172,43 +172,57 @@ export function resolveBuildings(game:Game) {
     }
 }
 
+function resolveValue(valueFrom: string | undefined, value: number, payload: PlayCardPayload): number {
+    if (!valueFrom) return value;
+    
+    const [source, field] = valueFrom.split('.');
+    const obj = source === 'target' ? payload.target
+              : source === 'target2' ? payload.target2
+              : undefined;
+    
+    if (!obj) return value;
+    return (obj as any)[field] ?? value;
+}
+
 export function resolveEffect(
     player: Hero,
     eff: Effect,
-    payload: PlayCardPayload): boolean { // succes or failure
+    payload: PlayCardPayload): boolean {
+        
     if (!payload.target)
         return false
+    let value = resolveValue(eff.valueFrom, eff.value, payload);
     switch (eff.effect) {
         case "ad_mod":
             if (payload.target.kind === "hero")
                 return false;
-            payload.target.currForce += eff.value;
+            payload.target.currForce += value;
             break;
         case "def_mod":
             if (payload.target.kind === "hero")
                 return false;
-            payload.target.currEndurance += eff.value;
+            payload.target.currEndurance += value;
             break;
         case "draw":
             if (payload.target.kind === "card")
                 return false;
-            playerDraw(payload.target, eff.value);
+            playerDraw(payload.target, value);
             break;
         case "dmg":
             if (payload.target.kind === "hero")
-                dealsDmg(player, payload.target, eff.value);
+                dealsDmg(player, payload.target, value);
             if (payload.target.kind === "card")
-                payload.target.currEndurance -= eff.value;
+                payload.target.currEndurance -= value;
             break;
         case "armor":
             if (payload.target.kind === "card")
                 return false;
-            payload.target.armor += eff.value;
+            payload.target.armor += value;
             break;
         case "runes":
             if (payload.target.kind === "card")
                 return false;
-            payload.target.curRunes += eff.value;
+            payload.target.curRunes += value;
             break;
         case "swap":
             if (!payload.target2)

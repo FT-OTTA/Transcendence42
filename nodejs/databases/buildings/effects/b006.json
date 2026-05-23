@@ -1,12 +1,10 @@
 {
     "effects": [
         {
-            "effect": "ad_mod",
-            "value": 1
-        },
-        {
-            "effect": "def_mod",
-            "value": 1
+            "effect": "addef_mod",
+            "value": -1,
+            "target": "all_enemies",
+            "targetType": { "creature": true }
         }
     ]
 }

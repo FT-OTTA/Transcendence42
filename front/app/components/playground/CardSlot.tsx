@@ -16,7 +16,7 @@ export default function CardSlot({ id, isHand = false, isOpponentSlot = false, s
   return (
     <div
       id={id}
-      onClick={() => onClick?.(card)}
+      onClick={() => onClick?.(card ?? null)}
       className={`
         aspect-square rounded border transition-all cursor-pointer p-1
         ${isHand

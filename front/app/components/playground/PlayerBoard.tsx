@@ -18,12 +18,14 @@ export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
 
       <div className="grid grid-cols-8 gap-2">
         {playerSlots.map((slot, index) => (
-          <CardSlot
+        <CardSlot
             key={slot}
             id={slot}
             card={cards[index] ?? undefined}
-            onClick={() => onPlay?.(index)}
-          />
+            onClick={() => {
+                if (!cards[index]) onPlay?.(index)  // ✅ seulement si slot vide
+            }}
+        />
         ))}
       </div>
     </div>

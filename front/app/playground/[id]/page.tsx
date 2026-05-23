@@ -31,6 +31,10 @@ export default function PlaygroundPage() {
   const [opponentSlots, setOpponentSlots] = useState<(Card | null)[]>(Array(8).fill(null));
   const [runes, setRunes] = useState(100);
 
+  const [meStats, setMeStats] = useState<any>(null);
+  const [opponentStats, setOpponentStats] = useState<any>(null);
+  const [turnNumber, setTurnNumber] = useState(1);
+  const [pendingSlots, setPendingSlots] = useState<(Card | null)[]>(Array(8).fill(null));
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -51,7 +55,32 @@ export default function PlaygroundPage() {
         console.log("Socket connecté, envoi de join_game");
         newSocket.emit('join_game', { heroId: selectedHero });
     });
+    const battlefieldToSlots = (battlefield: any) => {
+        const slots = Array(8).fill(null);
+        for (let i = 1; i <= 8; i++) {
+            slots[i - 1] = battlefield[`bf${i}`] ?? null;
+        }
+        return slots;
+    }; 
 
+    newSocket.on('turn_start', (data) => {
+        if (myPlayerIndexRef.current === null) return;
+        const me = data.game.players[myPlayerIndexRef.current];
+        const opponent = data.game.players[1 - myPlayerIndexRef.current];
+        
+        
+        setPendingSlots(Array(8).fill(null));
+
+        setGame(data.game);
+        setMeStats(me);
+        setOpponentStats(opponent);
+        setTurnNumber(data.game.turnNumber);
+        setHand(me.hand);
+        setRunes(me.curRunes);
+        setPlayerSlots(battlefieldToSlots(me.battlefield));
+        setOpponentSlots(battlefieldToSlots(opponent.battlefield));
+    })
+    
     newSocket.on('game_start', (data) => {
         console.log('REÇU GAME START:', data);
         myPlayerIndexRef.current = data.playerIndex; // On sauvegarde l'index
@@ -60,10 +89,13 @@ export default function PlaygroundPage() {
         const opponent = data.game.players[1 - data.playerIndex];
 
         setGame(data.game);
+        setMeStats(me);
+        setOpponentStats(opponent);
+        setTurnNumber(data.game.turnNumber);
         setHand(me.hand);
         setRunes(me.curRunes);
-        setPlayerSlots(Object.values(me.battlefield));
-        setOpponentSlots(Object.values(opponent.battlefield));
+        setPlayerSlots(battlefieldToSlots(me.battlefield));
+        setOpponentSlots(battlefieldToSlots(opponent.battlefield));
         setIsLoading(false);
     });
 
@@ -73,13 +105,15 @@ export default function PlaygroundPage() {
         const me = data.game.players[myPlayerIndexRef.current];
 
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
-
         setGame(data.game);
+        setMeStats(me);
+        setOpponentStats(opponent);
+        setTurnNumber(data.game.turnNumber);
         setHand(me.hand);
         setRunes(me.curRunes);
-        setPlayerSlots(Object.values(me.battlefield));
+        setPlayerSlots(battlefieldToSlots(me.battlefield));
         console.log("ME BF", me.battlefield);
-        setOpponentSlots(Object.values(opponent.battlefield));
+        setOpponentSlots(battlefieldToSlots(opponent.battlefield));
     });
 
     return () => {
@@ -92,8 +126,15 @@ export default function PlaygroundPage() {
   function handlePlayToSlot(slotIndex: number) {
     console.log('handlePlayToSlot appelé', { selectedCard, socket: !!socketRef.current })
     console.log('slotIndex:', slotIndex)
+    if (playerSlots[slotIndex] || pendingSlots[slotIndex]) return;
     if (!selectedCard || !socketRef.current) return;
     if (selectedCard.type === "spell") return; // Pour l'instant, on gère que les créatures/bâtiments
+
+    setPendingSlots(prev => {
+    const next = [...prev];
+    next[slotIndex] = selectedCard;
+    return next;
+})
 
     socketRef.current.emit('play_card', {
         cardId: selectedCard.idInGame,
@@ -109,7 +150,7 @@ function handleEndTurn() {
     if (!socketRef.current) return;
     socketRef.current.emit('end_turn')
 }
-
+const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
   // 3. Structure de rendu conditionnelle
 return (
     <main className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80">
@@ -127,15 +168,15 @@ return (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
                 <OpponentBoard cards={opponentSlots} onPlay={() => {}} />
-                <PlayerBoard cards={playerSlots} onPlay={handlePlayToSlot} />
+                <PlayerBoard cards={displaySlots} onPlay={handlePlayToSlot} />
                 <PlayerHand cards={playerHandCards} onClick={setSelectedCard}/>
               </div>
               <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
                 <GameStats
-                  handCount={hand.filter(Boolean).length}
-                  loadedCards={0}
-                  runes={runes}
-                  onEndTurn={handleEndTurn}  // ✅
+                  turnNumber={turnNumber}
+                  me={meStats}
+                  opponent={opponentStats}
+                  onEndTurn={handleEndTurn}
                 />
                 <LargeCardView card={selectedCard} />
               </div>

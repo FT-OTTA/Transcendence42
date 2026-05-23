@@ -149,10 +149,10 @@ async function buildHero(heroId: string): Promise<Hero> {
 
     if (hero.deck) {
         const cardIds: string[] = JSON.parse(hero.deck)
-        const cards = await prisma.card.findMany({
-            where: { id: { in: cardIds } }
-        })
-        
+        const cards = (await Promise.all(
+            cardIds.map(id => prisma.card.findUnique({ where: { id } }))
+        )).filter((c: Card | null): c is NonNullable<typeof c> => !!c)
+
         library = cards.map((c: typeof cards[0]): Card => ({
             kind: "card",
             idInGame: Math.floor(Math.random() * 100000),
@@ -278,6 +278,11 @@ export function initSocket(io: Server): void {
                 playCard(card, fullPayload);
             }
             else {
+                const zone = data.zone as BfZone;
+                if (session.game.players[playerIndex].battlefield[zone]) return; // slot occupé
+                const alreadySubmitted = session.submittedCards.get(socket.id) ?? [];
+                if (alreadySubmitted.some(({ payload }) => payload.zone === zone)) return; // déjà soumis ce tour
+
                 const existing = session.submittedCards.get(socket.id) ?? [];
                 existing.push({ card, payload:data });
                 session.submittedCards.set(socket.id, existing);
@@ -323,6 +328,7 @@ function getPlayerPerspective(game: Game, playerIndex: number) {
     copy.players.forEach((hero: any, index: number) => {
         if (index !== playerIndex) {
             hero.hand = hero.hand.map(() => ({ idInGame: -1, hidden: true }))
+            hero.libraryCount = hero.library.length
             hero.library = [];
         }
     });

@@ -3,7 +3,6 @@ import { cinzel } from "../../fonts"
 import { useRouter } from "next/navigation";
 import { requireAuth } from "../login/RequireAuth";
 
-
 const startButton = clsx
 (
   cinzel.className,

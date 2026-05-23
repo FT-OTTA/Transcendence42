@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
     "next": "16.2.6",
     "otta-shared-types": "file:../nodejs/src/types",
     "react": "19.2.4",

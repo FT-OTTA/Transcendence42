@@ -32,9 +32,9 @@ export default function StartButton({setIsLogin}: StartButtonProps)
       setIsLogin(true);
     }
   };
-	return (
-	<button className={ startButton } onClick={() => HandleClick()}>
-	  - get started -
-	</button>
-	);
+    return (
+    <button className={ startButton } onClick={() => HandleClick()}>
+      - get started -
+    </button>
+    );
 };

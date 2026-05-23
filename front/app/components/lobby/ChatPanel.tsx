@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
+import { customScrollBar } from "../scrollBar";
+import { socket } from "@/lib/socket";
 
 type Message = {
     id: number;
@@ -74,35 +76,38 @@ export default function ChatPanel() {
             return;
         }
 
-        const res = await fetch(
-            "http://localhost:3000/messages",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json"                    
-                },
-                body: JSON.stringify({
-                    username,
-                    content: messageInput,
-                    roomId: null,
-                }),
-            }
-        )
-
-        if (!res.ok) {
-            const err = await res.json();
-            alert(err.error);
-            return;
-        }
+        socket.emit('send_message', {
+            username,
+            content: messageInput,
+            roomId: null,
+        });
 
         setMessageInput("");
-
-        fetchMessages();
     }
 
     useEffect(() => {
         fetchMessages();
+
+        const username = localStorage.getItem("username");
+
+        socket.on('new_message', (msg) =>  {
+            const formatted: Message = {
+                id: msg.id,
+                name: msg.sender.username,
+                message: msg.content,
+                isSelf:
+                    msg.sender.username === username,
+            };
+
+            setChatMessages((prev) => [
+                ...prev,
+                formatted
+            ]);
+        });
+
+        return () => {
+            socket.off('new_message');
+        };
     }, []);
 
 
@@ -113,7 +118,7 @@ export default function ChatPanel() {
                 Chat
             </h2>
 
-            <div className="flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2">
+            <div className={`${customScrollBar} flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2`}>
 
                 {chatMessages.map((msg, index) => (
                     <div

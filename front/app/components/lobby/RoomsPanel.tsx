@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
+import { customScrollBar } from "../scrollBar";
+import { socket } from "@/lib/socket";
+
 
 type Room = {
 
@@ -16,7 +19,70 @@ export default function RoomPanel() {
 
 
     useEffect(() => {
+
         fetchRooms();
+
+        socket.on('room_updated', (room) => {
+            const formatted = {
+                id: room.id,
+                p1: room.player1.username,
+                p2: room.player2?.username ?? null,
+            };
+
+            setRoomDetails((prev) => {
+                const exists = prev.find(r => r.id === room.id);
+
+                if (!exists)
+                {
+                    return [formatted, ...prev];
+                }
+
+                return prev.map(r => 
+                    r.id === room.id ? formatted : r
+                );
+            });
+        })
+        
+        socket.on('room_error', (err) => {
+            showError(err.message);
+        });
+
+        return () => {
+            socket.off('room_updated');
+            socket.off('room_error');
+        };
+
+        const handleRoomUpdated = (room: any) => {
+            const formatted = {
+                id: room.id,
+                p1: room.player1.username,
+                p2: room.player2?.username ?? null,
+            };
+
+            setRoomDetails((prev) => {
+                const exists = prev.find(r => r.id === room.id);
+
+                if (!exists) {
+                    return [formatted, ...prev];
+                }
+
+                return prev.map(r => 
+                    r.id === room.id ? formatted : r
+                );
+            });
+        };
+
+        const handleRoomError = (err: any) => {
+            showError(err.message);
+        };
+
+        socket.on('room_updated', handleRoomUpdated);
+        socket.on('room_error', handleRoomError);
+
+        return () => {
+            socket.off('room_updated', handleRoomUpdated);
+            socket.off('room_error', handleRoomError);
+        };
     }, []);
 
     function showError(message: string) {
@@ -60,28 +126,11 @@ export default function RoomPanel() {
             showError("You need to be logged in for this feature.");
             return;
         }
-        const res = await fetch(
-            "http://localhost:3000/rooms/create",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify({
-                    username
-                }),
-            }
-        );
 
-        if (!res.ok) {
-            const err = await res.json();
-            alert(err.error);
-            return;
-        }
+        socket.emit('create_room', {
+            username
+        });
 
-
-        fetchRooms();
     }
 
     async function joinRoom(roomId: number) {   
@@ -94,25 +143,14 @@ export default function RoomPanel() {
             return;
         }
 
-        await fetch(
-            `http://localhost:3000/rooms/${roomId}/join`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify({
-                    username
-                }),
-            }
-        );
-
-        fetchRooms();
+        socket.emit('join_room', {
+            roomId,
+            username,
+        });
     }
 
     return (
-        <div className="h-full border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col gap-3">
+        <div className="h-full min-h-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
 
             <h2 className="text-xl mb-2 text-center ">Rooms</h2>
 
@@ -124,7 +162,7 @@ export default function RoomPanel() {
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
 
-            <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1">
+            <div className={`${customScrollBar} flex flex-col flex-1 min-h-0 overflow-y-auto mb-4`}>
                 {roomDetails.map((room) => (
                     <div
                         key={room.id}

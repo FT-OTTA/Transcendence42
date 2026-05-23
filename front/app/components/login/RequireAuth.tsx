@@ -1,6 +1,9 @@
+export async function requireAuth(): Promise<string | null> {
 
-
-export async function requireAuth() {
+    if (typeof window === "undefined")
+    {
+        return null;
+    }
 
     const username = localStorage.getItem("username");
 

@@ -111,11 +111,13 @@ async function importUsers() {
             update: {
                 username: row['Username'],
                 passwordHash: row['PasswordHash'],
+                moodphrase: row['MoodPhrase'],
             },
             create: {
                 id: parseInt(row['Id']),
                 username: row['Username'],
                 passwordHash: row['PasswordHash'],
+                moodphrase: row['MoodPhrase'],
             }
         })
 

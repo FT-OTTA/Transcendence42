@@ -5,11 +5,10 @@ import MatchHistory from "../../components/community/MatchHistory";
 import ProfileSearchBar from "../../components/community/ProfileSearchBar";
 import LoggedInBadge from "../../components/login/LoggedInBadge";
 import ProfileMood from "../../components/community/ProfileMood";
-import ProfileMood from "../../components/community/ProfileMood";
 
 export default async function CommunityProfilePage({
 	 params } : {
-		 params : Promise<{ login : string}>})
+		 params : Promise<{ login : string}>}) 
 {
 
 	const { login }= await params;

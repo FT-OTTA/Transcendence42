@@ -2,6 +2,7 @@ import AvatarFrame from "../AvatarFrame";
 import clsx from "clsx";
 import { cinzel } from "../../fonts";
 import ProfileMood from "./ProfileMood";
+import ProfileMood from "./ProfileMood";
 
 const profileBanner = clsx
 (

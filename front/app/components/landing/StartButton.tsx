@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { cinzel } from "../../fonts"
+import { cinzel } from "../../fonts";
+import { useRouter } from "next/navigation";
 
 const startButton = clsx
 (
@@ -17,9 +18,21 @@ type StartButtonProps = {
 
 export default function StartButton({setIsLogin}: StartButtonProps)
 {
-	return (
-	<button className={ startButton } onClick={() => setIsLogin(true)}>
-	  - get started -
-	</button>
-	);
+
+  const router = useRouter();
+
+  async function HandleClick() {
+    const user = await requireAuth();
+    if (user) {
+      router.push("/lobby");
+    }
+    else {
+      setIsLogin(true);
+    }
+  };
+    return (
+    <button className={ startButton } onClick={() => HandleClick()}>
+      - get started -
+    </button>
+    );
 };

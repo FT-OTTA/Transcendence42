@@ -38,12 +38,12 @@ function resolveRound(session: GameSession): void {
         const playerIndex = session.sockets.findIndex(s => s.id === socketId)
         const player = session.game.players[playerIndex]
 
-        for (const { card, payload } of cards) 
+        for (const { card, payload } of cards)
         {
             console.log('payload:', payload, 'card found:', !!card)
             console.log('calling playCard with zone:', payload.zone)
 
-        
+
             if (!card) continue
 
             const zone = payload.zone as BfZone | undefined
@@ -93,7 +93,7 @@ function launchGame(session: GameSession): void {
     session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
     session.sockets.forEach((s, id) => {
         console.log(`Tentative d'émission 'game_start' vers ${s.id}`);
-        s.emit('game_start', { 
+        s.emit('game_start', {
             game: getPlayerPerspective(session.game, id),
             playerIndex: id  // ✅
         })
@@ -117,20 +117,20 @@ async function buildHero(heroId: string): Promise<Hero> {
         throw new Error("Heros introuvable");
 
     // 2. Parsing du JSON de passif
-    let passiveEffect: Effect = { 
+    let passiveEffect: Effect = {
             effect: "armor",      // Doit être dans EffectType
-            value: 0, 
+            value: 0,
             target: "self_hero"   // Doit être dans EffectTarget
         };
-    
+
     if (hero.passive_json_path) {
         try {
             const fullPath = path.join(process.cwd(), 'databases', 'heroes', 'passives', hero.passive_json_path);
-            
+
             if (fs.existsSync(fullPath)) {
                 const rawData = fs.readFileSync(fullPath, 'utf-8');
                 const json = JSON.parse(rawData);
-                
+
                 // 2. Le Mapping sécurisé
                 // On cast "as EffectType" et "as EffectTarget" pour valider le JSON
                 passiveEffect = {
@@ -166,7 +166,7 @@ async function buildHero(heroId: string): Promise<Hero> {
             currForce: c.force ?? 0,
             baseEndurance: c.endurance ?? 0,
             currEndurance: c.endurance ?? 0,
-            effects: [],
+            effects: JSON.parse(c.effect) as Effect[],
             zone: null as any,
             owner: null as any,
             timing: "normal" as EffectTime,
@@ -194,7 +194,7 @@ async function buildHero(heroId: string): Promise<Hero> {
 }
 // 1. Ajoute 'async' ici
 export async function instantiateGame(players: WaitingPlayer[]): Promise<Game> {
-    
+
     // 2. On lance tous les buildHero en même temps et on attend qu'ils finissent
     const heroes = await Promise.all(
         players.map(p => buildHero(p.playerData.heroId))
@@ -256,7 +256,7 @@ export function initSocket(io: Server): void {
                 s.sockets.some(sock => sock.id === socket.id)
             )
             if (!session) return
-            
+
             const playerIndex = session.sockets.findIndex(s => s.id === socket.id);
             const player = session.game.players[playerIndex];
             const card = player.hand.find(c => c.idInGame === data.cardId);

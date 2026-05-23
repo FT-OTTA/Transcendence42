@@ -22,6 +22,8 @@ export default function PlaygroundPage() {
 
   const [cards, setCards] = useState<Card[]>([]);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [selectedTarget, setSelectedTarget] = useState<Card  | null>(null);
+  const [selectedTargets, setSelectedTargets] = useState<Card[]>([]); // Pour les sorts à plusieurs cibles
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -61,14 +63,14 @@ export default function PlaygroundPage() {
             slots[i - 1] = battlefield[`bf${i}`] ?? null;
         }
         return slots;
-    }; 
+    };
 
     newSocket.on('turn_start', (data) => {
         if (myPlayerIndexRef.current === null) return;
         const me = data.game.players[myPlayerIndexRef.current];
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
-        
-        
+
+
         setPendingSlots(Array(8).fill(null));
 
         setGame(data.game);
@@ -79,8 +81,8 @@ export default function PlaygroundPage() {
         setRunes(me.curRunes);
         setPlayerSlots(battlefieldToSlots(me.battlefield));
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
-    })
-    
+    });
+
     newSocket.on('game_start', (data) => {
         console.log('REÇU GAME START:', data);
         myPlayerIndexRef.current = data.playerIndex; // On sauvegarde l'index
@@ -150,8 +152,39 @@ function handleEndTurn() {
     if (!socketRef.current) return;
     socketRef.current.emit('end_turn')
 }
+
+function getTargets() {
+  if (!selectedCard) return;
+
+  //if (!socketRef.current) {
+  //  alert("No socket connection!");
+  //  return;
+  //}
+
+    console.log("Selected card:", selectedCard);
+
+  const ef = Array.isArray(selectedCard.effects)
+    ? selectedCard.effects
+    : Array.isArray((selectedCard.effects as any)?.effects)
+    ? (selectedCard.effects as any).effects
+    : [];
+    for (const e of ef) {
+    if (e.target === "self_hero" ||
+      e.target === "opponent_hero" ||
+      e.target === "left_neighbor" ||
+      e.target === "right_neighbor" ||
+      e.target === "all_allies" ||
+      e.target === "all_enemies") {
+        console.log("No target needed for effect:", e.effect);
+        continue;
+      }
+
+    }
+}
+
 const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
-  // 3. Structure de rendu conditionnelle
+
+// 3. Structure de rendu conditionnelle
 return (
     <main className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80">
       <Navbar />
@@ -178,7 +211,7 @@ return (
                   opponent={opponentStats}
                   onEndTurn={handleEndTurn}
                 />
-                <LargeCardView card={selectedCard} />
+                <LargeCardView card={selectedCard} onClick={getTargets} />
               </div>
             </div>
           )}

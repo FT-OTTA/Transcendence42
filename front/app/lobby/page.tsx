@@ -22,13 +22,13 @@ export default function LobbyPage() {
 
     return (
     <main
-      className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen p-4 text-white/80">
+      className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen box-border p-4 flex flex-col text-white/80">
         
         {mounted && <Navbar />}
         
         {mounted && <LoggedInBadge/>}
 
-          <div className="hidden md:grid flex flex-col h-screen overflow-hidden min-h-0 overflow-hidden grid-cols-1 md:grid-cols-4 gap-4 pt-4">
+          <div className="hidden md:grid flex flex-col flex-1 overflow-hidden min-h-0 overflow-hidden grid-cols-1 md:grid-cols-4 gap-4 pt-4">
 
             <div className="flex flex-col gap-4 h-full min-h-0">
                 {mounted && <ProfilePanel />}
@@ -43,7 +43,7 @@ export default function LobbyPage() {
         
           </div>
 
-          <div className="md:hidden h-screen pt-16 flex flex-col gap-4">
+          <div className="md:hidden flex-1 pt-16 flex flex-col gap-4">
             {mounted && <ProfilePanel/>}
 
             <div className="flex-1 min-h-0">

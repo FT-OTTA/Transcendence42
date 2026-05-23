@@ -189,7 +189,7 @@ export default function RoomPanel() {
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas,
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
 
-            <div className={`${customScrollBar} flex flex-col min-h-0 overflow-y-auto`}>
+            <div className={`${customScrollBar} flex flex-col flex-1 min-h-0 overflow-y-auto mb-4`}>
                 {roomDetails.map((room) => (
                     <div
                         key={room.id}

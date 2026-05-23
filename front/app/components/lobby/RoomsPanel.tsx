@@ -22,6 +22,36 @@ export default function RoomPanel() {
 
         fetchRooms();
 
+        socket.on('room_updated', (room) => {
+            const formatted = {
+                id: room.id,
+                p1: room.player1.username,
+                p2: room.player2?.username ?? null,
+            };
+
+            setRoomDetails((prev) => {
+                const exists = prev.find(r => r.id === room.id);
+
+                if (!exists)
+                {
+                    return [formatted, ...prev];
+                }
+
+                return prev.map(r => 
+                    r.id === room.id ? formatted : r
+                );
+            });
+        })
+        
+        socket.on('room_error', (err) => {
+            showError(err.message);
+        });
+
+        return () => {
+            socket.off('room_updated');
+            socket.off('room_error');
+        };
+
         const handleRoomUpdated = (room: any) => {
             const formatted = {
                 id: room.id,
@@ -132,7 +162,7 @@ export default function RoomPanel() {
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas, 
             cool pour quand il y a pleins de initialRooms, mais moche si il y en a pas bcp */}
 
-            <div className={`${customScrollBar} flex flex-col flex-1 min-h-0 overflow-y-auto mb-4`}>
+            <div className={`${customScrollBar} flex flex-col min-h-0 overflow-y-auto`}>
                 {roomDetails.map((room) => (
                     <div
                         key={room.id}

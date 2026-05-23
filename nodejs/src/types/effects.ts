@@ -20,9 +20,11 @@ export type EffectTarget =
 | "opponent_hero"
 | "self"
 | "opponent"
+| "random"
 | "left_neighbor"
 | "right_neighbor"
 | "all_allies"
+| "all_board"
 | "all_enemies";
 
 export type TargetType = 
@@ -34,6 +36,7 @@ export type TargetType =
 export type Effect = {
     effect: EffectType;
     value: number;
+    valueFrom?: string;
     target: EffectTarget;
     targetType?: TargetType;
 }

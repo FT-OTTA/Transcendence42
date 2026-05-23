@@ -2,7 +2,9 @@
     "effects": [
         {
             "effect": "addef_mod",
-            "value": 1
+            "value": 1,
+            "target": "all_board",
+            "targetType": { "creature": true }
         }
     ]
 }

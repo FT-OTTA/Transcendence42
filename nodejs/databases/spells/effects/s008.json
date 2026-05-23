@@ -2,7 +2,8 @@
     "effects": [
         {
             "effect": "destroy",
-            "targetType": "building"
+            "target": "all_board",
+            "targetType": { "building": true }
         }
     ]
 }

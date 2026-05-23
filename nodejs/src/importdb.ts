@@ -133,11 +133,15 @@ async function importUsers() {
             update: {
                 username: row['Username'],
                 passwordHash: await bcrypt.hash("prout", 10),
+                passwordHash: row['PasswordHash'],
+                moodphrase: row['MoodPhrase'],
             },
             create: {
                 id: parseInt(row['Id']),
                 username: row['Username'],
                 passwordHash: await bcrypt.hash("prout", 10),
+                passwordHash: row['PasswordHash'],
+                moodphrase: row['MoodPhrase'],
             }
         })
 

@@ -41,6 +41,8 @@ model User {
   username      String   @unique
   passwordHash  String   @map("password_hash")
 
+  moodphrase    String?
+
   friends       Friendship[] @relation("UserFriends")
   friendOf      Friendship[] @relation("FriendOf")
 

@@ -36,8 +36,7 @@ export default function RoomPanel() {
             setRoomDetails((prev) => {
                 const exists = prev.find(r => r.id === room.id);
 
-                if (!exists)
-                {
+                if (!exists) {
                     return [formatted, ...prev];
                 }
 
@@ -45,15 +44,18 @@ export default function RoomPanel() {
                     r.id === room.id ? formatted : r
                 );
             });
-        })
-        
-        socket.on('room_error', (err) => {
+        };
+
+        const handleRoomError = (err: any) => {
             showError(err.message);
-        });
+        };
+
+        socket.on('room_updated', handleRoomUpdated);
+        socket.on('room_error', handleRoomError);
 
         return () => {
-            socket.off('room_updated');
-            socket.off('room_error');
+            socket.off('room_updated', handleRoomUpdated);
+            socket.off('room_error', handleRoomError);
         };
     }, []);
 

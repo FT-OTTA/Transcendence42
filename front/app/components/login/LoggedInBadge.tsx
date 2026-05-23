@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 
 export default function LoggedInBadge() {
 
-    const [username, setUsername] = useState<string | null>(null);
+    const [username, setUsername] = useState<string | null>(() => {
+        if (typeof window !== "undefined")
+        {
+            localStorage.getItem("username");
+        }
+        return null;
+        });
 
     function logout()
     {
@@ -29,9 +35,9 @@ export default function LoggedInBadge() {
             {
                 localStorage.removeItem("token");
                 localStorage.removeItem("username");
-            }   
-
-            setUsername(storedUsername);
+            }
+            else
+                setUsername(storedUsername);
         }
         catch (err) {
             console.error(err);

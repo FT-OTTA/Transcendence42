@@ -1,35 +1,35 @@
-"use client";
-import Navbar from "../components/navigation/Navbar"
-import ProfileBanner from "../components/community/ProfileBanner"
-import ProfileStats from "../components/community/ProfileStats"
-import MatchHistory from "../components/community/MatchHistory"
-import ProfileSearchBar from "../components/community/ProfileSearchBar"
-import LoggedInBadge from "../components/login/LoggedInBadge"
+import Navbar from "../components/navigation/Navbar";
+import ProfileSearchBar from "../components/community/ProfileSearchBar";
 
-
-
-export default function Community()
-{
-
+export default function Community() {
 	return (
 		<main
-		className=" overflow-x-hidden md:overflow-y-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
-			
+			className="
+				min-h-screen
+				bg-[url('/homepage_bg.png')]
+				bg-cover
+				bg-center
+				flex
+				flex-col
+			"
+		>
 			<Navbar />
-			<div className="md:py-5" />
-	
-			<LoggedInBadge/>
-	
 
-			<div className="max-w-6xl mx-auto px-4 py-4">
-				<ProfileSearchBar />
-				<ProfileBanner username="Poman" mood="J'arrive ratale sur le beat, fatale est m..." isOnline={false} />
-			</div>
+			<section className="flex-1 flex items-center justify-center px-4">
+				<div className="w-full max-w-2xl flex flex-col items-center gap-6">
 
-			<section className="max-w-6xl mx-auto h-full grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
-				<ProfileStats />
-				<MatchHistory />
+					<div className="text-center">
+						<p className="text-white/50 italic mt-4 text-lg">
+							Search for a player profile
+						</p>
+					</div>
+
+					<div className="w-full">
+						<ProfileSearchBar />
+					</div>
+
+				</div>
 			</section>
 		</main>
 	);
-};
+}

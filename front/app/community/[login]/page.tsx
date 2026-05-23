@@ -17,8 +17,6 @@ export default async function CommunityProfilePage({
 	});
 
 	const user = await res.json();
-
-	console.log("BEFORE : login = ", login)
 	return (
 		<main
 		className=" overflow-x-hidden md:overflow-y-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">

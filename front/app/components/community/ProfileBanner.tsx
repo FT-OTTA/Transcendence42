@@ -48,7 +48,7 @@ export default function ProfileBanner({username, mood, isOnline}: ProfileBannerP
 				<h1 className={ userNameClass }> { username } </h1>				
 				<div className={ moodText }>
 					<ProfileMood
-						login={ username }
+						username={ username }
 						initialMood={ mood }
 					/>
 				</div>

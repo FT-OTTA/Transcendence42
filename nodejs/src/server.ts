@@ -37,9 +37,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(fileUpload());
-app.get("/debug-avatar", (req, res) => {
-	res.sendFile("/app/databases/users/avatars/teddy.png");
-});
 app.use('/avatars', express.static('/app/databases/users/avatars'));
 app.use('/cards', cardsRouter);
 app.use('/heroes', heroesRouter);

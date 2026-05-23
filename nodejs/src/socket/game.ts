@@ -27,6 +27,7 @@ function findById(game: Game, id: number): Hero | Card | undefined {
 }
 
 function resolveRound(session: GameSession): void {
+    console.log("Résolution du tour", session.game.turnNumber);
     if (session.timer === null)
         session.sockets.forEach(s => s.emit('timeout', {}))
 
@@ -37,20 +38,24 @@ function resolveRound(session: GameSession): void {
         const playerIndex = session.sockets.findIndex(s => s.id === socketId)
         const player = session.game.players[playerIndex]
 
-        for (const action of cards) {
-            const card = player.hand.find(c => c.idInGame === action.cardId)
+        for (const { card, payload } of cards) 
+        {
+            console.log('payload:', payload, 'card found:', !!card)
+            console.log('calling playCard with zone:', payload.zone)
+
+        
             if (!card) continue
 
-            const zone = action.zone as BfZone | undefined
-            const target = action.targetId
-                ? findById(session.game, action.targetId)
+            const zone = payload.zone as BfZone | undefined
+            const target = payload.targetId
+                ? findById(session.game, payload.targetId)
                 : undefined
-            const target2 = action.target2Id
-                ? findById(session.game, action.target2Id) as Card
+            const target2 = payload.target2Id
+                ? findById(session.game, payload.target2Id) as Card
                 : undefined
 
             const enrichedPayload = {
-                ...action,
+                ...payload,
                 target: target,
                 target2: target2
             }
@@ -60,7 +65,9 @@ function resolveRound(session: GameSession): void {
 
     checkBoardState(session.game)
     resolveCombat(session.game)
+    console.log("Après combat :")
     checkBoardState(session.game)
+    console.log("Après vérification board :")
 
     session.submittedCards.clear()
     session.readyPlayers.clear()
@@ -68,12 +75,15 @@ function resolveRound(session: GameSession): void {
     console.log("Tour actuel avant check :", session.game.turnNumber);
     if (session.game.turnNumber > 8) {
         checkVictory(session.game)
-        session.sockets.forEach(s => s.emit('game_over', { game: session.game }))
-        // LOAD LA GAME DANS LA DB OKLM
+        session.sockets.forEach((s, id) => {
+            s.emit('game_over', { game: getPlayerPerspective(session.game, id) })
+        })
     } else {
         startTurn(session.game)
         session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
-        session.sockets.forEach(s => s.emit('turn_start', { game: session.game }))
+        session.sockets.forEach((s, id) => {
+            s.emit('turn_start', { game: getPlayerPerspective(session.game, id) })
+        })
     }
 }
 
@@ -189,13 +199,18 @@ export async function instantiateGame(players: WaitingPlayer[]): Promise<Game> {
     const heroes = await Promise.all(
         players.map(p => buildHero(p.playerData.heroId))
     );
+    for (const hero of heroes) {
+        for (const card of hero.library) {
+            card.owner = hero;
+        }
+    }
 
     return {
         kind: "game",
         phase: "beginning",
         turnNumber: 1,
         clock_per_turn: 60,
-        players: heroes, // Là, 'heroes' est bien de type Hero[]
+        players: heroes,
         backgroundPath: "default.png"
     };
 }
@@ -235,6 +250,8 @@ export function initSocket(io: Server): void {
         })
 
         socket.on('play_card', (data) => {
+            console.log("Reçu play_card", { data });
+
             const session = sessions.find(s =>
                 s.sockets.some(sock => sock.id === socket.id)
             )
@@ -262,24 +279,26 @@ export function initSocket(io: Server): void {
             }
             else {
                 const existing = session.submittedCards.get(socket.id) ?? [];
-                existing.push(data);
+                existing.push({ card, payload:data });
                 session.submittedCards.set(socket.id, existing);
                 card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
 
             }
             const perspective = getPlayerPerspective(session.game, playerIndex);
+            console.log('Émission game_update à', socket.id)  // ✅
             socket.emit('game_update', { game: perspective });
 
         })
 
         socket.on('end_turn', () => {
+            console.log('Reçu end_turn de', socket.id)
             const session = sessions.find(s =>
                 s.sockets.some(sock => sock.id === socket.id)
             )
             if (!session) return
-
+            console.log('Session trouvée pour end_turn:', session.sockets.map(s => s.id))  // ✅
             session.readyPlayers.add(socket.id)
-
+            console.log('Joueurs prêts:', Array.from(session.readyPlayers))  // ✅
             if (session.readyPlayers.size === session.sockets.length){
                 resolveRound(session)
                 session.sockets.forEach((s, id) => {
@@ -297,7 +316,10 @@ export function initSocket(io: Server): void {
 }
 
 function getPlayerPerspective(game: Game, playerIndex: number) {
-    const copy = JSON.parse(JSON.stringify(game));
+    const copy = JSON.parse(JSON.stringify(game, (key, value) => {
+        if (key === 'owner') return undefined  // ✅ ignore owner to avoid circular reference
+        return value
+    }));
     copy.players.forEach((hero: any, index: number) => {
         if (index !== playerIndex) {
             hero.hand = hero.hand.map(() => ({ idInGame: -1, hidden: true }))

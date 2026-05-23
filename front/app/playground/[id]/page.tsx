@@ -14,7 +14,7 @@ import LargeCardView from '@/app/components/playground/LargeCardView';
 
 export default function PlaygroundPage() {
   const { id } = useParams();
-  console.log("Game ID from URL:", id);
+  // console.log("Game ID from URL:", id);
   const [selectedHero, setSelectedHero] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -32,12 +32,15 @@ export default function PlaygroundPage() {
   const [runes, setRunes] = useState(100);
 
   const myPlayerIndexRef = useRef<number | null>(null);
+  const socketRef = useRef<Socket | null>(null);
+
   // 2. Initialisation du socket uniquement quand le héros est choisi
   useEffect(() => {
     console.log("Selected Hero:", selectedHero)
     if (!selectedHero) return;
 
     const newSocket = io('http://localhost:3000');
+    socketRef.current = newSocket;
     setSocket(newSocket);
 
     console.log("Écouteur configuré sur socket:", newSocket.id); // Ajoute ça
@@ -65,15 +68,17 @@ export default function PlaygroundPage() {
     });
 
     newSocket.on('game_update', (data) => {
-        if (myPlayerIndex === null) return; // Sécurité
+        if (myPlayerIndexRef.current === null) return; // Sécurité
+        console.log('REÇU GAME UPDATE:', data);
+        const me = data.game.players[myPlayerIndexRef.current];
 
-        const me = data.game.players[myPlayerIndex];
-        const opponent = data.game.players[1 - myPlayerIndex];
+        const opponent = data.game.players[1 - myPlayerIndexRef.current];
 
         setGame(data.game);
         setHand(me.hand);
         setRunes(me.curRunes);
         setPlayerSlots(Object.values(me.battlefield));
+        console.log("ME BF", me.battlefield);
         setOpponentSlots(Object.values(opponent.battlefield));
     });
 
@@ -82,6 +87,28 @@ export default function PlaygroundPage() {
     };
   }, [selectedHero]);
   const playerHandCards = useMemo(() => hand, [hand]);
+
+
+  function handlePlayToSlot(slotIndex: number) {
+    console.log('handlePlayToSlot appelé', { selectedCard, socket: !!socketRef.current })
+    console.log('slotIndex:', slotIndex)
+    if (!selectedCard || !socketRef.current) return;
+    if (selectedCard.type === "spell") return; // Pour l'instant, on gère que les créatures/bâtiments
+
+    socketRef.current.emit('play_card', {
+        cardId: selectedCard.idInGame,
+        zone: `bf${slotIndex + 1}`,  // format attendu par le backend
+        targetId: null,
+        target2Id: null
+    })
+    setSelectedCard(null)
+}
+
+function handleEndTurn() {
+    console.log('handle endturn received socket id:', socketRef.current?.id)
+    if (!socketRef.current) return;
+    socketRef.current.emit('end_turn')
+}
 
   // 3. Structure de rendu conditionnelle
 return (
@@ -100,7 +127,7 @@ return (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
                 <OpponentBoard cards={opponentSlots} onPlay={() => {}} />
-                <PlayerBoard cards={playerSlots} onPlay={() => {}} />
+                <PlayerBoard cards={playerSlots} onPlay={handlePlayToSlot} />
                 <PlayerHand cards={playerHandCards} onClick={setSelectedCard}/>
               </div>
               <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
@@ -108,6 +135,7 @@ return (
                   handCount={hand.filter(Boolean).length}
                   loadedCards={0}
                   runes={runes}
+                  onEndTurn={handleEndTurn}  // ✅
                 />
                 <LargeCardView card={selectedCard} />
               </div>

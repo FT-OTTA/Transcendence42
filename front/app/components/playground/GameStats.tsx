@@ -4,9 +4,11 @@ interface GameStatsProps {
   handCount: number;
   loadedCards: number;
   runes?: number;
+  onEndTurn?: () => void;  // ✅
+
 }
 
-export default function GameStats({ handCount, loadedCards, runes = 3 }: GameStatsProps) {
+export default function GameStats({ handCount, loadedCards, runes = 3, onEndTurn}: GameStatsProps) {
   return (
     <div className="border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col gap-4">
       <h3 className="text-lg font-semibold text-blue-300 text-center">Game Stats</h3>
@@ -46,7 +48,7 @@ export default function GameStats({ handCount, loadedCards, runes = 3 }: GameSta
       <div className="text-xs text-blue-200/60 text-center">
         Loaded Cards: {loadedCards}
       </div>
-      <button className="border border-blue-300 py-2 px-3 text-sm hover:bg-blue-300 hover:text-black transition mt-2">
+      <button onClick={onEndTurn} className="border border-blue-300 py-2 px-3 text-sm hover:bg-blue-300 hover:text-black transition mt-2">
         End Turn
       </button>
     </div>

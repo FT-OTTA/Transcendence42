@@ -29,6 +29,9 @@ export function startTurn(game: Game): void {
 }
 
 export function playCard(card: Card, payload: PlayCardPayload) {
+    console.log("Playing card", { card, payload });
+    console.log("zone reçue:", payload.zone)
+    console.log("starts with bf:", payload.zone?.startsWith("bf"))
 
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
 
@@ -172,7 +175,7 @@ export function resolveBuildings(game:Game) {
 export function resolveEffect(
     player: Hero,
     eff: Effect,
-    payload: PlayCardPayload): boolean { //succes or failure
+    payload: PlayCardPayload): boolean { // succes or failure
     if (!payload.target)
         return false
     switch (eff.effect) {

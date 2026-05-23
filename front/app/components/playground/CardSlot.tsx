@@ -9,7 +9,7 @@ interface CardSlotProps {
   isOpponentSlot?: boolean;
   showEffectText?: boolean;
   card?: Card | null;
-  onClick?: (card: Card | null | undefined) => void
+  onClick?: (card: Card | null) => void
 }
 
 export default function CardSlot({ id, isHand = false, isOpponentSlot = false, showEffectText = false, card, onClick }: CardSlotProps) {

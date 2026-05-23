@@ -5,8 +5,9 @@ import type { Card } from 'otta-shared-types/card';
 
 interface PlayerBoardProps {
   cards: (Card | null)[];
-  onPlay?: (cardId: number, targetIndex: number, isOpponent: boolean) => void;
+  onPlay?: (slotIndex: number) => void;  // simplifié
 }
+
 
 export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
   const playerSlots = Array.from({ length: 8 }, (_, i) => `player-${i}`);
@@ -21,6 +22,7 @@ export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
             key={slot}
             id={slot}
             card={cards[index] ?? undefined}
+            onClick={() => onPlay?.(index)}
           />
         ))}
       </div>

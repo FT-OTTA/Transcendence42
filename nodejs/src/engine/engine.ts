@@ -44,13 +44,9 @@ export function playCard(card: Card, payload: PlayCardPayload) {
             card.owner.battlefield[payload.zone as BfZone] = card;
         }
     }
-    console.log("card effect:", card.effects)
-    const ef = Array.isArray(card.effects)
-    ? card.effects
-    : Array.isArray((card.effects as any)?.effects)
-    ? (card.effects as any).effects
-    : [];
-    for (const effect of ef) {
+
+
+    for (const effect of card.effects) {
         if (!resolveEffect(card.owner, effect, payload))
             console.log("Resolve effect failed", { cardId: card.idInGame, effect: effect.effect, payload });
     }
@@ -127,12 +123,7 @@ export function resolveBuildings(game:Game) {
             {
             const building = player.battlefield[zone];
             if (building && building.type === "building") {
-                const ef = Array.isArray(building.effects)
-                    ? building.effects
-                    : Array.isArray((building.effects as any)?.effects)
-                    ? (building.effects as any).effects
-                    : [];
-                for (const effect of ef ){
+                for (const effect of building.effects){
                     switch (effect.target) {
                         case "self_hero":
                             resolveEffect(player, effect, { cardId: 0, target: player });

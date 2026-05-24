@@ -86,7 +86,11 @@ export default function PlaygroundPage() {
     });
     newSocket.on('game_over', (data) => {
         console.log("Game over:", data);
-        alert(`Game over! Winner: ${data.winner}`);
+        if (data.winner === -1) {
+          alert("Game over! It's a draw!");
+        } else {
+          alert(`Game over! Winner: ${data.winner === myPlayerIndexRef.current ? "You" : "Opponent"}`);
+        }
         setSelectedHero(null);
         setGame(null);
         setHand(Array(8).fill(null));

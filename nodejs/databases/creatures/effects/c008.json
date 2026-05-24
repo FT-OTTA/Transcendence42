@@ -3,7 +3,8 @@
         {
             "effect": "win",
             "target": "self_hero",
-            "targetType": { "hero": true }
+            "targetType": { "hero": true },
+            "trigger": "on_deal_damage"
         }
     ]
 }

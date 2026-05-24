@@ -9,7 +9,8 @@ export type EffectType =
 | "runes" 
 | "swap" 
 | "destroy"
-| "freeze";
+| "freeze"
+| "win";
 
 export type EffectTime = 
 | "immediate"
@@ -33,11 +34,14 @@ export type TargetType =
 | "hero"
 | "zone";
 
+export type EffectTrigger = "on_deal_damage"
+
 export type Effect = {
     effect: EffectType;
     value: number;
     valueFrom?: string;
-    target: EffectTarget;
+    trigger?: EffectTrigger;
+    target?: EffectTarget;
     targetType?: TargetType;
 }
 

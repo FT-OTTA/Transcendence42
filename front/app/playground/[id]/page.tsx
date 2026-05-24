@@ -155,12 +155,17 @@ export default function PlaygroundPage() {
     next[slotIndex] = selectedCard;
     return next;
 })
-
+    console.log('Emitting play_card with:', {
+        cardId: selectedCard.idInGame,
+        zone: `bf${slotIndex + 1}`,
+        targetId: selectedTargets[0]?.idInGame ?? null,
+        target2Id: selectedTargets[1]?.idInGame ?? null,
+    });
     socketRef.current.emit('play_card', {
         cardId: selectedCard.idInGame,
         zone: `bf${slotIndex + 1}`,  // format attendu par le backend
-        targetId: null,
-        target2Id: null
+        targetId: selectedTargets[0]?.idInGame ?? null, // On prend la première cible sélectionnée pour l'instant
+        target2Id: selectedTargets[1]?.idInGame ?? null, // Si un sort à 2 cibles
     })
     setSelectedCard(null)
 }
@@ -226,6 +231,16 @@ function getTargets() {
   }
 }
 
+function pushSelectedTarget(card: Card) {
+  if (!selectedCard) return;
+
+  if (potentialTargets.some(c => c === card)) {
+    setSelectedTargets(prev => [...prev, card]);
+    console.log("Selected target:", card);
+  }
+}
+
+
 const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
 
 // 3. Structure de rendu conditionnelle
@@ -244,8 +259,8 @@ return (
           ) : (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
-                <OpponentBoard cards={opponentSlots} onPlay={() => {}} potentialTargets={potentialTargets} />
-                <PlayerBoard cards={displaySlots} onPlay={handlePlayToSlot} potentialTargets={potentialTargets} />
+                <OpponentBoard cards={opponentSlots} onPlay={() => {}} potentialTargets={potentialTargets} onClick={pushSelectedTarget} />
+                <PlayerBoard cards={displaySlots} onPlay={handlePlayToSlot} potentialTargets={potentialTargets} onClick={pushSelectedTarget} />
                 <PlayerHand cards={playerHandCards} onClick={setSelectedCard}/>
               </div>
               <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">

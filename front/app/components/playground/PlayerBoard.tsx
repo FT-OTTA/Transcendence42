@@ -7,10 +7,11 @@ interface PlayerBoardProps {
   cards: (Card | null)[];
   potentialTargets?: Card[]; // Ajouté pour recevoir les cibles potentielles
   onPlay?: (slotIndex: number) => void;  // simplifié
+  onClick?: (card: Card) => void; // Ajouté pour gérer les clics sur les cartes
 }
 
 
-export default function PlayerBoard({ cards, onPlay, potentialTargets }: PlayerBoardProps) {
+export default function PlayerBoard({ cards, onPlay, potentialTargets, onClick }: PlayerBoardProps) {
   const playerSlots = Array.from({ length: 8 }, (_, i) => `player-${i}`);
 
   return (

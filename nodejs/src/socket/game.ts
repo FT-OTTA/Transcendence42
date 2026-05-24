@@ -59,7 +59,7 @@ function resolveRound(session: GameSession): void {
                 target: target,
                 target2: target2
             }
-            playCard(card, enrichedPayload);
+            playCard(card, enrichedPayload, session.game);
         }
     }
 
@@ -168,7 +168,8 @@ async function buildHero(heroId: string): Promise<Hero> {
     // Parsing du deck
     let library: Card[] = []
 
-    if (hero.deck) {
+    if (true) { // remove this condition to load real decks from DB
+    // if (hero.deck) { // and put this back in
         const cardIds: string[] = JSON.parse(hero.deck)
         const cards = (await Promise.all(
             cardIds.map(id => prisma.card.findUnique({ where: { id } }))
@@ -300,7 +301,7 @@ export function initSocket(io: Server): void {
                     target: target,   // C'est maintenant un objet Hero ou Card
                     target2: target2
                 };
-                playCard(card, fullPayload);
+                playCard(card, fullPayload, session.game);
             }
             else {
                 const zone = data.zone as BfZone;

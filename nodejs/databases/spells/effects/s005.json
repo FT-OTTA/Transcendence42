@@ -2,7 +2,7 @@
     "effects": [
         {
             "effect": "destroy",
-            "target": "opponent",
+            "target": "all_board",
             "targetType": { "creature": true }
         }
     ]

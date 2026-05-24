@@ -21,14 +21,16 @@ export function playerDraw(player: Hero, n: number): boolean {
 export function startTurn(game: Game): void {
     for (const player of game.players) {
         player.curRunes = fibonacci(game.turnNumber);
-        playerDraw(player, 8 - player.hand.length);
-        resolveEffect(player, player.passive, { cardId: 0, target: player });
+        player.curRunes = 999; // remove this line to have normal rune gain
+        playerDraw(player, 50 - player.hand.length);// remove this line to have normal hand refill
+        // playerDraw(player, 8 - player.hand.length); 
+        resolveEffect(player, player.passive, { cardId: 0, target: player }, game);
         resolveBuildings(game);
         checkBoardState(game);
     }
 }
 
-export function playCard(card: Card, payload: PlayCardPayload) {
+export function playCard(card: Card, payload: PlayCardPayload, game: Game): void {
     // console.log("Playing card", { card, payload });
     // console.log("zone reçue:", payload.zone)
     // console.log("starts with bf:", payload.zone?.startsWith("bf"))
@@ -48,11 +50,14 @@ export function playCard(card: Card, payload: PlayCardPayload) {
         }
     }
 
+    if (card.type !== "building") // may be change later if we want to have building with immediate effects
+    {
+        for (const effect of card.effects) {
+            resolveEffect(card.owner, effect, payload, game)
+            // if (!resolveEffect(card.owner, effect, payload))
+                // console.log("Resolve effect failed", { cardId: card.idInGame, effect: effect.effect, payload });
+        }
 
-    for (const effect of card.effects) {
-        resolveEffect(card.owner, effect, payload)
-        // if (!resolveEffect(card.owner, effect, payload))
-            // console.log("Resolve effect failed", { cardId: card.idInGame, effect: effect.effect, payload });
     }
 }
 // p1 deals to p2
@@ -64,10 +69,10 @@ export function dealsDmg(player1: Hero, player2: Hero, x: number): void {
         player2.armor = 0;
     }
 }
-function resolveTriggers(card: Card, trigger: EffectTrigger, target: Hero) {
+function resolveTriggers(card: Card, trigger: EffectTrigger, target: Hero, game: Game) {
     for (const effect of card.effects) {
         if (effect.trigger === trigger) {
-            resolveEffect(card.owner, effect, { cardId: card.idInGame, target })
+            resolveEffect(card.owner, effect, { cardId: card.idInGame, target }, game)
         }
     }
 }
@@ -83,7 +88,7 @@ export function resolveCombat(game: Game) {
                 continue;
             else if (card1.type === "creature"){
                 dealsDmg(card1.owner, game.players[0], card1.currForce);
-                resolveTriggers(card1, "on_deal_damage", game.players[0]);
+                resolveTriggers(card1, "on_deal_damage", game.players[0], game);
 
             }
 
@@ -91,7 +96,7 @@ export function resolveCombat(game: Game) {
         else if (card1 === undefined) {
             if (card0.type === "creature"){
                 dealsDmg(card0.owner, game.players[1], card0.currForce);
-                resolveTriggers(card0, "on_deal_damage", game.players[1]);
+                resolveTriggers(card0, "on_deal_damage", game.players[1], game);
 
             }
         }
@@ -101,7 +106,7 @@ export function resolveCombat(game: Game) {
                 card0.currEndurance -= card1.currForce
             } else {
                 dealsDmg(card1.owner, game.players[0], card1.currForce - card0.currEndurance);
-                resolveTriggers(card1, "on_deal_damage", game.players[0]);
+                resolveTriggers(card1, "on_deal_damage", game.players[0], game);
                 card0.currEndurance = 0;  // ✅ la créature est morte
             }
 
@@ -110,7 +115,7 @@ export function resolveCombat(game: Game) {
                 card1.currEndurance -= card0.currForce
             } else {
                 dealsDmg(card0.owner, game.players[1], card0.currForce - card1.currEndurance);
-                resolveTriggers(card0, "on_deal_damage", game.players[1]);
+                resolveTriggers(card0, "on_deal_damage", game.players[1], game);
                 card1.currEndurance = 0;  // ✅ la créature est morte
             }
         }
@@ -144,17 +149,17 @@ export function resolveBuildings(game:Game) {
                 for (const effect of building.effects){
                     switch (effect.target) {
                         case "self_hero":
-                            resolveEffect(player, effect, { cardId: 0, target: player });
+                            resolveEffect(player, effect, { cardId: 0, target: player }, game);
                             break;
                         case "opponent_hero":
                             for (const oppo of game.players)
                             {
                                 if (oppo !== player)
-                                    resolveEffect(player, effect, { cardId: 0, target: oppo });
+                                    resolveEffect(player, effect, { cardId: 0, target: oppo }, game);
                             }
                             break;
                         case "self":
-                            resolveEffect(player, effect, { cardId: building.idInGame, target: building });
+                            resolveEffect(player, effect, { cardId: building.idInGame, target: building }, game);
                             break;
                         case "left_neighbor":
                             if (i === 1)
@@ -162,7 +167,7 @@ export function resolveBuildings(game:Game) {
                             const zoneLeftTarget = `bf${i - 1}` as BfZone;
                             const leftTarget = player.battlefield[zoneLeftTarget];
                             if (leftTarget)
-                                resolveEffect(player, effect, { cardId: building.idInGame, target: leftTarget });
+                                resolveEffect(player, effect, { cardId: building.idInGame, target: leftTarget }, game);
                             break;
                         case "right_neighbor":
                             if (i === 8)
@@ -170,7 +175,7 @@ export function resolveBuildings(game:Game) {
                             const zoneRightTarget = `bf${i + 1}` as BfZone;
                             const rightTarget = player.battlefield[zoneRightTarget];
                             if (rightTarget)
-                                resolveEffect(player, effect, { cardId: building.idInGame, target: rightTarget });
+                                resolveEffect(player, effect, { cardId: building.idInGame, target: rightTarget }, game);
                             break;
                         case "all_allies":
                             for (let j = 1 ; j <= 8; j++)
@@ -180,7 +185,7 @@ export function resolveBuildings(game:Game) {
                                 const nezo = `bf${j}` as BfZone;
                                 const ally = player.battlefield[nezo];
                                 if (ally)
-                                    resolveEffect(player, effect, { cardId: building.idInGame, target: ally });
+                                    resolveEffect(player, effect, { cardId: building.idInGame, target: ally }, game);
                             }
                             break;
                         case "all_enemies":
@@ -192,7 +197,7 @@ export function resolveBuildings(game:Game) {
                                         continue;
                                     const enemy = oppo.battlefield[enemyBf];
                                     if (enemy)
-                                        resolveEffect(oppo, effect, { cardId: building.idInGame, target: enemy });
+                                        resolveEffect(oppo, effect, { cardId: building.idInGame, target: enemy }, game);
                                 }
                             }
                             break;
@@ -224,66 +229,181 @@ export class GameOver extends Error {
 export function resolveEffect(
     player: Hero,
     eff: Effect,
-    payload: PlayCardPayload): boolean {
+    payload: PlayCardPayload,
+    game: Game): boolean {
 
     console.log("Resolving effect", { player: player.class, effect: eff.effect, payload });
-    if (!payload.target)
-        return false
+    let target = payload.target;
+    let target2 = payload.target2;
+    // Override target selon l'effet
+    if (eff.target === "self_hero") target = player;
+    
+    if (!target) return false;
     let value = resolveValue(eff.valueFrom, eff.value, payload);
     switch (eff.effect) {
         case "ad_mod":
-            if (payload.target.kind === "hero")
+            if (target.kind === "hero")
                 return false;
-            payload.target.currForce += value;
+            if (eff.target === "all_enemies" && game) {
+                const opponent = game.players.find(p => p !== player);
+                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currForce += value });
+                return true;
+            }
+            else if (eff.target === "all_allies" && game) {
+                Object.values(player.battlefield).forEach(c => { if (c) c.currForce += value });
+                return true;
+            }
+            else if (eff.target === "all_board" && game) {
+                for (const p of game.players){
+                    for (const c of Object.values(p.battlefield))
+                        if (c) c.currForce += value;
+                }
+                return true;
+            }
+            else
+                target.currForce += value;
             break;
         case "def_mod":
-            if (payload.target.kind === "hero")
+            if (target.kind === "hero")
                 return false;
-            payload.target.currEndurance += value;
+            if (eff.target === "all_enemies" && game) {
+                const opponent = game.players.find(p => p !== player);
+                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currEndurance += value });
+            }
+            else if (eff.target === "all_allies" && game) {
+                Object.values(player.battlefield).forEach(c => { if (c) c.currEndurance += value });
+            }
+            else if (eff.target === "all_board" && game) {
+                for (const p of game.players){
+                    for (const c of Object.values(p.battlefield))
+                        if (c) c.currEndurance += value;
+                }
+            }
+            else
+                target.currEndurance += value;
+            break;
+        case "addef_mod":
+            if (target.kind === "hero")
+                return false;
+            if (eff.target === "all_enemies" && game) {
+                const opponent = game.players.find(p => p !== player);
+                if (opponent)
+                    Object.values(opponent.battlefield).forEach(c => {
+                    if (c) {
+                        c.currForce += value;
+                        c.currEndurance += value;
+                    }
+                    });
+            }
+            else if (eff.target === "all_allies" && game) {
+                Object.values(player.battlefield).forEach(c => {
+                    if (c) {
+                        c.currForce += value;
+                        c.currEndurance += value }
+                });
+            }
+            else if (eff.target === "all_board" && game) {
+                for (const p of game.players){
+                    for (const c of Object.values(p.battlefield))
+                        if (c){
+                            c.currForce += value;
+                            c.currEndurance += value
+                        }
+                }
+            }
+            else {
+                target.currForce += value;
+                target.currEndurance += value;
+            }
             break;
         case "draw":
-            if (payload.target.kind === "card")
+            if (target.kind === "card")
                 return false;
-            playerDraw(payload.target, value);
+            playerDraw(target, value);
             break;
         case "dmg":
-            if (payload.target.kind === "hero")
-                dealsDmg(player, payload.target, value);
-            if (payload.target.kind === "card")
-                payload.target.currEndurance -= value;
+            if (target.kind === "hero")
+                dealsDmg(player, target, value);
+            else if (target.kind === "card")
+                target.currEndurance -= value;
+            else if (eff.target === "all_enemies" && game) {
+                const opponent = game.players.find(p => p !== player);
+                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currEndurance -= value });
+            }
+            else if (eff.target === "all_allies" && game) {
+                Object.values(player.battlefield).forEach(c => { if (c) c.currEndurance -= value });
+            }
+            else if (eff.target === "all_board" && game) {
+                for (const p of game.players){
+                    for (const c of Object.values(p.battlefield))
+                        if (c) c.currEndurance -= value;
+                }
+                return true;
+            }
             break;
         case "armor":
-            if (payload.target.kind === "card")
+            if (target.kind === "card")
                 return false;
-            payload.target.armor += value;
+            target.armor += value;
             break;
         case "runes":
-            if (payload.target.kind === "card")
+            if (target.kind === "card")
                 return false;
-            payload.target.curRunes += value;
+            target.curRunes += value;
             break;
         case "swap":
-            if (!payload.target2)
+            if (!target2)
                 return false;
-            if (payload.target.kind === "hero" || payload.target2 === undefined)
+            if (target.kind === "hero" || target2 === undefined)
                 return false;
-            const tmp = payload.target.zone;
-            payload.target.zone = payload.target2.zone;
-            payload.target2.zone = tmp;
+            const tmp = target.zone;
+            target.zone = target2.zone;
+            target2.zone = tmp;
             break;
         case "destroy":
-            if (payload.target.kind === "hero")
+            if (target.kind === "hero")
                 return false;
-            payload.target.currEndurance = 0;
+            else if (eff.target === "all_enemies" && game) {
+                const opponent = game.players.find(p => p !== player);
+                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currEndurance = 0 });
+                return true;
+            }
+            else if (eff.target === "all_allies" && game) {
+                Object.values(player.battlefield).forEach(c => { if (c) c.currEndurance = 0 });
+                return true;
+            }
+            else if (eff.target === "all_board" && game) {
+                for (const p of game.players){
+                    for (const c of Object.values(p.battlefield))
+                        if (c) c.currEndurance = 0;
+                }
+            }
+            target.currEndurance = 0;
             break;
         case "freeze":
-            if (payload.target.kind === "hero")
+            if (target.kind === "hero")
                 return false;
-            payload.target.state = "sick";
+            else if (eff.target === "all_enemies" && game) {
+                const opponent = game.players.find(p => p !== player);
+                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.state = "sick" });
+                return true;
+            }
+            else if (eff.target === "all_allies" && game) {
+                Object.values(player.battlefield).forEach(c => { if (c) c.state = "sick" });
+                return true;
+            }
+            else if (eff.target === "all_board" && game) {
+                for (const p of game.players){
+                    for (const c of Object.values(p.battlefield))
+                        if (c) c.state = "sick";
+                }
+            }
+            else
+                target.state = "sick";
             break;
         case "win":
-            if (payload.target.kind === "card") return false;
-            throw new GameOver(payload.target as Hero);
+            if (target.kind === "card") return false;
+            throw new GameOver(target as Hero);
 
     }
 

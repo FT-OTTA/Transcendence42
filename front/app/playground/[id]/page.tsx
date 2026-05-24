@@ -14,27 +14,22 @@ import LargeCardView from '@/app/components/playground/LargeCardView';
 
 export default function PlaygroundPage() {
   const { id } = useParams();
-  // console.log("Game ID from URL:", id);
   const [selectedHero, setSelectedHero] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-
   const [game, setGame] = useState<any>(null);
-
   const [cards, setCards] = useState<Card[]>([]);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
-  const [selectedTarget, setSelectedTarget] = useState<Card  | null>(null);
-  const [selectedTargets, setSelectedTargets] = useState<Card[]>([]); // Pour les sorts à plusieurs cibles
-  const [potentialTargets, setPotentialTargets] = useState<Card[]>([]); // Cibles valides pour le sort sélectionné
-  const [isHeroTarget, setIsHeroTarget] = useState<boolean>(false); // Si le sort peut cibler un héros
+  const [selectedTarget, setSelectedTarget] = useState<Card | null>(null);
+  const [selectedTargets, setSelectedTargets] = useState<Card[]>([]);
+  const [potentialTargets, setPotentialTargets] = useState<Card[]>([]);
+  const [isHeroTarget, setIsHeroTarget] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Local game state
+  const [runeError, setRuneError] = useState<string | null>(null);
   const [hand, setHand] = useState<(Card | null)[]>(Array(8).fill(null));
   const [playerSlots, setPlayerSlots] = useState<(Card | null)[]>(Array(8).fill(null));
   const [opponentSlots, setOpponentSlots] = useState<(Card | null)[]>(Array(8).fill(null));
   const [runes, setRunes] = useState(100);
-
   const [meStats, setMeStats] = useState<any>(null);
   const [opponentStats, setOpponentStats] = useState<any>(null);
   const [turnNumber, setTurnNumber] = useState(1);
@@ -42,23 +37,13 @@ export default function PlaygroundPage() {
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
-  // 2. Initialisation du socket uniquement quand le héros est choisi
   useEffect(() => {
-    console.log("Selected Hero:", selectedHero)
     if (!selectedHero) return;
 
     const newSocket = io('http://localhost:3000');
     socketRef.current = newSocket;
     setSocket(newSocket);
 
-    console.log("Écouteur configuré sur socket:", newSocket.id); // Ajoute ça
-    // On stocke l'index du joueur localement pour le réutiliser
-    let myPlayerIndex: number | null = null;
-
-    newSocket.on('connect', () => {
-        console.log("Socket connecté, envoi de join_game");
-        newSocket.emit('join_game', { heroId: selectedHero });
-    });
     const battlefieldToSlots = (battlefield: any) => {
         const slots = Array(8).fill(null);
         for (let i = 1; i <= 8; i++) {
@@ -67,14 +52,15 @@ export default function PlaygroundPage() {
         return slots;
     };
 
+    newSocket.on('connect', () => {
+        newSocket.emit('join_game', { heroId: selectedHero });
+    });
+
     newSocket.on('turn_start', (data) => {
         if (myPlayerIndexRef.current === null) return;
         const me = data.game.players[myPlayerIndexRef.current];
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
-
-
         setPendingSlots(Array(8).fill(null));
-
         setGame(data.game);
         setMeStats(me);
         setOpponentStats(opponent);
@@ -84,8 +70,8 @@ export default function PlaygroundPage() {
         setPlayerSlots(battlefieldToSlots(me.battlefield));
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
     });
+
     newSocket.on('game_over', (data) => {
-        console.log("Game over:", data);
         if (data.winner === -1) {
           alert("Game over! It's a draw!");
         } else {
@@ -101,13 +87,11 @@ export default function PlaygroundPage() {
         setOpponentStats(null);
         setTurnNumber(1);
     });
-    newSocket.on('game_start', (data) => {
-        console.log('REÇU GAME START:', data);
-        myPlayerIndexRef.current = data.playerIndex; // On sauvegarde l'index
 
+    newSocket.on('game_start', (data) => {
+        myPlayerIndexRef.current = data.playerIndex;
         const me = data.game.players[data.playerIndex];
         const opponent = data.game.players[1 - data.playerIndex];
-
         setGame(data.game);
         setMeStats(me);
         setOpponentStats(opponent);
@@ -120,10 +104,8 @@ export default function PlaygroundPage() {
     });
 
     newSocket.on('game_update', (data) => {
-        if (myPlayerIndexRef.current === null) return; // Sécurité
-        console.log('REÇU GAME UPDATE:', data);
+        if (myPlayerIndexRef.current === null) return;
         const me = data.game.players[myPlayerIndexRef.current];
-
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
         setGame(data.game);
         setMeStats(me);
@@ -132,79 +114,57 @@ export default function PlaygroundPage() {
         setHand(me.hand);
         setRunes(me.curRunes);
         setPlayerSlots(battlefieldToSlots(me.battlefield));
-        console.log("ME BF", me.battlefield);
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
     });
 
-    return () => {
-        newSocket.disconnect();
-    };
+    return () => { newSocket.disconnect(); };
   }, [selectedHero]);
-  const playerHandCards = useMemo(() => hand, [hand]);
 
+  const playerHandCards = useMemo(() => hand, [hand]);
+  const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
 
   function handlePlayToSlot(slotIndex: number) {
-    console.log('handlePlayToSlot appelé', { selectedCard, socket: !!socketRef.current })
-    console.log('slotIndex:', slotIndex)
-    if (playerSlots[slotIndex] || pendingSlots[slotIndex]) return;
     if (!selectedCard || !socketRef.current) return;
-    if (selectedCard.type === "spell") return; // Pour l'instant, on gère que les créatures/bâtiments
+    if (selectedCard.runeCost > runes) {
+      setRuneError("Not enough runes to play this card!");
+      setTimeout(() => setRuneError(null), 1000);
+      return;
+    }
+    if (playerSlots[slotIndex] || pendingSlots[slotIndex]) return;
+    if (selectedCard.type === "spell") return;
 
     setPendingSlots(prev => {
-    const next = [...prev];
-    next[slotIndex] = selectedCard;
-    return next;
-})
-    console.log('Emitting play_card with:', {
+      const next = [...prev];
+      next[slotIndex] = selectedCard;
+      return next;
+    });
+
+    socketRef.current.emit('play_card', {
         cardId: selectedCard.idInGame,
         zone: `bf${slotIndex + 1}`,
         targetId: selectedTargets[0]?.idInGame ?? null,
         target2Id: selectedTargets[1]?.idInGame ?? null,
     });
-    socketRef.current.emit('play_card', {
-        cardId: selectedCard.idInGame,
-        zone: `bf${slotIndex + 1}`,  // format attendu par le backend
-        targetId: selectedTargets[0]?.idInGame ?? null, // On prend la première cible sélectionnée pour l'instant
-        target2Id: selectedTargets[1]?.idInGame ?? null, // Si un sort à 2 cibles
-    })
-    setSelectedCard(null)
-}
+    setSelectedCard(null);
+  }
 
-function handleEndTurn() {
-    console.log('handle endturn received socket id:', socketRef.current?.id)
+  function handleEndTurn() {
     if (!socketRef.current) return;
-    socketRef.current.emit('end_turn')
-}
+    socketRef.current.emit('end_turn');
+  }
 
-function getTargets() {
-  if (!selectedCard) return;
-
-  //if (!socketRef.current) {
-  //  alert("No socket connection!");
-  //  return;
-  //}
-
-    console.log("Selected card:", selectedCard);
-
-  const ef = Array.isArray(selectedCard.effects)
-    ? selectedCard.effects
-    : Array.isArray((selectedCard.effects as any)?.effects)
-    ? (selectedCard.effects as any).effects
-    : [];
+  function getTargets() {
+    if (!selectedCard) return;
+    const ef = Array.isArray(selectedCard.effects)
+      ? selectedCard.effects
+      : Array.isArray((selectedCard.effects as any)?.effects)
+      ? (selectedCard.effects as any).effects
+      : [];
     for (const e of ef) {
-    if (e.target === "self_hero" ||
-      e.target === "opponent_hero" ||
-      e.target === "left_neighbor" ||
-      e.target === "right_neighbor" ||
-      e.target === "all_allies" ||
-      e.target === "random" ||
-      e.target === "all_board" ||
-      e.target === "all_enemies") {
-        console.log("No target needed for effect:", e.effect);
+      if (["self_hero","opponent_hero","left_neighbor","right_neighbor","all_allies","random","all_board","all_enemies"].includes(e.target)) {
         continue;
       }
       if (e.target === "self" || e.target === "opponent") {
-        console.log("Target type:", e.targetType);
         switch (e.target) {
           case "self":
             setPotentialTargets(playerSlots.filter(c => c !== null) as Card[]);
@@ -212,47 +172,27 @@ function getTargets() {
           case "opponent":
             setPotentialTargets(opponentSlots.filter(c => c !== null) as Card[]);
             break;
+        }
+        if (!(e.targetType?.creature)) setPotentialTargets(prev => prev.filter(c => c.type !== "creature"));
+        if (!(e.targetType?.building)) setPotentialTargets(prev => prev.filter(c => c.type !== "building"));
+        if (e.targetType?.hero) setIsHeroTarget(true);
       }
-      if (!(e.targetType?.creature)) {
-        setPotentialTargets(prev => prev.filter(c => c.type !== "creature"));
-      }
-      if (!(e.targetType?.building)) {
-        setPotentialTargets(prev => prev.filter(c => c.type !== "building"));
-      }
-      if (e.targetType?.hero) {
-        setIsHeroTarget(true);
-      }
-      console.log("Potential targets after filtering:", potentialTargets);
-      if (potentialTargets.length === 0) {
-        console.log("No valid targets for this card's effects. You can still play it, but it won't do anything.");
-      }
-      // Now highlight potential targets in UI
     }
   }
-}
 
-function pushSelectedTarget(card: Card) {
-  if (!selectedCard) return;
-
-  if (potentialTargets.some(c => c === card)) {
-    setSelectedTargets(prev => [...prev, card]);
-    console.log("Selected target:", card);
+  function pushSelectedTarget(card: Card) {
+    if (!selectedCard) return;
+    if (potentialTargets.some(c => c === card)) {
+      setSelectedTargets(prev => [...prev, card]);
+    }
   }
-}
 
-
-const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
-
-// 3. Structure de rendu conditionnelle
-return (
+  return (
     <main className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80">
       <Navbar />
-
       {!selectedHero ? (
-        // Affiche la sélection si aucun héros n'est choisi
         <HeroSelection onSelect={(id) => setSelectedHero(id)} />
       ) : (
-        // Affiche le plateau de jeu
         <>
           {isLoading ? (
             <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
@@ -276,6 +216,11 @@ return (
             </div>
           )}
         </>
+      )}
+      {runeError && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-900/80 text-red-200 px-4 py-2 rounded border border-red-500 text-sm z-50">
+          {runeError}
+        </div>
       )}
     </main>
   );

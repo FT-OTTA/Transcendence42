@@ -33,6 +33,9 @@ export function playCard(card: Card, payload: PlayCardPayload) {
     // console.log("zone reçue:", payload.zone)
     // console.log("starts with bf:", payload.zone?.startsWith("bf"))
 
+    if (card.owner.curRunes < card.runeCost)
+        return;
+    card.owner.curRunes -= card.runeCost;
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
 
 
@@ -94,21 +97,33 @@ export function resolveCombat(game: Game) {
         }
         else if (card0.type == "creature" && card1.type == "creature"){
             // 1 tabasse 0
-            if (card0.currEndurance - card1.currForce > 0)
+            if (card0.currEndurance - card1.currForce > 0) {
                 card0.currEndurance -= card1.currForce
-            else{
+            } else {
                 dealsDmg(card1.owner, game.players[0], card1.currForce - card0.currEndurance);
                 resolveTriggers(card1, "on_deal_damage", game.players[0]);
+                card0.currEndurance = 0;  // ✅ la créature est morte
             }
+
             // 0 tabasse 1
-            if (card1.currEndurance - card0.currForce > 0)
+            if (card1.currEndurance - card0.currForce > 0) {
                 card1.currEndurance -= card0.currForce
-            else {
+            } else {
                 dealsDmg(card0.owner, game.players[1], card0.currForce - card1.currEndurance);
                 resolveTriggers(card0, "on_deal_damage", game.players[1]);
+                card1.currEndurance = 0;  // ✅ la créature est morte
             }
-    
         }
+        else if (card0.type == "creature" && card1.type == "building") {
+            // card0 attaque le building
+            card1.currEndurance -= card0.currForce
+        }
+        else if (card0.type == "building" && card1.type == "creature") {
+            // card1 attaque le building
+            card0.currEndurance -= card1.currForce
+        }
+
+
         else if (card1.type == "creature"){
             game.players[0].dmgDealt += card1.currForce
         }
@@ -211,6 +226,7 @@ export function resolveEffect(
     eff: Effect,
     payload: PlayCardPayload): boolean {
 
+    console.log("Resolving effect", { player: player.class, effect: eff.effect, payload });
     if (!payload.target)
         return false
     let value = resolveValue(eff.valueFrom, eff.value, payload);
@@ -298,7 +314,7 @@ export function checkBoardState(game: Game) {
         const zone = `bf${i}` as BfZone;
         for (const player of game.players) {
             const card = player.battlefield[zone];
-            if (card && card.type == "creature" && card.currEndurance <= 0) {
+            if (card && card.currEndurance <= 0) {
                 card.zone = "graveyard";
                 player.battlefield[zone] = undefined;
             }

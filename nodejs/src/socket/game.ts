@@ -282,8 +282,11 @@ export function initSocket(io: Server): void {
             const playerIndex = session.sockets.findIndex(s => s.id === socket.id);
             const player = session.game.players[playerIndex];
             const card = player.hand.find(c => c.idInGame === data.cardId);
-
+            
             if (!card) return;
+            if (player.curRunes < card.runeCost)
+                return;
+            player.curRunes -= card.runeCost;
 
             if (card.timing === "immediate")
             {

@@ -35,7 +35,7 @@ export function playCard(card: Card, payload: PlayCardPayload) {
 
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
 
-    
+
     if (card.type == "building" || card.type == "creature")
     {
         if (payload.zone && payload.zone.startsWith("bf"))
@@ -44,9 +44,13 @@ export function playCard(card: Card, payload: PlayCardPayload) {
             card.owner.battlefield[payload.zone as BfZone] = card;
         }
     }
-
-
-    for (const effect of card.effects) {
+    console.log("card effect:", card.effects)
+    const ef = Array.isArray(card.effects)
+    ? card.effects
+    : Array.isArray((card.effects as any)?.effects)
+    ? (card.effects as any).effects
+    : [];
+    for (const effect of ef) {
         if (!resolveEffect(card.owner, effect, payload))
             console.log("Resolve effect failed", { cardId: card.idInGame, effect: effect.effect, payload });
     }
@@ -85,7 +89,7 @@ export function resolveCombat(game: Game) {
             else if (card1.type === "creature")
                 dealsDmg(card1.owner, game.players[0], card1.currForce);
                 resolveTriggers(card1, "on_deal_damage", game.players[0]);
-        
+
         }
         else if (card1 === undefined) {
             if (card0.type === "creature")
@@ -123,21 +127,26 @@ export function resolveBuildings(game:Game) {
             {
             const building = player.battlefield[zone];
             if (building && building.type === "building") {
-                for (const effect of building.effects){
+                const ef = Array.isArray(building.effects)
+                    ? building.effects
+                    : Array.isArray((building.effects as any)?.effects)
+                    ? (building.effects as any).effects
+                    : [];
+                for (const effect of ef ){
                     switch (effect.target) {
                         case "self_hero":
                             resolveEffect(player, effect, { cardId: 0, target: player });
-                            break;       
+                            break;
                         case "opponent_hero":
                             for (const oppo of game.players)
                             {
                                 if (oppo !== player)
                                     resolveEffect(player, effect, { cardId: 0, target: oppo });
                             }
-                            break;  
+                            break;
                         case "self":
                             resolveEffect(player, effect, { cardId: building.idInGame, target: building });
-                            break;          
+                            break;
                         case "left_neighbor":
                             if (i === 1)
                                 break;
@@ -145,7 +154,7 @@ export function resolveBuildings(game:Game) {
                             const leftTarget = player.battlefield[zoneLeftTarget];
                             if (leftTarget)
                                 resolveEffect(player, effect, { cardId: building.idInGame, target: leftTarget });
-                            break; 
+                            break;
                         case "right_neighbor":
                             if (i === 8)
                                 break;
@@ -187,12 +196,12 @@ export function resolveBuildings(game:Game) {
 
 function resolveValue(valueFrom: string | undefined, value: number, payload: PlayCardPayload): number {
     if (!valueFrom) return value;
-    
+
     const [source, field] = valueFrom.split('.');
     const obj = source === 'target' ? payload.target
               : source === 'target2' ? payload.target2
               : undefined;
-    
+
     if (!obj) return value;
     return (obj as any)[field] ?? value;
 }
@@ -207,7 +216,7 @@ export function resolveEffect(
     player: Hero,
     eff: Effect,
     payload: PlayCardPayload): boolean {
-        
+
     if (!payload.target)
         return false
     let value = resolveValue(eff.valueFrom, eff.value, payload);
@@ -287,7 +296,7 @@ export function checkVictory(game: Game) {
                 console.log(player.class);
         }
     }
-    else    
+    else
     {
         for (const player of game.players) {
             if (max === player.dmgDealt)

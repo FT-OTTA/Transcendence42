@@ -10,6 +10,8 @@ import { prisma } from '../../prisma/prisma.ts'
 import fs from 'fs'
 import path from 'path'
 
+import { Card as PrismaCard } from "@prisma/client"; // DEV MODE IN BUILD HERO TO REMOVE
+
 let waitingPlayers: WaitingPlayer[] = [];
 let sessions: GameSession[] = []
 
@@ -168,38 +170,63 @@ async function buildHero(heroId: string): Promise<Hero> {
     // Parsing du deck
     let library: Card[] = []
 
-    if (true) { // remove this condition to load real decks from DB
+// DEV MODE
+    const allCards = await prisma.card.findMany(); 
+library = allCards.map((c: PrismaCard): Card => ({
+    kind: "card",
+    idInGame: Math.floor(Math.random() * 100000),
+    idInCollection: parseInt(c.id),
+    cardName: c.name,
+    effectText: c.effect_text ?? '',
+    type: c.type as CardType,
+    class: c.class as CardClass,
+    runeCost: c.rune_cost,
+    baseForce: c.force ?? 0,
+    currForce: c.force ?? 0,
+    baseEndurance: c.endurance ?? 0,
+    currEndurance: c.endurance ?? 0,
+    effect: c.effect,
+    // Utilisation de la logique sécurisée discutée précédemment
+    effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[], 
+    zone: null as any,
+    owner: null as any,
+    timing: "normal" as EffectTime,
+    state: "alive" as CreatureState,
+    fullPicPath: c.illustration ?? '',
+    smallPicPath: c.illustration ?? '',
+    cardBackPath: ''
+}));
     // if (hero.deck) { // and put this back in
-        const cardIds: string[] = JSON.parse(hero.deck)
-        const cards = (await Promise.all(
-            cardIds.map(id => prisma.card.findUnique({ where: { id } }))
-        )).filter((c: Card | null): c is NonNullable<typeof c> => !!c)
+    //     const cardIds: string[] = JSON.parse(hero.deck)
+    //     const cards = (await Promise.all(
+    //         cardIds.map(id => prisma.card.findUnique({ where: { id } }))
+    //     )).filter((c: Card | null): c is NonNullable<typeof c> => !!c)
 
-        library = cards.map((c: typeof cards[0]): Card => ({
-            kind: "card",
-            idInGame: Math.floor(Math.random() * 100000),
-            idInCollection: parseInt(c.id),
-            cardName: c.name,
-            effectText: c.effect_text ?? '',
-            type: c.type as CardType,
-            class: c.class as CardClass,
-            runeCost: c.rune_cost,
-            baseForce: c.force ?? 0,
-            currForce: c.force ?? 0,
-            baseEndurance: c.endurance ?? 0,
-            currEndurance: c.endurance ?? 0,
-            effect: c.effect,
-            effects: JSON.parse(c.effect).effects as Effect[],
-            zone: null as any,
-            owner: null as any,
-            timing: "normal" as EffectTime,
-            state: "alive" as CreatureState,
-            fullPicPath: c.illustration ?? '',
-            smallPicPath: c.illustration ?? '',
-            cardBackPath: ''
-        }))
-        library = shuffle(library);
-    }
+    //     library = cards.map((c: typeof cards[0]): Card => ({
+    //         kind: "card",
+    //         idInGame: Math.floor(Math.random() * 100000),
+    //         idInCollection: parseInt(c.id),
+    //         cardName: c.name,
+    //         effectText: c.effect_text ?? '',
+    //         type: c.type as CardType,
+    //         class: c.class as CardClass,
+    //         runeCost: c.rune_cost,
+    //         baseForce: c.force ?? 0,
+    //         currForce: c.force ?? 0,
+    //         baseEndurance: c.endurance ?? 0,
+    //         currEndurance: c.endurance ?? 0,
+    //         effect: c.effect,
+    //         effects: JSON.parse(c.effect).effects as Effect[],
+    //         zone: null as any,
+    //         owner: null as any,
+    //         timing: "normal" as EffectTime,
+    //         state: "alive" as CreatureState,
+    //         fullPicPath: c.illustration ?? '',
+    //         smallPicPath: c.illustration ?? '',
+    //         cardBackPath: ''
+    //     }))
+    //     library = shuffle(library);
+    // }
     return {
         kind: "hero",
         idInGame: Math.floor(Math.random() * 100000),

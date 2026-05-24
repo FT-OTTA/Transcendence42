@@ -3,20 +3,20 @@
         {
             "effect": "dmg",
             "value": 5,
-            "target": "all_enemies",
+            "target": "opponent",
             "targetType": { "hero": true, "creature": true, "building": true }
         },
         {
             "effect": "dmg",
             "value": 4,
-            "target": "all_enemies",
-            "targetType": { "hero": true, "creature": true, "building": true }  
+            "target": "opponent",
+            "targetType": { "hero": true, "creature": true, "building": true }
         },
         {
             "effect": "dmg",
             "value": 3,
-            "target": "all_enemies",
-            "targetType": { "hero": true, "creature": true, "building": true }  
+            "target": "opponent",
+            "targetType": { "hero": true, "creature": true, "building": true }
         }
     ]
 }

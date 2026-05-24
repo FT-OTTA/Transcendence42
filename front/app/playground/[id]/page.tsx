@@ -24,6 +24,7 @@ export default function PlaygroundPage() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [selectedTarget, setSelectedTarget] = useState<Card  | null>(null);
   const [selectedTargets, setSelectedTargets] = useState<Card[]>([]); // Pour les sorts à plusieurs cibles
+  const [potentialTargets, setPotentialTargets] = useState<Card[]>([]); // Cibles valides pour le sort sélectionné
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -174,12 +175,34 @@ function getTargets() {
       e.target === "left_neighbor" ||
       e.target === "right_neighbor" ||
       e.target === "all_allies" ||
+      e.target === "random" ||
+      e.target === "all_board" ||
       e.target === "all_enemies") {
         console.log("No target needed for effect:", e.effect);
         continue;
       }
-
+      if (e.target === "self" || e.target === "opponent") {
+        console.log("Target type:", e.targetType);
+        switch (e.target) {
+          case "self":
+            setPotentialTargets(playerSlots.filter(c => c !== null) as Card[]);
+            break;
+          case "opponent":
+            setPotentialTargets(opponentSlots.filter(c => c !== null) as Card[]);
+            break;
+      }
+      if (!(e.targetType?.creature)) {
+        setPotentialTargets(prev => prev.filter(c => c.type !== "creature"));
+      }
+      if (!(e.targetType?.building)) {
+        setPotentialTargets(prev => prev.filter(c => c.type !== "building"));
+      }
+      if (!(e.targetType?.hero)) {
+        setPotentialTargets(prev => [...prev, [".."]]); // Placeholder for hero
+      }
+      console.log("Potential targets after filtering:", potentialTargets);
     }
+  }
 }
 
 const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);

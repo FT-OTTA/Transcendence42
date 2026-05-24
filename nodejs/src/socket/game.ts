@@ -63,6 +63,7 @@ function resolveRound(session: GameSession): void {
         }
     }
 
+    console.log("Après résolution des cartes jouées :")
     try {
         checkBoardState(session.game)
         resolveCombat(session.game)
@@ -73,23 +74,32 @@ function resolveRound(session: GameSession): void {
     } catch (e) {
         if (e instanceof GameOver) {
             console.log(`Game over détecté : ${e.message}`)
+            const winnerIndex = session.game.players.indexOf(e.winner)
             session.sockets.forEach((s, id) => {
-                s.emit('game_over', { game: getPlayerPerspective(session.game, id), message: e.message })
+                s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
             })
             return
         }
+        throw e
     }
+    
+    console.log("Après résolution du tour :")
 
     session.submittedCards.clear()
     session.readyPlayers.clear()
     session.game.turnNumber += 1
     console.log("Tour actuel avant check :", session.game.turnNumber);
     if (session.game.turnNumber > 8) {
-        checkVictory(session.game)
+        const winner = checkVictory(session.game)
+        const winnerIndex = winner ? session.game.players.indexOf(winner) : -1
         session.sockets.forEach((s, id) => {
-            s.emit('game_over', { game: getPlayerPerspective(session.game, id) })
+            s.emit('game_over', { 
+                game: getPlayerPerspective(session.game, id),
+                winner: winnerIndex  // -1 = draw
+            })
         })
-    } else {
+    }
+    else {
         startTurn(session.game)
         session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
         session.sockets.forEach((s, id) => {

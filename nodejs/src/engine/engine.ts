@@ -29,9 +29,9 @@ export function startTurn(game: Game): void {
 }
 
 export function playCard(card: Card, payload: PlayCardPayload) {
-    console.log("Playing card", { card, payload });
-    console.log("zone reçue:", payload.zone)
-    console.log("starts with bf:", payload.zone?.startsWith("bf"))
+    // console.log("Playing card", { card, payload });
+    // console.log("zone reçue:", payload.zone)
+    // console.log("starts with bf:", payload.zone?.startsWith("bf"))
 
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
 
@@ -47,25 +47,20 @@ export function playCard(card: Card, payload: PlayCardPayload) {
 
 
     for (const effect of card.effects) {
-        if (!resolveEffect(card.owner, effect, payload))
-            console.log("Resolve effect failed", { cardId: card.idInGame, effect: effect.effect, payload });
+        resolveEffect(card.owner, effect, payload)
+        // if (!resolveEffect(card.owner, effect, payload))
+            // console.log("Resolve effect failed", { cardId: card.idInGame, effect: effect.effect, payload });
     }
 }
 // p1 deals to p2
-export function dealsDmg(player1: Hero, player2: Hero, x: number): void
-{
-    if (x - player2.armor > 0)
-    {
-        player2.armor -= x;
-    }
-    else
-    {
-        player1.dmgDealt += x - player2.armor;
+export function dealsDmg(player1: Hero, player2: Hero, x: number): void {
+    if (x <= player2.armor) {
+        player2.armor -= x;  // l'armure absorbe tout
+    } else {
+        player1.dmgDealt += x - player2.armor;  // les dégâts dépassent l'armure
         player2.armor = 0;
     }
-
 }
-
 function resolveTriggers(card: Card, trigger: EffectTrigger, target: Hero) {
     for (const effect of card.effects) {
         if (effect.trigger === trigger) {
@@ -75,6 +70,7 @@ function resolveTriggers(card: Card, trigger: EffectTrigger, target: Hero) {
 }
 
 export function resolveCombat(game: Game) {
+    console.log("Résolution du combat...")
     for (let i = 1; i <= 8 ; i++) {
         const zone = `bf${i}` as BfZone;
         const card0 = game.players[0].battlefield[zone];
@@ -91,7 +87,7 @@ export function resolveCombat(game: Game) {
         }
         else if (card1 === undefined) {
             if (card0.type === "creature"){
-                dealsDmg(card0.owner, game.players[0], card0.currForce);
+                dealsDmg(card0.owner, game.players[1], card0.currForce);
                 resolveTriggers(card0, "on_deal_damage", game.players[1]);
 
             }
@@ -117,7 +113,7 @@ export function resolveCombat(game: Game) {
             game.players[0].dmgDealt += card1.currForce
         }
         else if (card0.type == "creature"){
-            game.players[0].dmgDealt += card0.currForce
+            game.players[1].dmgDealt += card0.currForce
         }
     }
 }
@@ -278,30 +274,23 @@ export function resolveEffect(
     return true;
 }
 
-export function checkVictory(game: Game) {
+export function checkVictory(game: Game): Hero | null {
     let max = 0;
     let draw = false;
+    let winner: Hero | null = null;
+
     for (const player of game.players) {
-        if (max === player.dmgDealt)
+        if (player.dmgDealt > max) {
+            max = player.dmgDealt;
+            winner = player;
+            draw = false;
+        } else if (player.dmgDealt === max) {
             draw = true;
-        if (max < player.dmgDealt)
-            max = player.dmgDealt
-    }
-    if (draw){
-        console.log("draw between ")
-        for (const player of game.players) {
-            if (max === player.dmgDealt)
-                console.log(player.class);
         }
     }
-    else
-    {
-        for (const player of game.players) {
-            if (max === player.dmgDealt)
-                console.log(player.class);
-        }
-        console.log(" wins");
-    }
+
+    if (draw) return null;
+    return winner;
 }
 
 export function checkBoardState(game: Game) {

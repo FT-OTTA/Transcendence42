@@ -82,29 +82,36 @@ export function resolveCombat(game: Game) {
         if (card0 === undefined) {
             if (card1 === undefined)
                 continue;
-            else if (card1.type === "creature")
+            else if (card1.type === "creature"){
                 dealsDmg(card1.owner, game.players[0], card1.currForce);
                 resolveTriggers(card1, "on_deal_damage", game.players[0]);
 
+            }
+
         }
         else if (card1 === undefined) {
-            if (card0.type === "creature")
+            if (card0.type === "creature"){
                 dealsDmg(card0.owner, game.players[0], card0.currForce);
                 resolveTriggers(card0, "on_deal_damage", game.players[1]);
+
+            }
         }
         else if (card0.type == "creature" && card1.type == "creature"){
             // 1 tabasse 0
             if (card0.currEndurance - card1.currForce > 0)
                 card0.currEndurance -= card1.currForce
-            else
+            else{
                 dealsDmg(card1.owner, game.players[0], card1.currForce - card0.currEndurance);
                 resolveTriggers(card1, "on_deal_damage", game.players[0]);
+            }
             // 0 tabasse 1
             if (card1.currEndurance - card0.currForce > 0)
                 card1.currEndurance -= card0.currForce
-            else
+            else {
                 dealsDmg(card0.owner, game.players[1], card0.currForce - card1.currEndurance);
                 resolveTriggers(card0, "on_deal_damage", game.players[1]);
+            }
+    
         }
         else if (card1.type == "creature"){
             game.players[0].dmgDealt += card1.currForce

@@ -5,5 +5,5 @@
             "target": "self",
             "targetType": { "creature": true, "building": true }
         }
-    ]   
+    ]
 }

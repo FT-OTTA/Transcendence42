@@ -16,7 +16,7 @@ model Card {
   endurance Int?
   rune_cost Int
   effect_text String
-  effect_json_path String
+  effect String @db.Text
   illustration String
   target_number Int?
   target_type String?

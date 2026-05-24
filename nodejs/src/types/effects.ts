@@ -1,22 +1,22 @@
 
-export type EffectType = 
+export type EffectType =
 | "ad_mod" // 1 target
 | "def_mod" // 1 target
 | "addef_mod" // 1 target
-| "draw" 
-| "dmg" 
-| "armor" 
-| "runes" 
-| "swap" 
+| "draw"
+| "dmg"
+| "armor"
+| "runes"
+| "swap"
 | "destroy"
 | "freeze"
 | "win";
 
-export type EffectTime = 
+export type EffectTime =
 | "immediate"
 | "end_of_turn";
 
-export type EffectTarget = 
+export type EffectTarget =
 | "self_hero"
 | "opponent_hero"
 | "self"
@@ -28,12 +28,11 @@ export type EffectTarget =
 | "all_board"
 | "all_enemies";
 
-export type TargetType = 
-| "creature"
-| "building"
-| "hero"
-| "zone";
-
+export type TargetType = {
+    creature?: boolean;
+    building?: boolean;
+    hero?: boolean;
+}
 export type EffectTrigger = "on_deal_damage"
 
 export type Effect = {

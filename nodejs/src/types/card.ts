@@ -11,6 +11,7 @@ export type CardClass = "common" | "Warrior" | "Druid";
 export type Card = {
     kind: "card";
     zone: Zone;
+    effect: string; // JSON string des effets, à parser côté client
     effects: Effect[];
     timing: EffectTime;
     type: CardType;

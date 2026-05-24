@@ -5,7 +5,7 @@ import type { Game } from '../types/gamesession.ts'
 import type { Effect, EffectType, EffectTarget, EffectTime } from '../types/effects.ts'
 import type { BfZone } from '../types/zones.ts'
 import type { GameSession, WaitingPlayer } from '../types/gamesession.ts'
-import { startTurn, checkVictory, resolveCombat, resolveBuildings, checkBoardState, playCard, resolveEffect } from '../engine/engine.ts'
+import { startTurn, checkVictory, resolveCombat, resolveBuildings, checkBoardState, playCard, resolveEffect, GameOver} from '../engine/engine.ts'
 import { prisma } from '../../prisma/prisma.ts'
 import fs from 'fs'
 import path from 'path'
@@ -63,11 +63,22 @@ function resolveRound(session: GameSession): void {
         }
     }
 
-    checkBoardState(session.game)
-    resolveCombat(session.game)
-    console.log("Après combat :")
-    checkBoardState(session.game)
-    console.log("Après vérification board :")
+    try {
+        checkBoardState(session.game)
+        resolveCombat(session.game)
+        console.log("Après combat :")
+        checkBoardState(session.game)
+        console.log("Après vérification board :")
+
+    } catch (e) {
+        if (e instanceof GameOver) {
+            console.log(`Game over détecté : ${e.message}`)
+            session.sockets.forEach((s, id) => {
+                s.emit('game_over', { game: getPlayerPerspective(session.game, id), message: e.message })
+            })
+            return
+        }
+    }
 
     session.submittedCards.clear()
     session.readyPlayers.clear()

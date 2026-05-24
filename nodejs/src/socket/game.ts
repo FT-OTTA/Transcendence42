@@ -178,7 +178,7 @@ async function buildHero(heroId: string): Promise<Hero> {
             baseEndurance: c.endurance ?? 0,
             currEndurance: c.endurance ?? 0,
             effect: c.effect,
-            effects: JSON.parse(c.effect) as Effect[],
+            effects: JSON.parse(c.effect).effects as Effect[],
             zone: null as any,
             owner: null as any,
             timing: "normal" as EffectTime,

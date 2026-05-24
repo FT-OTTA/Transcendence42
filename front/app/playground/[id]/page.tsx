@@ -25,6 +25,7 @@ export default function PlaygroundPage() {
   const [selectedTarget, setSelectedTarget] = useState<Card  | null>(null);
   const [selectedTargets, setSelectedTargets] = useState<Card[]>([]); // Pour les sorts à plusieurs cibles
   const [potentialTargets, setPotentialTargets] = useState<Card[]>([]); // Cibles valides pour le sort sélectionné
+  const [isHeroTarget, setIsHeroTarget] = useState<boolean>(false); // Si le sort peut cibler un héros
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -83,7 +84,19 @@ export default function PlaygroundPage() {
         setPlayerSlots(battlefieldToSlots(me.battlefield));
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
     });
-
+    newSocket.on('game_over', (data) => {
+        console.log("Game over:", data);
+        alert(`Game over! Winner: ${data.winner}`);
+        setSelectedHero(null);
+        setGame(null);
+        setHand(Array(8).fill(null));
+        setPlayerSlots(Array(8).fill(null));
+        setOpponentSlots(Array(8).fill(null));
+        setRunes(0);
+        setMeStats(null);
+        setOpponentStats(null);
+        setTurnNumber(1);
+    });
     newSocket.on('game_start', (data) => {
         console.log('REÇU GAME START:', data);
         myPlayerIndexRef.current = data.playerIndex; // On sauvegarde l'index
@@ -197,10 +210,14 @@ function getTargets() {
       if (!(e.targetType?.building)) {
         setPotentialTargets(prev => prev.filter(c => c.type !== "building"));
       }
-      if (!(e.targetType?.hero)) {
-        setPotentialTargets(prev => [...prev, [".."]]); // Placeholder for hero
+      if (e.targetType?.hero) {
+        setIsHeroTarget(true);
       }
       console.log("Potential targets after filtering:", potentialTargets);
+      if (potentialTargets.length === 0) {
+        console.log("No valid targets for this card's effects. You can still play it, but it won't do anything.");
+      }
+      // Now highlight potential targets in UI
     }
   }
 }
@@ -223,8 +240,8 @@ return (
           ) : (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
-                <OpponentBoard cards={opponentSlots} onPlay={() => {}} />
-                <PlayerBoard cards={displaySlots} onPlay={handlePlayToSlot} />
+                <OpponentBoard cards={opponentSlots} onPlay={() => {}} potentialTargets={potentialTargets} />
+                <PlayerBoard cards={displaySlots} onPlay={handlePlayToSlot} potentialTargets={potentialTargets} />
                 <PlayerHand cards={playerHandCards} onClick={setSelectedCard}/>
               </div>
               <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
@@ -233,6 +250,7 @@ return (
                   me={meStats}
                   opponent={opponentStats}
                   onEndTurn={handleEndTurn}
+                  highlightOpponentHero={isHeroTarget}
                 />
                 <LargeCardView card={selectedCard} onClick={getTargets} />
               </div>

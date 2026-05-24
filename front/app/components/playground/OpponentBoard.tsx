@@ -6,9 +6,10 @@ import type { Card } from 'otta-shared-types/card';
 interface OpponentBoardProps {
   cards: (Card | null)[];
   onPlay?: (cardId: string, targetIndex: number, isOpponent: boolean) => void;
+  potentialTargets?: Card[]; // Ajouté pour recevoir les cibles potentielles
 }
 
-export default function OpponentBoard({ cards, onPlay }: OpponentBoardProps) {
+export default function OpponentBoard({ cards, onPlay, potentialTargets }: OpponentBoardProps) {
   const opponentSlots = Array.from({ length: 8 }, (_, i) => `opponent-${i}`);
 
   return (
@@ -22,6 +23,7 @@ export default function OpponentBoard({ cards, onPlay }: OpponentBoardProps) {
             id={slot}
             isOpponentSlot={true}
             card={cards[index] ?? undefined}
+            isHighlighted={potentialTargets?.some(c => c === cards[index])}
           />
         ))}
       </div>

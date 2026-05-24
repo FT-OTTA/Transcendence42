@@ -5,11 +5,12 @@ import type { Card } from 'otta-shared-types/card';
 
 interface PlayerBoardProps {
   cards: (Card | null)[];
+  potentialTargets?: Card[]; // Ajouté pour recevoir les cibles potentielles
   onPlay?: (slotIndex: number) => void;  // simplifié
 }
 
 
-export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
+export default function PlayerBoard({ cards, onPlay, potentialTargets }: PlayerBoardProps) {
   const playerSlots = Array.from({ length: 8 }, (_, i) => `player-${i}`);
 
   return (
@@ -25,6 +26,7 @@ export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
             onClick={() => {
                 if (!cards[index]) onPlay?.(index)  // ✅ seulement si slot vide
             }}
+            isHighlighted={potentialTargets?.some(c => c === cards[index])} // Highlight les slots qui sont des cibles potentielles
         />
         ))}
       </div>

@@ -10,9 +10,10 @@ interface CardSlotProps {
   showEffectText?: boolean;
   card?: Card | null;
   onClick?: (card: Card | null) => void
+  isHighlighted?: boolean
 }
 
-export default function CardSlot({ id, isHand = false, isOpponentSlot = false, showEffectText = false, card, onClick }: CardSlotProps) {
+export default function CardSlot({ id, isHand = false, isOpponentSlot = false, showEffectText = false,  card, onClick, isHighlighted = false}: CardSlotProps) {
   return (
     <div
       id={id}
@@ -25,6 +26,7 @@ export default function CardSlot({ id, isHand = false, isOpponentSlot = false, s
         }
         ${isOpponentSlot ? 'opacity-80' : ''}
         flex flex-col items-center justify-center text-blue-300/40 text-xs
+        ${isHighlighted ? 'ring-2 ring-yellow-400/80 scale-105 shadow-lg' : ''}
       `}
     >
       {card ? (

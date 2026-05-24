@@ -1,12 +1,17 @@
 {
     "effects": [
         {
-            "effect": "ad_mod",
-            "value": 1
+            "effect": "addef_mod",
+            "value": -1,
+            "target": "opponent",
+            "targetType": { "creature": true }
         },
         {
-            "effect": "def_mod",
-            "value": 1
+            "effect": "dmg",
+            "value": 0,
+            "valueFrom": "target.currForce",
+            "target": "opponent_hero",
+            "targetType": { "hero": true }
         }
     ]
 }

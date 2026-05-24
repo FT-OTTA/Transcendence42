@@ -6,4 +6,4 @@ Pretre suceur de sang;2;0;1;« Quand vous jouez cette carte, la creature ciblee
 Caillou de runes animé;3;0;5;« Quand vous jouez cette carte, vous gagnez 1 rune »;c005.json;common;c005.png;c005;0;[]
 Auto-flagelleur sadique;3;8;8;« Quand vous jouez cette carte, vous perdez 8 d’armure »;c006.json;common;c006.png;c006;0;[]
 Sniper incontrôlé;4;3;2;« Quand vous jouez cette carte, détruisez la créature ciblée »;c007.json;common;c007.png;c007;1;[ « creature » ]
-Teddy;0;8;8;« Quand vous jouez cette carte, gagnez la partie instantanement »;c008.json;common;c008.png;c008;0;[]
+Teddy;88;8;8;« Quand Teddy inflige des blessures, vous gagnez la partie instantanément »;c008.json;common;c008.png;c008;0;[]

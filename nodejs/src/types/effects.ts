@@ -9,7 +9,8 @@ export type EffectType =
 | "runes" 
 | "swap" 
 | "destroy"
-| "freeze";
+| "freeze"
+| "win";
 
 export type EffectTime = 
 | "immediate"
@@ -20,9 +21,11 @@ export type EffectTarget =
 | "opponent_hero"
 | "self"
 | "opponent"
+| "random"
 | "left_neighbor"
 | "right_neighbor"
 | "all_allies"
+| "all_board"
 | "all_enemies";
 
 export type TargetType = 
@@ -31,10 +34,14 @@ export type TargetType =
 | "hero"
 | "zone";
 
+export type EffectTrigger = "on_deal_damage"
+
 export type Effect = {
     effect: EffectType;
     value: number;
-    target: EffectTarget;
+    valueFrom?: string;
+    trigger?: EffectTrigger;
+    target?: EffectTarget;
     targetType?: TargetType;
 }
 

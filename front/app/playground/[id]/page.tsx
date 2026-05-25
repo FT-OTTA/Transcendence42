@@ -281,7 +281,6 @@ console.log("game:", game, "myPlayerIndex:", myPlayerIndexRef.current, "e.target
     console.log("Potential targets for effect", { effect: e, pool });
 }
 
-
   function abortPlay() {
     // 1. On vide le slot en attente
     setPendingSlots(prev => {
@@ -298,6 +297,7 @@ console.log("game:", game, "myPlayerIndex:", myPlayerIndexRef.current, "e.target
     setSelectedTargets([]);
     setPotentialTargets([]);
 }
+
 function pushSelectedTarget(target: Card | Hero) {
     if (!selectedCard) return;
 
@@ -317,24 +317,6 @@ function pushSelectedTarget(target: Card | Hero) {
     setSelectedTargets(prev => [...prev, target]);
     getTargets(currentEffectIndex + 1, selectedCard);
 }
-// function pushSelectedTarget(target: Card | Hero) {
-//     if (!selectedCard) return;
-
-//     // 1. Logique de Toggle
-//     const isAlreadySelected = selectedTargets.some(t => t.idInGame === target.idInGame);
-
-//     let newTargets: (Card | Hero)[];
-//     if (isAlreadySelected) {
-//         newTargets = selectedTargets.filter(t => t.idInGame !== target.idInGame);
-//     } else {
-//         if (!potentialTargets.some(c => c.idInGame === target.idInGame)) return;
-//         newTargets = [...selectedTargets, target];
-//     }
-
-//     setSelectedTargets(newTargets);
-
-//     // getTargets(currentEffectIndex + 1, selectedCard); // Recalcul des potentiels à chaque sélection/désélection
-// }
 
     return (
     <main className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80">
@@ -403,7 +385,7 @@ function pushSelectedTarget(target: Card | Hero) {
         : false
     }
 />
-<ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard}> </ConfirmPlay>
+<ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} />
 <></>
 </div>
 </div>

@@ -97,17 +97,34 @@ export function resolveBuildings(game:Game) {
         }
     }
 }
-function resolveValue(valueFrom: string | undefined, value: number | undefined, payload: PlayCardPayload, target?: Card | Hero, target2?: Card | Hero): number {
-    if (!value) return 0;
-    if (!valueFrom) return value;
+function resolveValue(
+    valueFrom: string | undefined,
+    value: number | undefined,
+    payload: PlayCardPayload,
+    target?: Card | Hero,
+    target2?: Card | Hero
+): number
+{
+    if (valueFrom)
+    {
+        const [source, field] = valueFrom.split('.');
 
-    const [source, field] = valueFrom.split('.');
-    const obj = source === 'target' ? target
-              : source === 'target2' ? target2
-              : undefined;
+        const obj =
+            source === 'target' ? target :
+            source === 'target2' ? target2 :
+            undefined;
 
-    if (!obj) return value;
-    return (obj as any)[field] ?? value;
+        if (!obj)
+            return value ?? 0;
+
+        const resolved = (obj as any)[field];
+
+        return typeof resolved === 'number'
+            ? resolved
+            : value ?? 0;
+    }
+
+    return value ?? 0;
 }
 
 export class GameOver extends Error {
@@ -181,7 +198,12 @@ export function resolveEffect(
     target = target!;
 
 
+    console.log("currForce direct:", (target as any).currForce)
+    console.log("stats:", (target as any).stats)
+    console.log("stats.currForce:", (target as any).stats?.currForce)
     let value = resolveValue(eff.valueFrom, eff.value, payload, target, target2);
+    console.log("Resolved value:", value);
+    
     console.log("target avant switch:", target?.kind, "noTargetNeeded:", noTargetNeeded)
     switch (eff.effect) {
         case "ad_mod":

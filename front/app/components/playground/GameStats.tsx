@@ -1,6 +1,7 @@
 "use client";
 
 interface PlayerStats {
+  class: "Druid" | "Warrior";
   armor: number;
   dmgDealt: number;
   curRunes: number;
@@ -20,7 +21,11 @@ interface GameStatsProps {
   isPlayerHeroSelected?: boolean;
 
 }
-
+function formatHeroLabel(label: string, cls?: string)
+{
+  if (!cls) return label;
+  return `${label} (${cls})`;
+}
 export default function GameStats({ 
   turnNumber = 1, 
   me, 
@@ -44,7 +49,9 @@ export default function GameStats({
 
 className={`border-b border-blue-300/30 pb-4 
   ${isOpponentHeroSelected ? "ring-4 ring-orange-500 bg-orange-500/20" : highlightOpponentHero ? "ring-2 ring-yellow-400/80 cursor-pointer" : ""}`}      >
-        <h4 className="text-sm text-blue-300/60 uppercase tracking-wider mb-2">Opponent</h4>
+        <h4 className="text-sm text-blue-300/60 uppercase tracking-wider mb-2">
+          {formatHeroLabel("Opponent", opponent?.class)}
+        </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-blue-200/70">Armor:</span>
@@ -66,7 +73,9 @@ className={`border-b border-blue-300/30 pb-4
       onClick={() => (highlightPlayerHero || isPlayerHeroSelected) && onHeroClick?.("self")}
         className={`${isPlayerHeroSelected ? "ring-4 ring-green-500 bg-green-500/20" : highlightPlayerHero ? "ring-2 ring-green-400/80 cursor-pointer" : ""}`}
       >
-        <h4 className="text-sm text-green-300/60 uppercase tracking-wider mb-2">You</h4>
+        <h4 className="text-sm text-green-300/60 uppercase tracking-wider mb-2">
+          {formatHeroLabel("You", me?.class)}
+        </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-blue-200/70">Hand Cards:</span>

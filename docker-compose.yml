@@ -93,8 +93,13 @@ services:
     networks:
       - otta
     restart: unless-stopped
+    volumes: # only for dev purpose gotta remove later
+      - ./nodejs/src:/app/src
+      - ./nodejs/databases:/app/databases
+      - /app/node_modules
     labels:
       collect_logs: "true"
+      
   mysql:
     build: ./mysql
     container_name: mysql

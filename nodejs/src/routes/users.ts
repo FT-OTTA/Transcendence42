@@ -41,9 +41,15 @@ router.patch('/:login', async (req, res) => {
 		const { login } = req.params;
 		const { moodphrase } = req.body;
 
-		if (!moodphrase) {
+		if (!moodphrase)
+        {
 			return res.status(400).json({ error: "moodPhrase is required" });
 		}
+
+        if (moodphrase.length() > 100)
+        {
+            return res.status(413).json({ error: "moodPhrase too long"});
+        }
 
 		const updatedUser = await prisma.user.update({
 			where: {

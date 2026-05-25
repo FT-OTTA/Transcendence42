@@ -5,6 +5,8 @@ import MatchHistory from "../../components/community/MatchHistory";
 import ProfileSearchBar from "../../components/community/ProfileSearchBar";
 import LoggedInBadge from "../../components/login/LoggedInBadge";
 import ProfileMood from "../../components/community/ProfileMood";
+import { notFound } from "next/navigation";
+
 
 export default async function CommunityProfilePage({
 	 params } : {
@@ -15,8 +17,12 @@ export default async function CommunityProfilePage({
 	const res = await fetch(`http://nodejs:3000/users/${login}`, {
 		cache: "no-store",
 	});
-
+	if (!res.ok)
+	{
+		notFound();
+	}
 	const user = await res.json();
+
 	return (
 		<main
 		className=" overflow-x-hidden md:overflow-y-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">

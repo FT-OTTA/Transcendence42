@@ -13,7 +13,9 @@ import path from 'path'
 import { Card as PrismaCard } from "@prisma/client"; // DEV MODE IN BUILD HERO TO REMOVE
 
 let waitingPlayers: WaitingPlayer[] = [];
-let sessions: GameSession[] = []
+let sessions: GameSession[] = [];
+
+let timeout = 9999999;
 
 function findById(game: Game, id: number): Hero | Card | undefined {
     for (const player of game.players) {
@@ -259,7 +261,7 @@ export async function instantiateGame(players: WaitingPlayer[]): Promise<Game> {
         kind: "game",
         phase: "beginning",
         turnNumber: 1,
-        clock_per_turn: 60,
+        clock_per_turn: 600, // 10 minutes pour tester
         players: heroes,
         backgroundPath: "default.png"
     };

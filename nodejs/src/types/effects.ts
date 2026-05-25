@@ -21,6 +21,7 @@ export type EffectTarget =
 | "opponent_hero"
 | "self"
 | "opponent"
+| "all"
 | "random"
 | "left_neighbor"
 | "right_neighbor"

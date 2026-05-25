@@ -25,8 +25,14 @@ export function resolveCombat(game: Game) {
     console.log("Résolution du combat...")
     for (let i = 1; i <= 8 ; i++) {
         const zone = `bf${i}` as BfZone;
-        const card0 = game.players[0].battlefield[zone];
-        const card1 = game.players[1].battlefield[zone];
+        let card0 = game.players[0].battlefield[zone];
+        let card1 = game.players[1].battlefield[zone];
+        if (card0 &&card0.type === "creature" && card0.state === "sick") {
+            card0 = undefined;
+        }
+        if (card1 && card1.type === "creature" && card1.state === "sick") {
+            card1 = undefined;
+        }
         if (card0 === undefined) {
             if (card1 === undefined)
                 continue;

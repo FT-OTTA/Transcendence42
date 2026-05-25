@@ -20,6 +20,9 @@ export function playerDraw(player: Hero, n: number): boolean {
 export function startTurn(game: Game): void {
     console.log(`Starting turn ${game.turnNumber}...`)
     for (const player of game.players) {
+        for (const card of Object.values(player.battlefield)) {
+            if (card && card.state === "sick") card.state = "ready";
+        }
         player.curRunes = fibonacci(game.turnNumber);
         player.curRunes = 999; // remove this line to have normal rune gain
         playerDraw(player, 24 - player.hand.length);// remove this line to have normal hand refill

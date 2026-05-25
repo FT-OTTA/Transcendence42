@@ -12,12 +12,15 @@ export function playCard(card: Card, payload: PlayCardPayload, game: Game): void
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
 
 
-    if (card.type == "building" || card.type == "creature")
+    if (card.type === "building" || card.type === "creature")
     {
         if (payload.zone && payload.zone.startsWith("bf"))
         {
             card.zone = payload.zone;
             card.owner.battlefield[payload.zone as BfZone] = card;
+        }
+        if (card.type === "creature") {
+            card.state = "sick";
         }
     }
 

@@ -1,13 +1,14 @@
 "use client";
 
+import type { Hero } from "otta-shared-types/hero";
 import CardSlot from "./CardSlot";
 import type { Card } from 'otta-shared-types/card';
 
 interface OpponentBoardProps {
   cards: (Card | null)[];
   onPlay?: (cardId: string, targetIndex: number, isOpponent: boolean) => void;
-  potentialTargets?: Card[];
-  selectedTargets?: Card[];
+  potentialTargets?: (Card | Hero)[];
+  selectedTargets?: (Card | Hero)[];
   onClick?: (card: Card) => void;
 }
 

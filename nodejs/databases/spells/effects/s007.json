@@ -3,7 +3,7 @@
         {
             "effect": "dmg",
             "value": 3,
-            "target": "all_board",
+            "target": "all",
             "targetType": { "hero": true, "creature": true, "building": true }
         }
     ]

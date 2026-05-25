@@ -1,12 +1,13 @@
 "use client";
 
+import type { Hero } from "otta-shared-types/hero";
 import CardSlot from "./CardSlot";
 import type { Card } from 'otta-shared-types/card';
 
 interface PlayerBoardProps {
   cards: (Card | null)[];
-  potentialTargets?: Card[];
-  selectedTargets?: Card[];
+  potentialTargets?: (Card | Hero)[];
+  selectedTargets?: (Card | Hero)[];
   onPlay?: (slotIndex: number) => void;
   onClick?: (card: Card) => void;
 }

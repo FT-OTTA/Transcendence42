@@ -14,9 +14,8 @@ function placeCard(hero: Hero, zone: `bf${number}`, card: Card) {
 }
 
 function resolve(player: Hero, eff: ReturnType<typeof makeEffect>, game: Game, target?: Card | Hero, target2?: Card) {
-    return resolveEffect(player, eff, { cardId: 0, target, target2 }, game)
+    return resolveEffect(player, eff, { cardId: 0 }, game, undefined, target, target2)
 }
-
 // ─── dmg ────────────────────────────────────────────────────────────────────
 
 describe('resolveEffect - dmg', () => {

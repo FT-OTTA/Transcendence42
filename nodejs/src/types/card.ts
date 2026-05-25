@@ -32,10 +32,17 @@ export type Card = {
     cardBackPath: string;
 };
 
+// export type PlayCardPayload = {
+//     cardId: number;
+//     zone?: Zone;
+//     target?: Card | Hero;
+//     target2?: Card;
+
+// };
+
+
 export type PlayCardPayload = {
     cardId: number;
     zone?: Zone;
-    target?: Card | Hero;
-    target2?: Card;
-
-};
+    targets?: { targetId?: number, target2Id?: number }[];
+}

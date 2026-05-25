@@ -24,7 +24,7 @@ export function startTurn(game: Game): void {
         player.curRunes = 999; // remove this line to have normal rune gain
         playerDraw(player, 24 - player.hand.length);// remove this line to have normal hand refill
         // playerDraw(player, 8 - player.hand.length); 
-        resolveEffect(player, player.passive, { cardId: 0, target: player }, game);
+        resolveEffect(player, player.passive, { cardId: 0 }, game, undefined, player)
     }
     resolveBuildings(game);
 }

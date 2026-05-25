@@ -2,6 +2,7 @@ import type { Card, PlayCardPayload } from '../types/card.ts'
 import type { Game } from '../types/gamesession.ts'
 import type { BfZone } from '../types/zones.ts'
 import { resolveEffect } from "./resolveEffects.ts";
+import { findById } from './utils.ts'
 
 export function playCard(card: Card, payload: PlayCardPayload, game: Game): void {
     // console.log("Playing card", { card, payload });
@@ -20,14 +21,12 @@ export function playCard(card: Card, payload: PlayCardPayload, game: Game): void
         }
     }
 
-    if (card.type !== "building") // may be change later if we want to have building with immediate effects
-    {
-        for (const effect of card.effects) {
-            console.log("Resolving effect", { effect: effect.effect });
-            resolveEffect(card.owner, effect, payload, game)
-            // if (!resolveEffect(card.owner, effect, payload))
-                // console.log("Resolve effect failed", { cardId: card.idInGame, effect: effect.effect, payload });
-        }
+    if (card.type !== "building") {
+        for (let i = 0; i < card.effects.length; i++) {
+            const t = payload.targets?.[i]
+            const target = t?.targetId ? findById(game, t.targetId) : undefined
+            const target2 = t?.target2Id ? findById(game, t.target2Id) as Card : undefined
+            resolveEffect(card.owner, card.effects[i], payload, game, undefined, target, target2)        }
 
     }
 }

@@ -8,19 +8,8 @@ import { launchGame, resolveRound } from './round.ts'
 import { getPlayerPerspective } from './perspective.ts'
 import { waitingPlayers, sessions, clearWaitingPlayers, addSession, findSession } from './state.ts'
 import { playCard } from '../engine/playCard.ts'
+import { findById } from '../engine/utils.ts'
 
-function findById(game: any, id: number): Hero | Card | undefined {
-    for (const player of game.players) {
-        if (player.idInGame === id) return player
-        const card = [
-            ...player.hand,
-            ...player.library,
-            ...Object.values(player.battlefield)
-        ].find((c: any) => c?.idInGame === id)
-        if (card) return card
-    }
-    return undefined
-}
 
 export function onConnection(io: Server, socket: Socket): void {
 
@@ -62,9 +51,7 @@ export function onConnection(io: Server, socket: Socket): void {
         player.curRunes -= card.runeCost
 
         if (card.timing === 'immediate') {
-            const target = findById(session.game, data.targetId)
-            const target2 = findById(session.game, data.target2Id)
-            playCard(card, { ...data, target, target2 }, session.game)
+            playCard(card, { cardId: data.cardId, zone: data.zone, targets: data.targets }, session.game)
         } else {
             const zone = data.zone as BfZone
             if (session.game.players[playerIndex].battlefield[zone]) return

@@ -17,8 +17,7 @@ export function dealsDmg(player1: Hero, player2: Hero, x: number): void {
 function resolveTiming(card: Card, timing: EffectTime, target: Hero, game: Game) {
     for (const effect of card.effects) {
         if (effect.timing === timing) {
-            resolveEffect(card.owner, effect, { cardId: card.idInGame, target }, game, timing)
-        }
+            resolveEffect(card.owner, effect, { cardId: card.idInGame }, game, timing, target)        }
     }
 }
 
@@ -93,20 +92,18 @@ export function resolveBuildings(game:Game) {
             const building = player.battlefield[zone];
             if (building && building.type === "building") {
                 for (const effect of building.effects) {
-                    resolveEffect(player, effect, { cardId: building.idInGame }, game);
-                }
+                    resolveEffect(player, effect, { cardId: building.idInGame }, game)                }
             }
         }
     }
 }
-
-function resolveValue(valueFrom: string | undefined, value: number | undefined, payload: PlayCardPayload): number {
+function resolveValue(valueFrom: string | undefined, value: number | undefined, payload: PlayCardPayload, target?: Card | Hero, target2?: Card | Hero): number {
     if (!value) return 0;
     if (!valueFrom) return value;
 
     const [source, field] = valueFrom.split('.');
-    const obj = source === 'target' ? payload.target
-              : source === 'target2' ? payload.target2
+    const obj = source === 'target' ? target
+              : source === 'target2' ? target2
               : undefined;
 
     if (!obj) return value;
@@ -167,15 +164,15 @@ export function resolveEffect(
     eff: Effect,
     payload: PlayCardPayload,
     game: Game,
-    fromTiming?: EffectTime
+    fromTiming?: EffectTime,
+    target?: Card | Hero,
+    target2?: Card | Hero
+
     ): boolean {
 
     console.log("Resolving effect", { eff });
     if (eff.timing && eff.timing !== fromTiming) return true;
     
-    let target = payload.target;
-    let target2 = payload.target2;
-
     // Override target selon l'effet
     target = resolveTarget(player, eff, game) ?? target;
     const noTargetNeeded = !!eff.target && (["all_enemies", "all_allies", "all_board"] as string[]).includes(eff.target)
@@ -184,7 +181,7 @@ export function resolveEffect(
     target = target!;
 
 
-    let value = resolveValue(eff.valueFrom, eff.value, payload);
+    let value = resolveValue(eff.valueFrom, eff.value, payload, target, target2);
     console.log("target avant switch:", target?.kind, "noTargetNeeded:", noTargetNeeded)
     switch (eff.effect) {
         case "ad_mod":
@@ -298,15 +295,19 @@ export function resolveEffect(
                 return false;
             target.curRunes += value;
             break;
-        case "swap":
-            if (target.kind === "hero" || !target2)
-                return false;
-            {
-                const tmp = target.zone;
-                target.zone = target2.zone;
-                target2.zone = tmp;
-            }
+        case "swap": {
+            if (target.kind === "hero" || !target2 || target2.kind === "hero") return false;
+            const zone1 = target.zone as BfZone;
+            const zone2 = target2.zone as BfZone;
+            target.owner.battlefield[zone1] = target2;
+            target2.owner.battlefield[zone2] = target;
+            const tmpOwner = target.owner;
+            target.owner = target2.owner;
+            target2.owner = tmpOwner;
+            target.zone = zone2;
+            target2.zone = zone1;
             break;
+        }
         case "destroy":
             if (eff.target === "all_enemies" && game) {
                 const opponent = game.players.find(p => p !== player);

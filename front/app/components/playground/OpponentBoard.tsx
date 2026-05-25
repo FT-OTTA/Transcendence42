@@ -6,11 +6,12 @@ import type { Card } from 'otta-shared-types/card';
 interface OpponentBoardProps {
   cards: (Card | null)[];
   onPlay?: (cardId: string, targetIndex: number, isOpponent: boolean) => void;
-  potentialTargets?: Card[]; // Ajouté pour recevoir les cibles potentielles
-  onClick?: (card: Card) => void; // Ajouté pour gérer les clics sur les cartes adverses
+  potentialTargets?: Card[];
+  selectedTargets?: Card[];
+  onClick?: (card: Card) => void;
 }
 
-export default function OpponentBoard({ cards, onPlay, potentialTargets, onClick }: OpponentBoardProps) {
+export default function OpponentBoard({ cards, onPlay, potentialTargets, selectedTargets, onClick }: OpponentBoardProps) {
   const opponentSlots = Array.from({ length: 8 }, (_, i) => `opponent-${i}`);
 
   return (
@@ -24,7 +25,8 @@ export default function OpponentBoard({ cards, onPlay, potentialTargets, onClick
             id={slot}
             isOpponentSlot={true}
             card={cards[index] ?? undefined}
-            isHighlighted={potentialTargets?.some(c => c === cards[index])}
+            isHighlighted={potentialTargets?.some(c => c.idInGame === cards[index]?.idInGame)}
+            isSelected={selectedTargets?.some(c => c.idInGame === cards[index]?.idInGame)}
             onClick={() => onClick?.(cards[index] as Card)}
           />
         ))}

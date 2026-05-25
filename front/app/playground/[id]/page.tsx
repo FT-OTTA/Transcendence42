@@ -34,6 +34,7 @@ export default function PlaygroundPage() {
   const [opponentStats, setOpponentStats] = useState<any>(null);
   const [turnNumber, setTurnNumber] = useState(1);
   const [pendingSlots, setPendingSlots] = useState<(Card | null)[]>(Array(8).fill(null));
+  const [pendingSlotIndex, setPendingSlotIndex] = useState<number | null>(null); // Pour mémoriser le slot ciblé lors du play d'une créature
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -123,32 +124,118 @@ export default function PlaygroundPage() {
   const playerHandCards = useMemo(() => hand, [hand]);
   const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
 
-  function handlePlayToSlot(slotIndex: number) {
+  function handlePlaySpell() {
+      if (!selectedCard || selectedCard.type !== "spell") return;
+      
+      // 1. Vérification des runes
+      if (selectedCard.runeCost > runes) {
+          setRuneError("Not enough runes!");
+          return;
+      }
+
+      // 2. Vérification si le sort nécessite des cibles
+      const ef = Array.isArray(selectedCard.effects) ? selectedCard.effects : [];
+      const needsTarget = ef.some((e: any) => e.target === "opponent" || e.target === "self");
+
+      // Si le sort n'a pas besoin de cible, on l'émet immédiatement
+      if (!needsTarget) {
+          socketRef.current?.emit('play_card', {
+              cardId: selectedCard.idInGame,
+              zone: null, // Pas de zone pour un sort
+              targetId: null,
+              target2Id: null,
+          });
+          setSelectedCard(null);
+      } else {
+          // Sinon, on lance la phase de ciblage (ton code existant)
+          getTargets(); 
+      }
+  }
+
+    function handleConfirmSpell() {
+        if (!selectedCard) return;
+
+        // Envoi de la carte avec les cibles si elles existent, sinon null
+        socketRef.current?.emit('play_card', {
+            cardId: selectedCard.idInGame,
+            zone: selectedCard.type === "spell" ? null : `bf${pendingSlotIndex! + 1}`,
+            // Si aucune cible n'a été sélectionnée, on envoie null (c'est le choix du joueur)
+            targetId: selectedTargets[0]?.idInGame ?? null,
+            target2Id: selectedTargets[1]?.idInGame ?? null,
+        });
+
+          // Reset total
+          setSelectedCard(null);
+          setSelectedTargets([]);
+          setPotentialTargets([]);
+          setPendingSlotIndex(null);
+      }
+
+      function selectCardInHand(card: Card) {
+    abortPlay(); // <--- Annule tout avant de sélectionner la nouvelle
+    setSelectedCard(card);
+}
+
+function handlePlayToSlot(slotIndex: number) {
     if (!selectedCard || !socketRef.current) return;
     if (selectedCard.runeCost > runes) {
-      setRuneError("Not enough runes to play this card!");
+      setRuneError("Not enough runes!");
       setTimeout(() => setRuneError(null), 1000);
       return;
     }
+
     if (playerSlots[slotIndex] || pendingSlots[slotIndex]) return;
     if (selectedCard.type === "spell") return;
-
     setPendingSlots(prev => {
-      const next = [...prev];
-      next[slotIndex] = selectedCard;
-      return next;
-    });
+        const next = [...prev]; // On copie l'état actuel
+        
+        // 1. On nettoie uniquement l'ancienne preview si elle existait
+        if (pendingSlotIndex !== null) {
+            next[pendingSlotIndex] = null;
+        }
+        
+        // 2. On place la nouvelle carte à la nouvelle position
+        next[slotIndex] = selectedCard;
+        
+        return next;
+    });    // On pose TOUJOURS la carte en preview, qu'elle ait des effets ou non
+    setPendingSlotIndex(slotIndex);
+    
+    
+    setSelectedTargets([]);
+    setPotentialTargets([]);
+    
+      // Si elle a besoin de cibles, on lance le ciblage
+    const hasTargetedEffects = selectedCard.effects.some(e => 
+        typeof e.target === "string" && ["opponent", "self", "all"].includes(e.target)
+    );
+    
+    if (hasTargetedEffects) {
+        getTargets(); 
+    }
+}
 
-    socketRef.current.emit('play_card', {
-        cardId: selectedCard.idInGame,
-        zone: `bf${slotIndex + 1}`,
-        targetId: selectedTargets[0]?.idInGame ?? null,
-        target2Id: selectedTargets[1]?.idInGame ?? null,
-    });
-    setSelectedCard(null);
+function getRequiredTargetCount(card: Card) {
+
+  // Si c'est un effet "all" ou "random", on n'attend aucune sélection utilisateur
+  if (card.effects.some(e => typeof e.target === "string" && ["all_board", "all_allies", "all_enemies", "random"].includes(e.target))) {
+    return 0;
+  }
+  
+  // Si c'est "swap" ou tout effet nécessitant 2 cibles, tu retournes 2
+  if (card.effects.some(e => e.effect === "swap")) {
+    return 2;
   }
 
-  function handleEndTurn() {
+  // Sinon, si c'est "opponent" ou "self", on attend 1 cible
+  if (card.effects.some(e => typeof e.target === "string" && ["opponent", "self", "all"].includes(e.target))) {
+    return 1;
+  }
+
+  return 0;
+}
+
+function handleEndTurn() {
     if (!socketRef.current) return;
     socketRef.current.emit('end_turn');
   }
@@ -164,13 +251,16 @@ export default function PlaygroundPage() {
       if (["self_hero","opponent_hero","left_neighbor","right_neighbor","all_allies","random","all_board","all_enemies"].includes(e.target)) {
         continue;
       }
-      if (e.target === "self" || e.target === "opponent") {
+      if (e.target === "self" || e.target === "opponent" || e.target === "all") {
         switch (e.target) {
           case "self":
             setPotentialTargets(playerSlots.filter(c => c !== null) as Card[]);
             break;
           case "opponent":
             setPotentialTargets(opponentSlots.filter(c => c !== null) as Card[]);
+            break;
+          case "all":
+            setPotentialTargets([...playerSlots, ...opponentSlots].filter(c => c !== null) as Card[]);
             break;
         }
         if (!(e.targetType?.creature)) setPotentialTargets(prev => prev.filter(c => c.type !== "creature"));
@@ -180,13 +270,55 @@ export default function PlaygroundPage() {
     }
   }
 
-  function pushSelectedTarget(card: Card) {
-    if (!selectedCard) return;
-    if (potentialTargets.some(c => c === card)) {
-      setSelectedTargets(prev => [...prev, card]);
-    }
-  }
+  function abortPlay() {
+    // 1. On vide le slot en attente
+    setPendingSlots(prev => {
+        const next = [...prev];
+        if (pendingSlotIndex !== null) {
+            next[pendingSlotIndex] = null;
+        }
+        return next;
+    });
 
+    // 2. On reset tous les états de ciblage et de sélection
+    setSelectedCard(null);
+    setPendingSlotIndex(null);
+    setSelectedTargets([]);
+    setPotentialTargets([]);
+}
+// function pushSelectedTarget(card: Card) {
+//       if (!selectedCard) return;
+      
+//       // On récupère le nombre requis via la fonction qu'on vient de créer
+//       const required = getRequiredTargetCount(selectedCard);
+
+//       // Si on a déjà assez de cibles, on ne fait rien
+//       if (selectedTargets.length >= required) return;
+
+//       // On ajoute la cible si elle est dans les choix valides (potentialTargets)
+//       if (potentialTargets.some(c => c.idInGame === card.idInGame)) {
+//         setSelectedTargets(prev => [...prev, card]);
+//       }
+//   }
+function pushSelectedTarget(card: Card) {
+    if (!selectedCard) return;
+
+    // Si la carte est déjà sélectionnée, on la retire (Désélection)
+    if (selectedTargets.some(t => t.idInGame === card.idInGame)) {
+        setSelectedTargets(prev => prev.filter(t => t.idInGame !== card.idInGame));
+        return;
+    }
+
+    const required = getRequiredTargetCount(selectedCard);
+    
+    // Si on a atteint le max, on ne fait rien
+    if (selectedTargets.length >= required) return;
+
+    // Ajout si c'est une cible valide
+    if (potentialTargets.some(c => c.idInGame === card.idInGame)) {
+        setSelectedTargets(prev => [...prev, card]);
+    }
+}
   return (
     <main className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80">
       <Navbar />
@@ -199,10 +331,27 @@ export default function PlaygroundPage() {
           ) : (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
-                <OpponentBoard cards={opponentSlots} onPlay={() => {}} potentialTargets={potentialTargets} onClick={pushSelectedTarget} />
-                <PlayerBoard cards={displaySlots} onPlay={handlePlayToSlot} potentialTargets={potentialTargets} onClick={pushSelectedTarget} />
-                <PlayerHand cards={playerHandCards} onClick={setSelectedCard}/>
-              </div>
+                <OpponentBoard 
+                cards={opponentSlots}
+                onPlay={() => {}}
+                potentialTargets={potentialTargets} 
+                selectedTargets={selectedTargets} 
+                onClick={pushSelectedTarget} />
+<PlayerBoard 
+    cards={displaySlots} 
+    onPlay={handlePlayToSlot} 
+    potentialTargets={potentialTargets} 
+    selectedTargets={selectedTargets} // <--- Ajoute ça
+    onClick={pushSelectedTarget} 
+/>
+                <PlayerHand 
+                    cards={playerHandCards} 
+                    onClick={(card) => {
+                        abortPlay(); // Nettoie le plateau (pendingSlot, etc.)
+                        setSelectedCard(card);
+                    }}
+                />
+                </div>
               <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
                 <GameStats
                   turnNumber={turnNumber}
@@ -211,8 +360,18 @@ export default function PlaygroundPage() {
                   onEndTurn={handleEndTurn}
                   highlightOpponentHero={isHeroTarget}
                 />
-                <LargeCardView card={selectedCard} onClick={getTargets} />
-              </div>
+<LargeCardView 
+    card={selectedCard} 
+    onClick={getTargets}
+    onConfirm={handleConfirmSpell}
+    hasTargets={
+        selectedCard 
+        ? (selectedCard.type === "spell" 
+            ? selectedTargets.length >= getRequiredTargetCount(selectedCard)
+            : pendingSlotIndex !== null) // Toujours vrai si une créature est en preview
+        : false
+    }
+/>              </div>
             </div>
           )}
         </>

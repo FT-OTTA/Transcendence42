@@ -1,7 +1,10 @@
+"use client";
 import AvatarFrame from "../AvatarFrame";
 import clsx from "clsx";
 import { cinzel } from "../../fonts";
 import ProfileMood from "./ProfileMood";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const profileBanner = clsx
 (
@@ -36,14 +39,37 @@ const onlineStatus = clsx
 	" opacity-80 font-bold md:px-5"
 )
 
-
 export default function ProfileBanner({username, mood, isOnline, avatarUrl}: ProfileBannerProps)
 {
+	const [isOwner, setIsOwner] = useState(false);
 
+	useEffect(() => {
+		const storedUsername = localStorage.getItem("username");
 
+		setIsOwner(storedUsername === username);
+	}, [username]);
+
+	async function uploadAvatar(file: File)
+	{
+		const formData = new FormData();
+		formData.append("avatar", file);
+
+		await fetch(`http://localhost:3000/users/${username}/avatar`,
+		{
+			method: "POST",
+			body: formData,
+		});
+
+		// reload image (simple version)
+		window.location.reload();
+	}
 	return (
 		<section className={ profileBanner }>
-			<AvatarFrame avatarUrl={avatarUrl}/>
+			<AvatarFrame 
+				avatarUrl={avatarUrl}
+				isOwner={isOwner}
+				onUpload={uploadAvatar}
+			/>
 
 			<div className="flex flex-col items-center md:items-start md:px-4 flex-1">
 				<h1 className={ userNameClass }> { username } </h1>				

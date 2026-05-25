@@ -7,3 +7,4 @@ Caillou de runes animé;3;1;5;« Quand vous jouez cette carte, vous gagnez 1 ru
 Auto-flagelleur sadique;3;8;8;« Quand vous jouez cette carte, vous perdez 8 d’armure »;c006.json;common;c006.png;c006;0;[]
 Sniper incontrôlé;4;3;2;« Quand vous jouez cette carte, détruisez la créature ciblée »;c007.json;common;c007.png;c007;1;[ « creature » ]
 Teddy;88;1;1;« Quand Teddy inflige des blessures, vous gagnez la partie instantanément »;c008.json;common;c008.png;c008;0;[]
+Chibromax;5;5;5;« Quand vous jouez cette carte, detruisez une creature adverse aleatoire »;c009.json;common;c009.png;c009;1;[ « creature » ]

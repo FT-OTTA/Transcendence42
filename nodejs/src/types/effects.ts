@@ -22,7 +22,9 @@ export type EffectTarget =
 | "self"
 | "opponent"
 | "all"
-| "random"
+| "random_enemies"
+| "random_allies"
+| "random_all"
 | "left_neighbor"
 | "right_neighbor"
 | "all_allies"
@@ -38,7 +40,7 @@ export type EffectTrigger = "on_deal_damage"
 
 export type Effect = {
     effect: EffectType;
-    value: number;
+    value?: number;
     valueFrom?: string;
     trigger?: EffectTrigger;
     target?: EffectTarget;

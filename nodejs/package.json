@@ -15,8 +15,8 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js"
+      "test": "vitest",
+      "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -34,6 +34,8 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
-    "tsx": "^4.0.0"
+    "@vitest/ui": "^4.1.7",
+    "tsx": "^4.0.0",
+    "vitest": "^4.1.7"
   }
 }

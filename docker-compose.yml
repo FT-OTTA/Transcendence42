@@ -37,6 +37,7 @@ services:
       - /app/node_modules
     labels:
       collect_logs: "true"
+      
   mysql:
     build: ./mysql
     container_name: mysql

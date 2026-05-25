@@ -37,6 +37,7 @@ model User {
   passwordHash  String   @map("password_hash")
 
   moodphrase    String?
+  avatarUrl     String?
 
   friends       Friendship[] @relation("UserFriends")
   friendOf      Friendship[] @relation("FriendOf")

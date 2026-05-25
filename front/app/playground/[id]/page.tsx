@@ -7,6 +7,7 @@ import OpponentBoard from '../../components/playground/OpponentBoard';
 import PlayerBoard from '../../components/playground/PlayerBoard';
 import PlayerHand from '../../components/playground/PlayerHand';
 import GameStats from '../../components/playground/GameStats';
+import ConfirmPlay from '../../components/playground/ConfirmPlay';
 import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
 import { useParams } from 'next/navigation';
@@ -128,7 +129,7 @@ export default function PlaygroundPage() {
 
   function handlePlaySpell() {
       if (!selectedCard || selectedCard.type !== "spell") return;
-      
+
       // 1. Vérification des runes
       if (selectedCard.runeCost > runes) {
           setRuneError("Not enough runes!");
@@ -150,7 +151,7 @@ export default function PlaygroundPage() {
           setSelectedCard(null);
       } else {
           // Sinon, on lance la phase de ciblage (ton code existant)
-          getTargets(); 
+          getTargets();
       }
   }
 function handleConfirmSpell() {
@@ -181,30 +182,30 @@ function handlePlayToSlot(slotIndex: number) {
     if (selectedCard.type === "spell") return;
     setPendingSlots(prev => {
         const next = [...prev]; // On copie l'état actuel
-        
+
         // 1. On nettoie uniquement l'ancienne preview si elle existait
         if (pendingSlotIndex !== null) {
             next[pendingSlotIndex] = null;
         }
-        
+
         // 2. On place la nouvelle carte à la nouvelle position
         next[slotIndex] = selectedCard;
-        
+
         return next;
     });    // On pose TOUJOURS la carte en preview, qu'elle ait des effets ou non
     setPendingSlotIndex(slotIndex);
-    
-    
+
+
     setSelectedTargets([]);
     setPotentialTargets([]);
-    
+
       // Si elle a besoin de cibles, on lance le ciblage
-    const hasTargetedEffects = selectedCard.effects.some(e => 
+    const hasTargetedEffects = selectedCard.effects.some(e =>
         typeof e.target === "string" && ["opponent", "self", "all"].includes(e.target)
     );
-    
+
     if (hasTargetedEffects) {
-        getTargets(); 
+        getTargets();
     }
 }
 
@@ -214,7 +215,7 @@ function getRequiredTargetCount(card: Card) {
   if (card.effects.some(e => typeof e.target === "string" && ["all_board", "all_allies", "all_enemies", "random"].includes(e.target))) {
     return 0;
   }
-  
+
   // Si c'est "swap" ou tout effet nécessitant 2 cibles, tu retournes 2
   if (card.effects.some(e => e.effect === "swap")) {
     return 2;
@@ -232,11 +233,11 @@ function handleEndTurn() {
     if (!socketRef.current) return;
     socketRef.current.emit('end_turn');
   }
-  
+
 function getTargets(effectIndex: number = 0, card: Card | null = selectedCard) {
     console.log("getTargets for card", { card });
 
-  
+
     if (!card) return;
     const ef = card.effects;
     if (effectIndex >= ef.length) {
@@ -255,7 +256,7 @@ function getTargets(effectIndex: number = 0, card: Card | null = selectedCard) {
     if (e.target === "self") pool = playerSlots.filter(Boolean) as Card[];
     else if (e.target === "opponent") pool = opponentSlots.filter(Boolean) as Card[];
     else if (e.target === "all") pool = [...playerSlots, ...opponentSlots].filter(Boolean) as Card[];
-    
+
     if (e.targetType?.hero) {
         if (e.target === "opponent") pool.push(game.players[1 - myPlayerIndexRef.current!]);
         else if (e.target === "self") pool.push(game.players[myPlayerIndexRef.current!]);
@@ -273,7 +274,7 @@ function getTargets(effectIndex: number = 0, card: Card | null = selectedCard) {
         } else if (e.target === "self") {
             pool.push(game.players[myPlayerIndexRef.current!]);
         }
-      } 
+      }
 console.log("game:", game, "myPlayerIndex:", myPlayerIndexRef.current, "e.targetType:", e.targetType)
     setPotentialTargets(pool);
     setCurrentEffectIndex(effectIndex);
@@ -301,7 +302,7 @@ function pushSelectedTarget(target: Card | Hero) {
     if (!selectedCard) return;
 
     const isAlreadySelected = selectedTargets.some(t => t.idInGame === target.idInGame);
-    
+
     if (isAlreadySelected) {
         // Trouve l'index de l'effet correspondant à cette target
         const targetIndex = selectedTargets.findIndex(t => t.idInGame === target.idInGame);
@@ -321,7 +322,7 @@ function pushSelectedTarget(target: Card | Hero) {
 
 //     // 1. Logique de Toggle
 //     const isAlreadySelected = selectedTargets.some(t => t.idInGame === target.idInGame);
-    
+
 //     let newTargets: (Card | Hero)[];
 //     if (isAlreadySelected) {
 //         newTargets = selectedTargets.filter(t => t.idInGame !== target.idInGame);
@@ -347,21 +348,21 @@ function pushSelectedTarget(target: Card | Hero) {
           ) : (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
-                <OpponentBoard 
+                <OpponentBoard
                 cards={opponentSlots}
                 onPlay={() => {}}
-                potentialTargets={potentialTargets} 
-                selectedTargets={selectedTargets} 
+                potentialTargets={potentialTargets}
+                selectedTargets={selectedTargets}
                 onClick={pushSelectedTarget} />
-<PlayerBoard 
-    cards={displaySlots} 
-    onPlay={handlePlayToSlot} 
-    potentialTargets={potentialTargets} 
+<PlayerBoard
+    cards={displaySlots}
+    onPlay={handlePlayToSlot}
+    potentialTargets={potentialTargets}
     selectedTargets={selectedTargets} // <--- Ajoute ça
-    onClick={pushSelectedTarget} 
+    onClick={pushSelectedTarget}
 />
-<PlayerHand 
-    cards={playerHandCards} 
+<PlayerHand
+    cards={playerHandCards}
     onClick={(card) => {
         if (!card) return;
         abortPlay();
@@ -389,18 +390,23 @@ function pushSelectedTarget(target: Card | Hero) {
     if (hero) pushSelectedTarget(hero);
   }}
 />
-<LargeCardView 
-    card={selectedCard} 
+<div className="flex flex-1 items-center justify-center gap-4 p-4">
+  <LargeCardView
+    card={selectedCard}
     onClick={getTargets}
     onConfirm={handleConfirmSpell}
     hasTargets={
-        selectedCard 
-        ? (selectedCard.type === "spell" 
+        selectedCard
+        ? (selectedCard.type === "spell"
             ? selectedTargets.length >= getRequiredTargetCount(selectedCard)
             : pendingSlotIndex !== null) // Toujours vrai si une créature est en preview
         : false
     }
-/>              </div>
+/>
+<ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard}> </ConfirmPlay>
+<></>
+</div>
+</div>
             </div>
           )}
         </>

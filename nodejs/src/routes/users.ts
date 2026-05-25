@@ -46,7 +46,9 @@ router.patch('/:login', async (req, res) => {
 			return res.status(400).json({ error: "moodPhrase is required" });
 		}
 
-        if (moodphrase.length() > 100)
+        console.log("LEN = ", moodphrase.length)
+
+        if (moodphrase.length > 100)
         {
             return res.status(413).json({ error: "moodPhrase too long"});
         }

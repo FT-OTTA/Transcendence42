@@ -27,6 +27,7 @@ type ProfileBannerProps = {
 	username: string;
 	mood: string;
 	isOnline: boolean;
+	avatarUrl?: string | null;
 };
 
 const onlineStatus = clsx
@@ -36,13 +37,13 @@ const onlineStatus = clsx
 )
 
 
-export default function ProfileBanner({username, mood, isOnline}: ProfileBannerProps)
+export default function ProfileBanner({username, mood, isOnline, avatarUrl}: ProfileBannerProps)
 {
 
 
 	return (
 		<section className={ profileBanner }>
-			<AvatarFrame />
+			<AvatarFrame avatarUrl={avatarUrl}/>
 
 			<div className="flex flex-col items-center md:items-start md:px-4 flex-1">
 				<h1 className={ userNameClass }> { username } </h1>				

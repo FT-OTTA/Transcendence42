@@ -35,7 +35,7 @@ export default async function CommunityProfilePage({
 
 			<div className="max-w-6xl mx-auto px-4 py-4">
 				<ProfileSearchBar />
-				<ProfileBanner username={login} mood={user?.moodphrase ?? "No mood yet..."} isOnline={false} />
+				<ProfileBanner username={login} mood={user?.moodphrase ?? "No mood yet..."} isOnline={false} avatarUrl={user.avatarUrl} />
 			</div>
 
 			<section className="max-w-6xl mx-auto h-full grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">

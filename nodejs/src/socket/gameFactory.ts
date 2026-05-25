@@ -39,61 +39,62 @@ async function buildHero(heroId: string): Promise<Hero> {
     }
 
     // DEV MODE — remplacer par le vrai deck plus tard
-    // const allCards = await prisma.card.findMany()
-    // const library: Card[] = allCards.map((c: PrismaCard): Card => ({
-    //     kind: 'card',
-    //     idInGame: Math.floor(Math.random() * 100000),
-    //     idInCollection: parseInt(c.id),
-    //     cardName: c.name,
-    //     effectText: c.effect_text ?? '',
-    //     type: c.type as CardType,
-    //     class: c.class as CardClass,
-    //     runeCost: c.rune_cost,
-    //     baseForce: c.force ?? 0,
-    //     currForce: c.force ?? 0,
-    //     baseEndurance: c.endurance ?? 0,
-    //     currEndurance: c.endurance ?? 0,
-    //     effect: c.effect,
-    //     effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[],
-    //     zone: null as any,
-    //     owner: null as any,
-    //     timing: c.timing ?? 'end_of_turn' as EffectTime,
-    //     state: 'alive' as CreatureState,
-    //     fullPicPath: c.illustration ?? '',
-    //     smallPicPath: c.illustration ?? '',
-    //     cardBackPath: ''
-    // }))
+    const allCards = await prisma.card.findMany()
+    const library: Card[] = allCards.map((c: PrismaCard): Card => ({
+        kind: 'card',
+        idInGame: Math.floor(Math.random() * 100000),
+        idInCollection: parseInt(c.id),
+        cardName: c.name,
+        effectText: c.effect_text ?? '',
+        type: c.type as CardType,
+        class: c.class as CardClass,
+        runeCost: c.rune_cost,
+        baseForce: c.force ?? 0,
+        currForce: c.force ?? 0,
+        baseEndurance: c.endurance ?? 0,
+        currEndurance: c.endurance ?? 0,
+        effect: c.effect,
+        effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[],
+        zone: null as any,
+        owner: null as any,
+        timing: c.timing ?? 'end_of_turn' as EffectTime,
+        state: 'alive' as CreatureState,
+        fullPicPath: c.illustration ?? '',
+        smallPicPath: c.illustration ?? '',
+        cardBackPath: ''
+    }))
 
-const cardIds: string[] = JSON.parse(hero.deck)
-const cards = (await Promise.all(
-    cardIds.map(id => prisma.card.findUnique({ where: { id } }))
-)).filter((c : PrismaCard | null): c is NonNullable<typeof c> => !!c)
+    // PROD ONLY
+// const cardIds: string[] = JSON.parse(hero.deck)
+// const cards = (await Promise.all(
+//     cardIds.map(id => prisma.card.findUnique({ where: { id } }))
+// )).filter((c : PrismaCard | null): c is NonNullable<typeof c> => !!c)
 
-const library: Card[] = cards.map((c : PrismaCard): Card => ({
-    kind: 'card',
-    idInGame: Math.floor(Math.random() * 100000),
-    idInCollection: parseInt(c.id),
-    cardName: c.name,
-    effectText: c.effect_text ?? '',
-    type: c.type as CardType,
-    class: c.class as CardClass,
-    runeCost: c.rune_cost,
-    baseForce: c.force ?? 0,
-    currForce: c.force ?? 0,
-    baseEndurance: c.endurance ?? 0,
-    currEndurance: c.endurance ?? 0,
-    effect: c.effect,
-    effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[],
-    zone: null as any,
-    owner: null as any,
-    timing: c.timing ?? 'end_of_turn' as EffectTime,
-    state: 'alive' as CreatureState,
-    fullPicPath: c.illustration ?? '',
-    smallPicPath: c.illustration ?? '',
-    cardBackPath: ''
-}))
+// const library: Card[] = cards.map((c : PrismaCard): Card => ({
+//     kind: 'card',
+//     idInGame: Math.floor(Math.random() * 100000),
+//     idInCollection: parseInt(c.id),
+//     cardName: c.name,
+//     effectText: c.effect_text ?? '',
+//     type: c.type as CardType,
+//     class: c.class as CardClass,
+//     runeCost: c.rune_cost,
+//     baseForce: c.force ?? 0,
+//     currForce: c.force ?? 0,
+//     baseEndurance: c.endurance ?? 0,
+//     currEndurance: c.endurance ?? 0,
+//     effect: c.effect,
+//     effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[],
+//     zone: null as any,
+//     owner: null as any,
+//     timing: c.timing ?? 'end_of_turn' as EffectTime,
+//     state: 'alive' as CreatureState,
+//     fullPicPath: c.illustration ?? '',
+//     smallPicPath: c.illustration ?? '',
+//     cardBackPath: ''
+// }))
 
-    shuffle(library);
+//     shuffle(library);
 
     return {
         kind: 'hero',

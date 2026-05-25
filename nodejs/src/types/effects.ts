@@ -14,7 +14,9 @@ export type EffectType =
 
 export type EffectTime =
 | "immediate"
-| "end_of_turn";
+| "end_of_turn"
+| "on_deal_damage";
+// | "on_death"; pour plus tard peut-être
 
 export type EffectTarget =
 | "self_hero"
@@ -36,13 +38,12 @@ export type TargetType = {
     building?: boolean;
     hero?: boolean;
 }
-export type EffectTrigger = "on_deal_damage"
 
 export type Effect = {
     effect: EffectType;
+    timing?: EffectTime;
     value?: number;
     valueFrom?: string;
-    trigger?: EffectTrigger;
     target?: EffectTarget;
     targetType?: TargetType;
 }

@@ -90,7 +90,8 @@ async function importSpells() {
                 effect: parseJSON("/app/databases/spells/effects/" + row['Effect (json path)']),
                 illustration: row['Illustration (.png)'],
                 target_number: parseInt(row['Target Number']),
-                target_type: row['Target Type']
+                target_type: row['Target Type'],
+                timing: row['Timing'] === 'immediate' ? 'immediate' : 'end_of_turn'
 
             }
         await prisma.card.upsert({

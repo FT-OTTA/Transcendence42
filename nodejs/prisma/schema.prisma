@@ -20,6 +20,8 @@ model Card {
   illustration String
   target_number Int?
   target_type String?
+  timing String @default("end_of_turn")
+
 }
 
 model Hero {

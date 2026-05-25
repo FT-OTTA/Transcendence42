@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { resolveBuildings, resolveEffect } from '../resolveEffects.ts'
+import { GameOver, resolveBuildings, resolveEffect } from '../resolveEffects.ts'
 import { makeCard, makeHero, makeGame, makeEffect, nextId } from './mocks.ts'
 import type { Hero } from '../../types/hero.ts'
 import type { Card } from '../../types/card.ts'
@@ -250,5 +250,39 @@ describe('resolveBuildings - destroy random_enemies', () => {
         resolveBuildings(game)
 
         expect(building.currEndurance).toBe(110) // toujours vivant
+    })
+})
+// ─── win ────────────────────────────────────────────────────────────────────────────
+describe('resolveEffect - win', () => {
+    it('throw GameOver quand la cible est un héros', () => {
+        const player = makeHero()
+        const opponent = makeHero()
+        const game = makeGame(player, opponent)
+        const eff = makeEffect({ effect: "win", target: "self_hero" })
+
+        expect(() => resolve(player, eff, game, player)).toThrow(GameOver)
+    })
+
+    it('throw GameOver avec le bon gagnant', () => {
+        const player = makeHero()
+        const opponent = makeHero()
+        const game = makeGame(player, opponent)
+        const eff = makeEffect({ effect: "win", target: "self_hero" })
+
+        try {
+            resolve(player, eff, game, player)
+        } catch (e) {
+            expect(e).toBeInstanceOf(GameOver)
+            expect((e as GameOver).winner).toBe(player)
+        }
+    })
+
+    it('ne throw pas si la cible est une carte', () => {
+        const player = makeHero()
+        const game = makeGame(player)
+        const creature = makeCard()
+        const eff = makeEffect({ effect: "win", target: "self" })
+
+        expect(() => resolve(player, eff, game, creature)).not.toThrow()
     })
 })

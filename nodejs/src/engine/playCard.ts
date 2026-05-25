@@ -8,9 +8,6 @@ export function playCard(card: Card, payload: PlayCardPayload, game: Game): void
     // console.log("zone reçue:", payload.zone)
     // console.log("starts with bf:", payload.zone?.startsWith("bf"))
 
-    if (card.owner.curRunes < card.runeCost)
-        return;
-    card.owner.curRunes -= card.runeCost;
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
 
 

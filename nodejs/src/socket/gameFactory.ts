@@ -57,7 +57,7 @@ async function buildHero(heroId: string): Promise<Hero> {
         effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[],
         zone: null as any,
         owner: null as any,
-        timing: 'normal' as EffectTime,
+        timing: c.timing ?? 'end_of_turn' as EffectTime,
         state: 'alive' as CreatureState,
         fullPicPath: c.illustration ?? '',
         smallPicPath: c.illustration ?? '',

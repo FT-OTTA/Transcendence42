@@ -4,7 +4,7 @@
             "effect": "win",
             "target": "self_hero",
             "targetType": { "hero": true },
-            "trigger": "on_deal_damage"
+            "timing": "on_deal_damage"
         }
     ]
 }

@@ -2,7 +2,7 @@ import type { Hero } from '../types/hero.ts'
 import type { Card, PlayCardPayload } from '../types/card.ts'
 import type { Game } from '../types/gamesession.ts'
 import type { BfZone } from '../types/zones.ts'
-import type { Effect, EffectTrigger } from '../types/effects.ts'
+import type { Effect, EffectTime } from '../types/effects.ts'
 import { playerDraw } from "./startTurn.ts";
 
 export function dealsDmg(player1: Hero, player2: Hero, x: number): void {
@@ -14,10 +14,10 @@ export function dealsDmg(player1: Hero, player2: Hero, x: number): void {
     }
 }
 
-function resolveTriggers(card: Card, trigger: EffectTrigger, target: Hero, game: Game) {
+function resolveTiming(card: Card, timing: EffectTime, target: Hero, game: Game) {
     for (const effect of card.effects) {
-        if (effect.trigger === trigger) {
-            resolveEffect(card.owner, effect, { cardId: card.idInGame, target }, game)
+        if (effect.timing === timing) {
+            resolveEffect(card.owner, effect, { cardId: card.idInGame, target }, game, timing)
         }
     }
 }
@@ -33,7 +33,7 @@ export function resolveCombat(game: Game) {
                 continue;
             else if (card1.type === "creature"){
                 dealsDmg(card1.owner, game.players[0], card1.currForce);
-                resolveTriggers(card1, "on_deal_damage", game.players[0], game);
+                resolveTiming(card1, "on_deal_damage", game.players[0], game);
 
             }
 
@@ -41,7 +41,7 @@ export function resolveCombat(game: Game) {
         else if (card1 === undefined) {
             if (card0.type === "creature"){
                 dealsDmg(card0.owner, game.players[1], card0.currForce);
-                resolveTriggers(card0, "on_deal_damage", game.players[1], game);
+                resolveTiming(card0, "on_deal_damage", game.players[1], game);
 
             }
         }
@@ -51,7 +51,7 @@ export function resolveCombat(game: Game) {
                 card0.currEndurance -= card1.currForce
             } else {
                 dealsDmg(card1.owner, game.players[0], card1.currForce - card0.currEndurance);
-                resolveTriggers(card1, "on_deal_damage", game.players[0], game);
+                resolveTiming(card1, "on_deal_damage", game.players[0], game);
                 card0.currEndurance = 0;  // ✅ la créature est morte
             }
 
@@ -60,7 +60,7 @@ export function resolveCombat(game: Game) {
                 card1.currEndurance -= card0.currForce
             } else {
                 dealsDmg(card0.owner, game.players[1], card0.currForce - card1.currEndurance);
-                resolveTriggers(card0, "on_deal_damage", game.players[1], game);
+                resolveTiming(card0, "on_deal_damage", game.players[1], game);
                 card1.currEndurance = 0;  // ✅ la créature est morte
             }
         }
@@ -166,9 +166,13 @@ export function resolveEffect(
     player: Hero,
     eff: Effect,
     payload: PlayCardPayload,
-    game: Game): boolean {
+    game: Game,
+    fromTiming?: EffectTime
+    ): boolean {
 
     console.log("Resolving effect", { eff });
+    if (eff.timing && eff.timing !== fromTiming) return true;
+    
     let target = payload.target;
     let target2 = payload.target2;
 
@@ -181,6 +185,7 @@ export function resolveEffect(
 
 
     let value = resolveValue(eff.valueFrom, eff.value, payload);
+    console.log("target avant switch:", target?.kind, "noTargetNeeded:", noTargetNeeded)
     switch (eff.effect) {
         case "ad_mod":
             if (eff.target === "all_enemies" && game) {
@@ -345,6 +350,7 @@ export function resolveEffect(
                 target.state = "sick";
             break;
         case "win":
+            console.log("WIN kind:", target?.kind)
             if (target.kind === "card") return false;
             throw new GameOver(target as Hero);
 

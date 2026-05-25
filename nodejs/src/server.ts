@@ -4,6 +4,7 @@ import { Server } from 'socket.io'
 import { initSocket } from './socket/game.ts'
 import { prisma } from '../prisma/prisma.ts'
 import cors from 'cors'
+import fileUpload from 'express-fileupload'
 
 import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
@@ -12,6 +13,7 @@ import usersRouter from './routes/users.ts'
 import friendRouter from './routes/friends.ts'
 import roomRouter from './routes/rooms.ts'
 import messageRouter from './routes/messages.ts'
+import avatarRouter from './routes/avatar.ts'
 
 const app = express()
 // app.use(cors({ origin: '*' }))
@@ -33,20 +35,27 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use(express.json())
-
-app.use('/cards', cardsRouter)
-app.use('/heroes', heroesRouter)
-app.use('/auth', authRouter)
-app.use('/users', usersRouter)
-app.use('/friends', friendRouter)
-app.use('/rooms', roomRouter)
-app.use('/messages', messageRouter)
-
+app.use(express.json());
+app.use(fileUpload());
+app.get("/debug-avatar", (req, res) => {
+	res.sendFile("/app/databases/users/avatars/teddy.png");
+});
+app.use('/avatars', express.static('/app/databases/users/avatars'));
+app.use('/cards', cardsRouter);
+app.use('/heroes', heroesRouter);
+app.use('/auth', authRouter);
+app.use('/users', usersRouter);
+app.use('/friends', friendRouter);
+app.use('/rooms', roomRouter);
+app.use('/messages', messageRouter);
+app.use('/users', avatarRouter);
 app.get('/', (req, res) => {
     res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')
 })
-
+app.use((req, res, next) => {
+	console.log("REQ:", req.url);
+	next();
+});
 initSocket(io)
 
 httpServer.listen(3000, () => {

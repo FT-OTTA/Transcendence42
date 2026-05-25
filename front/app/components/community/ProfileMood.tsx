@@ -40,11 +40,14 @@ export default function ProfileMood({ initialMood, username }: Props)
 	}
 
 	if (!isOwner) {
-		return <p className="text-white/60 italic">{ currentMood }</p>;
+				return <p className="text-white/60 italic whitespace-normal break-words max-w-xs md:max-w-sm">{ currentMood }</p>;
 	}
 
 	return editing ?(
+		<div>
+
 			<input
+				maxLength={100}
 				autoFocus
 				value={currentMood}
 				onChange={(e) => setCurrentMood(e.target.value)}
@@ -59,8 +62,12 @@ export default function ProfileMood({ initialMood, username }: Props)
 					saveMood(currentMood);
 					setEditing(false);
 				}}
-				className="bg-black/30 border border-sky-500 text-white px-2 py-1 rounded"
+				className="focus:outline-none bg-black/30 border border-sky-500 text-white px-2 py-1 rounded"
 			/>
+			<p className="pt-1 text-xs text-white/40">
+				{currentMood.length}/100
+			</p>
+		</div>
 	) : (
 		<div className="flex gap-2 items-center">
 

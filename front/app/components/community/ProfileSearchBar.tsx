@@ -20,7 +20,7 @@ const searchInput = clsx
 	"hover:border-sky-500/30 hover:placeholder:text-sky-200/50",
 	"focus-within:border-sky-500 focus-within:placeholder:text-sky-200/50",
 	"focus-within:shadow-[0_0_20px_rgba(14,165,233,0.15)]",
-	"transition"
+	"transition-all duration-200"
 )
 
 type SearchBarProps = {
@@ -30,21 +30,47 @@ type SearchBarProps = {
 export default function ProfileSearchBar()
 {
 	const [search, setSearch] = useState("");
+	const [error, setError] = useState("");
+	const [shake, setShake] = useState(false);
 	const router = useRouter();
 
-	const handleSearch = () => {
-		if (!search.trim())
+	async function handleSearch() {
+		if (!search.trim().toLowerCase())
 			return;
+		
+		setError("");
+
+		const res = await fetch(
+			`http://localhost:3000/users/${search}`
+		);
+
+		if (!res.ok)
+		{
+			setError("User not found");
+			setShake(true);
+			setTimeout(() => {
+				setShake(false);
+			}, 400);
+			return;
+		}
 		router.push(`/community/${search.trim()}`);
 	};
 
 	return (
 		<section>
 			<div className={ searchBar }>
-				<input className={ searchInput }
+				<input className={ clsx(
+						searchInput,
+						error && "focus:text-gray-500 placeholder:text-gray-700",
+						shake && "animate-shake"
+					)}
 					value={search}
-					onChange={(e) => setSearch(e.target.value)
-					}
+					onChange={(e) => 
+						{
+							setSearch(e.target.value)
+							setError("");
+						}
+						}
 					placeholder="Search player..."
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
@@ -52,6 +78,11 @@ export default function ProfileSearchBar()
 						}
 					}}
 					/>
+				{error && (
+					<p className="text-gray-600 items-center text-sm mt-2 italic">
+						{error}
+					</p>
+				)}
 			</div>
 		</section>
 	);

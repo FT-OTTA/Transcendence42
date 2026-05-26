@@ -45,9 +45,9 @@ app.get('/', (req, res) => {
 
 initSocket(io)
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
+httpServer.listen(PORT, "0.0.0.0", () => {
+  console.log("listening");
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

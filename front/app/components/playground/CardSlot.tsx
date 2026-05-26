@@ -1,7 +1,7 @@
 "use client";
 
 import type React from 'react';
-import type { Card } from 'otta-shared-types/card';
+import type { Card } from '../../types/card';
 
 interface CardSlotProps {
   id: string;

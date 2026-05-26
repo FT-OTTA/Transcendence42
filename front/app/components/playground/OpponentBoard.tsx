@@ -1,8 +1,8 @@
 "use client";
 
-import type { Hero } from "otta-shared-types/hero";
+import type { Hero } from "../../types/hero";
 import CardSlot from "./CardSlot";
-import type { Card } from 'otta-shared-types/card';
+import type { Card } from '../../types/card';
 
 interface OpponentBoardProps {
   cards: (Card | null)[];

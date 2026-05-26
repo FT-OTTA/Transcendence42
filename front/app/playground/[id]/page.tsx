@@ -8,11 +8,11 @@ import PlayerBoard from '../../components/playground/PlayerBoard';
 import PlayerHand from '../../components/playground/PlayerHand';
 import GameStats from '../../components/playground/GameStats';
 import ConfirmPlay from '../../components/playground/ConfirmPlay';
-import type { Card } from 'otta-shared-types/card';
+import type { Card } from '../../types/card';
 import { io, Socket } from 'socket.io-client';
 import { useParams } from 'next/navigation';
 import LargeCardView from '@/app/components/playground/LargeCardView';
-import { Hero } from 'otta-shared-types/hero';
+import { Hero } from '../../types/hero';
 
 export default function PlaygroundPage() {
   const { id } = useParams();
@@ -43,7 +43,7 @@ export default function PlaygroundPage() {
   useEffect(() => {
     if (!selectedHero) return;
 
-    const newSocket = io('${process.env.NEXT_PUBLIC_API_URL}:3000');
+    const newSocket = io('${process.env.NEXT_PUBLIC_API_URL}');
     socketRef.current = newSocket;
     setSocket(newSocket);
 

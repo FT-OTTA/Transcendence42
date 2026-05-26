@@ -23,7 +23,7 @@ const io = new Server(httpServer, { cors: { origin: "*" } })
 console.log('Prisma Engine prêt ✅')
 
 app.use(cors({
-    origin: "http://localhost:3001",
+    origin: "${BACK_PUBLIC_API_URL}",
     credentials: true,
 }));
 

@@ -1,12 +1,11 @@
-import Navbar from "../../components/navigation/Navbar";
-import ProfileBanner from "../../components/community/ProfileBanner";
-import ProfileStats from "../../components/community/ProfileStats";
-import MatchHistory from "../../components/community/MatchHistory";
-import ProfileSearchBar from "../../components/community/ProfileSearchBar";
-import LoggedInBadge from "../../components/login/LoggedInBadge";
-import ProfileMood from "../../components/community/ProfileMood";
+import Navbar from "../../../components/navigation/Navbar";
+import ProfileBanner from "../../../components/community/ProfileBanner";
+import ProfileStats from "../../../components/community/ProfileStats";
+import MatchHistory from "../../../components/community/MatchHistory";
+import ProfileSearchBar from "../../../components/community/ProfileSearchBar";
+import LoggedInBadge from "../../../components/login/LoggedInBadge";
+import ProfileMood from "../../../components/community/ProfileMood";
 import { notFound } from "next/navigation";
-
 
 export default async function CommunityProfilePage({
 	 params } : {

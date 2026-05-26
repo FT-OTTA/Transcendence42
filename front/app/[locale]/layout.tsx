@@ -2,7 +2,39 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Cinzel, Inter, Bellefair } from "next/font/google";
 import localFont from "next/font/local";
-import "./globals.css";
+import "../globals.css";
+import {NextIntlClientProvider} from 'next-intl';
+import {notFound} from 'next/navigation';
+
+const locales = ['en', 'fr', 'sv'];
+
+export default async function LocaleLayout({
+  children,
+  params
+}: {
+  children: React.ReactNode;
+  params: Promise<{locale?: string}>;
+}) {
+  const resolvedParams = await params;
+  const locale = resolvedParams?.locale ?? 'en';
+
+  if (!locales.includes(locale)) {
+    notFound();
+  }
+
+  const messages = (await import(`../../messages/${locale}.json`)).default;
+
+  return (
+    <html lang={locale}>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
+}
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,21 +66,5 @@ export const bellefair = Bellefair({
 });
 
 export const nordic = localFont({
-  src:"../public/fonts/Nordic.ttf"
+  src:"../../public/fonts/Nordic.ttf"
 })
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  );
-}
-

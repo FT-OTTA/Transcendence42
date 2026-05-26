@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
@@ -29,6 +30,7 @@ type SearchBarProps = {
 
 export default function ProfileSearchBar()
 {
+	const l = useTranslations("Profile");
 	const [search, setSearch] = useState("");
 	const [error, setError] = useState("");
 	const [shake, setShake] = useState(false);

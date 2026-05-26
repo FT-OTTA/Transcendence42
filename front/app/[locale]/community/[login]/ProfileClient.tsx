@@ -1,11 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
-import Navbar from "../../components/navigation/Navbar";
-import ProfileBanner from "../../components/community/ProfileBanner";
-import ProfileStats from "../../components/community/ProfileStats";
-import MatchHistory from "../../components/community/MatchHistory";
-import ProfileSearchBar from "../../components/community/ProfileSearchBar";
-import LoggedInBadge from "../../components/login/LoggedInBadge";
+import Navbar from "../../../components/navigation/Navbar";
+import ProfileBanner from "../../../components/community/ProfileBanner";
+import ProfileStats from "../../../components/community/ProfileStats";
+import MatchHistory from "../../../components/community/MatchHistory";
+import ProfileSearchBar from "../../../components/community/ProfileSearchBar";
+import LoggedInBadge from "../../../components/login/LoggedInBadge";
 
 export default function ProfileClient({ login }: { login: string })
 {

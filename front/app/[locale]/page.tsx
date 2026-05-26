@@ -1,9 +1,10 @@
 "use client";
 
-import LoggedInBadge from "./components/login/LoggedInBadge";
-import LoginCard from "./components/login/LoginCard"
-import Navbar from "./components/navigation/Navbar";
-import Hero from "./components/landing/Hero";
+import LoggedInBadge from "../components/login/LoggedInBadge";
+import LoginCard from "../components/login/LoginCard"
+import Navbar from "../components/navigation/Navbar";
+import Hero from "../components/landing/Hero";
+import LanguageSwitcher from "../components/Language/LanguageSwitcher";
 import { useEffect, useState } from "react";
 
 
@@ -15,7 +16,7 @@ export default function Home() {
     <main 
       className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
       <Navbar />
-    
+      <LanguageSwitcher />
       <LoggedInBadge/>
 
       <Hero setIsLogin={setIsLogin}/>

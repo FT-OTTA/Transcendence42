@@ -1,0 +1,49 @@
+{
+    "Homepage": {
+      "start": "Kom igång",
+      "whats_otta": "Vad är Otta?",
+      "log_status": "Logga in för att ta del av våra fantastiska funktioner",
+      "login_as": "Inloggad som:",
+      "log_out": "Logga ut"
+    },
+
+    "Navbar": {
+      "home": "Hem",
+      "lobby": "Lobby",
+      "community": "Gemenskap"
+    },
+
+    "Auth": {
+      "username": "Användarnamn",
+      "password": "Lösenord",
+      "confirm_password": "Bekräfta lösenord",
+      "create_account": "Skapa konto",
+      "welcome_back": "Välkommen tillbaka",
+      "hide": "Dölj",
+      "show": "Visa",
+      "register": "Registrera",
+      "login": "Logga in",
+      "already_have": "Har du redan ett konto?",
+      "dont_have": "Har du inget konto?",
+      "sign_in": "Logga in",
+      "sign_up": "Skapa konto",
+      "loading": "Laddar..."
+    },
+
+    "Profile": {
+      "online": "Online",
+      "offline": "Offline",
+      "set_mood": "Klicka för att ange ditt humör",
+      "loading": "Laddar",
+      "search_placeholder": "Sök spelare..."
+    },
+
+    "Stats": {
+      "num_played": "Spelade",
+      "wins": "Vinster",
+      "losses": "Förluster",
+      "draws": "Oavgjorda",
+      "best_friend": "Spelat mest med",
+      "worst_enemy": "Värsta fiende"
+    }
+}

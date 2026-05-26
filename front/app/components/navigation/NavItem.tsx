@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import { cinzel } from "@/app/fonts";
 const NavItemClass = clsx
 (

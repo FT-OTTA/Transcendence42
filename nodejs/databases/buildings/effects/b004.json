@@ -4,13 +4,15 @@
             "effect": "runes",
             "value": 1,
             "target": "self_hero",
-            "targetType": { "hero": true }
+            "targetType": { "hero": true },
+            "timing": "start_turn"
         },
         {
             "effect": "armor",
             "value": 5,
             "target": "self_hero",
-            "targetType": { "hero": true }
+            "targetType": { "hero": true },
+            "timing": "start_turn"
         }
     ]
 }

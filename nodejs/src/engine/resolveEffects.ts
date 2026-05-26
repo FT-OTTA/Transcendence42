@@ -2,7 +2,7 @@ import type { Hero } from '../types/hero.ts'
 import type { Card, PlayCardPayload } from '../types/card.ts'
 import type { Game } from '../types/gamesession.ts'
 import type { BfZone } from '../types/zones.ts'
-import type { Effect, EffectTime } from '../types/effects.ts'
+import type { Effect, EffectTime, EffectContext } from '../types/effects.ts'
 import { playerDraw } from "./startTurn.ts";
 
 export function dealsDmg(player1: Hero, player2: Hero, x: number): void {
@@ -98,38 +98,71 @@ export function resolveBuildings(game:Game) {
             const building = player.battlefield[zone];
             if (building && building.type === "building") {
                 for (const effect of building.effects) {
-                    resolveEffect(player, effect, { cardId: building.idInGame }, game)                }
+                    // pourquoi y a pas besoin de l'argument fromtiming ici ?
+                    resolveEffect(player, effect, { cardId: building.idInGame }, game, "start_turn");
+                }
             }
         }
     }
 }
+// function resolveValue(
+//     valueFrom: string | undefined,
+//     value: number | undefined,
+//     payload: PlayCardPayload,
+//     target?: Card | Hero,
+//     target2?: Card | Hero
+// ): number
+// {
+//     if (valueFrom)
+//     {
+//         const [source, field] = valueFrom.split('.');
+
+//         const obj =
+//             source === 'target' ? target :
+//             source === 'target2' ? target2 :
+//             undefined;
+
+//         if (!obj)
+//             return value ?? 0;
+
+//         const resolved = (obj as any)[field];
+
+//         return typeof resolved === 'number'
+//             ? resolved
+//             : value ?? 0;
+//     }
+
+//     return value ?? 0;
+// }
+// resolveValue
 function resolveValue(
     valueFrom: string | undefined,
     value: number | undefined,
     payload: PlayCardPayload,
     target?: Card | Hero,
-    target2?: Card | Hero
-): number
-{
-    if (valueFrom)
-    {
-        const [source, field] = valueFrom.split('.');
+    target2?: Card | Hero,
+    context?: EffectContext
+): number {
+    if (valueFrom) {
+        const parts = valueFrom.split('.');
+        // context.targets[0].currForce → ['context', 'targets[0]', 'currForce']
+        if (parts[0] === 'context' && parts[1]?.startsWith('targets[')) {
+            const index = parseInt(parts[1].match(/\d+/)?.[0] ?? '0');
+            const obj = context?.targets?.[index];
+            if (!obj) return value ?? 0;
+            const resolved = (obj as any)[parts[2]];
+            return typeof resolved === 'number' ? resolved : value ?? 0;
+        }
 
         const obj =
-            source === 'target' ? target :
-            source === 'target2' ? target2 :
+            parts[0] === 'target' ? target :
+            parts[0] === 'target2' ? target2 :
             undefined;
 
-        if (!obj)
-            return value ?? 0;
-
-        const resolved = (obj as any)[field];
-
-        return typeof resolved === 'number'
-            ? resolved
-            : value ?? 0;
+        if (!obj) return value ?? 0;
+        const resolved = (obj as any)[parts[1]];
+        return typeof resolved === 'number' ? resolved : value ?? 0;
     }
-
     return value ?? 0;
 }
 
@@ -183,8 +216,8 @@ export function resolveEffect(
     game: Game,
     fromTiming?: EffectTime,
     target?: Card | Hero,
-    target2?: Card | Hero
-
+    target2?: Card | Hero,
+    context?: EffectContext
     ): boolean {
 
     console.log("Resolving effect", { eff });
@@ -197,9 +230,9 @@ export function resolveEffect(
     if (!target && !noTargetNeeded) return false;
     target = target!;
 
-
-    let value = resolveValue(eff.valueFrom, eff.value, payload, target, target2);
     
+    let value = resolveValue(eff.valueFrom, eff.value, payload, target, target2, context);
+    console.log("Resolved value:", value, "from", eff.valueFrom);
     console.log("target avant switch:", target?.kind, "noTargetNeeded:", noTargetNeeded)
     switch (eff.effect) {
         case "ad_mod":
@@ -297,8 +330,11 @@ export function resolveEffect(
                 }
                 return true;
             }
-            else if (target.kind === "hero")
+            else if (target.kind === "hero") {
+                console.log("💥 dealsDmg", { player: player.idInGame, target: target.idInGame, value });
+
                 dealsDmg(player, target, value);
+            }
             else if (target.kind === "card")
                 target.currEndurance -= value;
 

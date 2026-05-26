@@ -1,3 +1,5 @@
+import { Card } from "./card";
+import { Hero } from "./hero";
 
 export type EffectType =
 | "ad_mod" // 1 target
@@ -14,6 +16,7 @@ export type EffectType =
 
 export type EffectTime =
 | "immediate"
+| "start_turn"
 | "end_of_turn"
 | "on_deal_damage";
 // | "on_death"; pour plus tard peut-être
@@ -48,3 +51,6 @@ export type Effect = {
     targetType?: TargetType;
 }
 
+export interface EffectContext {
+    targets: (Card | Hero)[]
+}

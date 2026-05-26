@@ -1,0 +1,51 @@
+{
+  "description": "Traitrise de Loki: créature adverse perd -1/-1, puis dégâts égaux à sa force sur le héros adverse",
+  "players": [
+    {
+      "id": "P1",
+      "board": [],
+      "battlefield": {}
+    },
+    {
+      "id": "P2",
+      "board": [
+        { "id": 1, "name": "P2 Creature A", "force": 4, "endurance": 5, "zone": "bf1", "kind": "card", "type": "creature" }
+      ],
+      "battlefield": { "bf1": { "id": 1, "name": "P2 Creature A", "force": 4, "endurance": 5, "zone": "bf1", "kind": "card", "type": "creature" } }
+    }
+  ],
+  "turn": 1,
+  "stack": [],
+  "actions": [
+    { "type": "end_turn", "player": "P1" },
+    { "type": "end_turn", "player": "P2" },
+    { "type": "start_turn_2" },
+    {
+      "type": "play_card",
+      "player": "P1",
+      "card": {
+        "effects": [
+          {
+            "effect": "addef_mod",
+            "value": -1,
+            "target": "opponent",
+            "targetType": { "creature": true }
+          },
+          {
+            "effect": "dmg",
+            "value": 0,
+            "valueFrom": "context.targets[0].currForce",
+            "target": "opponent_hero",
+            "targetType": { "hero": true }
+          }
+        ]
+      },
+      "target": 1
+    }
+  ],
+  "expected": {
+    "P2_creature_A_force": 3,
+    "P2_creature_A_endurance": 4,
+    "P1_hero_damage_taken": 3
+  }
+}

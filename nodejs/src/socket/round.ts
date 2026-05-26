@@ -1,5 +1,4 @@
 import type { GameSession } from '../types/gamesession.ts'
-import type { BfZone } from '../types/zones.ts'
 import type { Hero } from '../types/hero.ts'
 import type { Card } from '../types/card.ts'
 import { resolveCombat } from '../engine/resolveEffects.ts'

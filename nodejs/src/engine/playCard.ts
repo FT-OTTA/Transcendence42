@@ -1,5 +1,7 @@
 import type { Card, PlayCardPayload } from '../types/card.ts'
+import { EffectContext } from '../types/effects.ts';
 import type { Game } from '../types/gamesession.ts'
+import { Hero } from '../types/hero.ts';
 import type { BfZone } from '../types/zones.ts'
 import { resolveEffect } from "./resolveEffects.ts";
 import { findById } from './utils.ts'
@@ -43,9 +45,15 @@ export function playCard(card: Card, payload: PlayCardPayload, game: Game): void
                 target = t?.targetId ? findById(game, t.targetId) : undefined;
                 target2 = undefined;
             }
+            const context: EffectContext = {
+                targets: (payload.targets ?? [])
+                    .map(t => t?.targetId ? findById(game, t.targetId) : undefined)
+                    .filter(Boolean) as (Card | Hero)[]
+            };
 
-            console.log("Resolving effect", { effect, target, target2 });
-            resolveEffect(card.owner, effect, payload, game, undefined, target, target2);
+            
+            console.log("Resolving effect", { effect, target, target2 ,context });
+            resolveEffect(card.owner, effect, payload, game, undefined, target, target2, context);
         }
     }
 }

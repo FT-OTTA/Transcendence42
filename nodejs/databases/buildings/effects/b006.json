@@ -4,7 +4,8 @@
             "effect": "addef_mod",
             "value": -1,
             "target": "all_enemies",
-            "targetType": { "creature": true }
+            "targetType": { "creature": true },
+            "timing": "start_turn"
         }
     ]
 }

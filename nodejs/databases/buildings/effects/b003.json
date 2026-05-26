@@ -4,7 +4,8 @@
             "effect": "dmg",
             "value": 3,
             "target": "all_enemies",
-            "targetType": { "hero": true, "creature": true, "building": true }
+            "targetType": { "hero": true, "creature": true, "building": true },
+            "timing": "start_turn"
         }
     ]
 }

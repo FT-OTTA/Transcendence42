@@ -9,7 +9,7 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 3001
+# EXPOSE 3001
 
 # This runs the dev server, it's not meant for production.
 # Prod would build when the image is built then run npm start instead.

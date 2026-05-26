@@ -25,7 +25,7 @@ const io = new Server(httpServer, { cors: { origin: "*" } })
 console.log('Prisma Engine prêt ✅')
 
 app.use(cors({
-    origin: "${NEXT_PUBLIC_API_URL}:3001",
+    origin: "${NEXT_PUBLIC_API_URL}",
     credentials: true,
 }));
 

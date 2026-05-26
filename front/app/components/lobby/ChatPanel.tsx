@@ -31,7 +31,7 @@ export default function ChatPanel() {
         const username = localStorage.getItem("username");
 
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/messages/global`
+            `${process.env.NEXT_PUBLIC_API_URL}:3000/messages/global`
         );
 
         if (!res.ok) {
@@ -75,7 +75,7 @@ export default function ChatPanel() {
         }
 
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/messages`,
+            `${process.env.NEXT_PUBLIC_API_URL}:3000/messages`,
             {
                 method: "POST",
                 headers: {

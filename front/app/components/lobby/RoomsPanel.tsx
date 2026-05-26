@@ -30,7 +30,7 @@ export default function RoomPanel() {
     async function fetchRooms() {
 
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/rooms`
+            `${process.env.NEXT_PUBLIC_API_URL}:3000/rooms`
         );
 
         if (!res.ok) {
@@ -61,7 +61,7 @@ export default function RoomPanel() {
             return;
         }
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/rooms/create`,
+            `${process.env.NEXT_PUBLIC_API_URL}:3000/rooms/create`,
             {
                 method: "POST",
                 headers: {
@@ -100,7 +100,7 @@ export default function RoomPanel() {
         }
 
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/rooms/${roomId}/join`,
+            `${process.env.NEXT_PUBLIC_API_URL}:3000/rooms/${roomId}/join`,
             {
                 method: "POST",
                 headers: {

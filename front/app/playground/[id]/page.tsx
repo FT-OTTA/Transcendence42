@@ -43,7 +43,7 @@ export default function PlaygroundPage() {
   useEffect(() => {
     if (!selectedHero) return;
 
-    const newSocket = io('${process.env.NEXT_PUBLIC_API_URL}');
+    const newSocket = io('${process.env.NEXT_PUBLIC_API_URL}:3000');
     socketRef.current = newSocket;
     setSocket(newSocket);
 

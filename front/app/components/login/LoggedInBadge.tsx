@@ -22,7 +22,7 @@ export default function LoggedInBadge() {
 
         try {
             const res = await fetch(
-                `http://localhost:3000/users/${storedUsername}`
+                `${process.env.NEXT_PUBLIC_API_URL}/users/${storedUsername}`
             );
 
             if (!res.ok)

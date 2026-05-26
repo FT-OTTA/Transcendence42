@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { cinzel } from "../../fonts"
-import { requireAuth } from "../login/requireAuth";
+import { requireAuth } from "../login/RequireAuth";
 import { useRouter } from "next/navigation";
 
 

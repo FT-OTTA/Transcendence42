@@ -23,6 +23,7 @@ export function checkVictory(game: Game): Hero | null {
     if (draw) return null;
     return winner;
 }
+
 export function checkBoardState(game: Game): "continue" | "game_over" {
     if (game.status === "game_over") return "game_over";
 
@@ -38,15 +39,6 @@ export function checkBoardState(game: Game): "continue" | "game_over" {
                 player.battlefield[zone] = undefined;
             }
         }
-    }
-
-    // check win (après cleanup + état actuel)
-    const winner = checkVictory(game);
-
-    if (winner) {
-        game.status = "game_over";
-        game.winner = winner;
-        return "game_over";
     }
 
     return "continue";

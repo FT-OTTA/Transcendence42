@@ -124,6 +124,8 @@ export async function instantiateGame(players: WaitingPlayer[]): Promise<Game> {
         turnNumber: 1,
         clock_per_turn: 600,
         players: heroes,
+        status: 'playing',
+        winner: undefined,
         backgroundPath: 'default.png'
     }
 }

@@ -374,6 +374,7 @@ export function resolveEffect(
                 target.state = "sick";
             break;
         case "win":
+            console.log("target dans win:", target);
             if (!target || target.kind !== "hero") return false;
             game.status = "game_over";
             game.winner = target as Hero;

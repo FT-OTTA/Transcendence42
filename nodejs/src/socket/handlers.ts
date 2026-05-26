@@ -65,17 +65,17 @@ export function onConnection(io: Server, socket: Socket): void {
         socket.emit('game_update', { game: getPlayerPerspective(session.game, playerIndex) })
     })
 
-    socket.on('end_turn', () => {
-        console.log('Reçu end_turn de', socket.id)
-        const session = findSession(socket.id)
-        if (!session) return
+        socket.on('end_turn', () => {
+            console.log('Reçu end_turn de', socket.id)
+            const session = findSession(socket.id)
+            if (!session) return
 
-        session.readyPlayers.add(socket.id)
-        if (session.readyPlayers.size === session.sockets.length) {
-            resolveRound(session)
-            session.sockets.forEach((s, id) => {
-                s.emit('game_update', { game: getPlayerPerspective(session.game, id) })
-            })
+            session.readyPlayers.add(socket.id)
+            if (session.readyPlayers.size === session.sockets.length) {
+                resolveRound(session)
+                session.sockets.forEach((s, id) => {
+                    s.emit('game_update', { game: getPlayerPerspective(session.game, id) })
+                })
         }
     })
 

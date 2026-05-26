@@ -21,6 +21,13 @@ function findById(game: any, id: number): Hero | Card | undefined {
     return undefined
 }
 
+function emitGameOver(session: GameSession) {
+    const winnerIndex = session.game.winner ? session.game.players.indexOf(session.game.winner) : -1
+    session.sockets.forEach((s, id) => {
+        s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
+    })
+}
+
 export function resolveRound(session: GameSession): void {
     console.log('Résolution du tour', session.game.turnNumber)
     if (session.timer === null)
@@ -38,13 +45,21 @@ export function resolveRound(session: GameSession): void {
             playCard(card, payload, session.game)
         }
     }
-
-    if (checkBoardState(session.game) === "game_over") return;
-    resolveCombat(session.game)
-    if (checkBoardState(session.game) === "game_over") return;
-
     session.submittedCards.clear()
     session.readyPlayers.clear()
+
+    if (checkBoardState(session.game) === "game_over") {
+        emitGameOver(session)
+        return;
+    }
+
+    resolveCombat(session.game)
+
+    if (checkBoardState(session.game) === "game_over") {
+        emitGameOver(session)
+        return;
+    }
+
     session.game.turnNumber += 1
 
     if (session.game.turnNumber > 8) {

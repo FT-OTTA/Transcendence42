@@ -75,7 +75,7 @@ export default function PlaygroundPage() {
     });
 
     newSocket.on('game_over', (data) => {
-        if (data.winner === -1) {
+        if (-1 === data.winner) {
           alert("Game over! It's a draw!");
         } else {
           alert(`Game over! Winner: ${data.winner === myPlayerIndexRef.current ? "You" : "Opponent"}`);

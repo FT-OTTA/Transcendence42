@@ -20,24 +20,25 @@ async function buildHero(heroId: string): Promise<Hero> {
     const hero = await prisma.hero.findUnique({ where: { id: heroId } })
     if (!hero) throw new Error('Héros introuvable')
 
-    let passiveEffect: Effect = { effect: 'armor', value: 0, target: 'self_hero' }
+    let passiveEffect: Effect[] = []
     if (hero.passive_json_path) {
         try {
             const fullPath = path.join(process.cwd(), 'databases', 'heroes', 'passives', hero.passive_json_path)
             if (fs.existsSync(fullPath)) {
                 const json = JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
-                passiveEffect = {
-                    effect: (json.effect as EffectType) || 'armor',
-                    value: json.value ?? 0,
-                    target: (json.target as EffectTarget) || 'self_hero',
-                    ...(json.targetType && { targetType: json.targetType })
-                }
+                const effects = json.effects ?? [json];
+                passiveEffect = effects.map((e: any) => ({
+                    effect: e.effect as EffectType,
+                    value: e.value ?? 0,
+                    target: e.target as EffectTarget,
+                    ...(e.timing && { timing: e.timing }),
+                    ...(e.targetType && { targetType: e.targetType })
+                }))
             }
         } catch (err) {
             console.error(`Erreur passif ${heroId}:`, err)
         }
     }
-
     // DEV MODE — remplacer par le vrai deck plus tard
     const allCards = await prisma.card.findMany()
     const library: Card[] = allCards.map((c: PrismaCard): Card => ({

@@ -6,7 +6,7 @@ export type Hero = {
     kind: "hero";
     idInGame: number;
     class: CardClass;
-    passive: Effect;
+    passive: Effect[];
     armor: number;
     dmgDealt: number;
     curRunes: number;

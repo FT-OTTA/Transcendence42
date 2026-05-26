@@ -133,12 +133,6 @@ function resolveValue(
     return value ?? 0;
 }
 
-export class GameOver extends Error {
-    constructor(public winner: Hero) {
-        super('game_over')
-    }
-}
-
 function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | undefined {
     let target: Hero | Card | undefined = undefined;
     if (eff.target === "self_hero") target = player;
@@ -204,11 +198,7 @@ export function resolveEffect(
     target = target!;
 
 
-    console.log("currForce direct:", (target as any).currForce)
-    console.log("stats:", (target as any).stats)
-    console.log("stats.currForce:", (target as any).stats?.currForce)
     let value = resolveValue(eff.valueFrom, eff.value, payload, target, target2);
-    console.log("Resolved value:", value);
     
     console.log("target avant switch:", target?.kind, "noTargetNeeded:", noTargetNeeded)
     switch (eff.effect) {
@@ -334,6 +324,11 @@ export function resolveEffect(
             target2.owner = tmpOwner;
             target.zone = zone2;
             target2.zone = zone1;
+
+            // 👇 Sync board depuis battlefield
+            for (const player of (game as any).players) {
+                player.board = Object.values(player.battlefield).filter(Boolean);
+            }
             break;
         }
         case "destroy":
@@ -379,10 +374,10 @@ export function resolveEffect(
                 target.state = "sick";
             break;
         case "win":
-            console.log("WIN kind:", target?.kind)
-            if (target.kind === "card") return false;
-            throw new GameOver(target as Hero);
-
+            if (!target || target.kind !== "hero") return false;
+            game.status = "game_over";
+            game.winner = target as Hero;
+            return true;
     }
 
     return true;

@@ -23,5 +23,8 @@ export type Game = {
     clock_per_turn: number;
     players: Hero[];
     backgroundPath: string;
+    status: "playing" | "game_over";
+    winner?: Hero;
+
 };
 

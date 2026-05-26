@@ -2,7 +2,7 @@ import type { GameSession } from '../types/gamesession.ts'
 import type { BfZone } from '../types/zones.ts'
 import type { Hero } from '../types/hero.ts'
 import type { Card } from '../types/card.ts'
-import { resolveCombat, GameOver } from '../engine/resolveEffects.ts'
+import { resolveCombat } from '../engine/resolveEffects.ts'
 import { playCard } from '../engine/playCard.ts'
 import { startTurn } from '../engine/startTurn.ts'
 import { checkBoardState, checkVictory } from '../engine/checks.ts'
@@ -35,27 +35,13 @@ export function resolveRound(session: GameSession): void {
 
         for (const { card, payload } of cards) {
             if (!card) continue
-            const target = payload.targetId ? findById(session.game, payload.targetId) : undefined
-            const target2 = payload.target2Id ? findById(session.game, payload.target2Id) as Card : undefined
-            playCard(card, { ...payload, target, target2 }, session.game)
+            playCard(card, payload, session.game)
         }
     }
 
-    try {
-        checkBoardState(session.game)
-        resolveCombat(session.game)
-        checkBoardState(session.game)
-    } catch (e) {
-        if (e instanceof GameOver) {
-            console.log(`Game over : ${e.message}`)
-            const winnerIndex = session.game.players.indexOf(e.winner)
-            session.sockets.forEach((s, id) => {
-                s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
-            })
-            return
-        }
-        throw e
-    }
+    if (checkBoardState(session.game) === "game_over") return;
+    resolveCombat(session.game)
+    if (checkBoardState(session.game) === "game_over") return;
 
     session.submittedCards.clear()
     session.readyPlayers.clear()

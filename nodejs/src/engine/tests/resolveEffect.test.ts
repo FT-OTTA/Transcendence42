@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { GameOver, resolveBuildings, resolveEffect } from '../resolveEffects.ts'
+import { resolveBuildings, resolveEffect } from '../resolveEffects.ts'
 import { makeCard, makeHero, makeGame, makeEffect, nextId } from './mocks.ts'
 import type { Hero } from '../../types/hero.ts'
 import type { Card } from '../../types/card.ts'
@@ -253,35 +253,54 @@ describe('resolveBuildings - destroy random_enemies', () => {
 })
 // ─── win ────────────────────────────────────────────────────────────────────────────
 describe('resolveEffect - win', () => {
-    it('throw GameOver quand la cible est un héros', () => {
+
+    it('termine la partie quand la cible est un héros', () => {
         const player = makeHero()
         const opponent = makeHero()
         const game = makeGame(player, opponent)
-        const eff = makeEffect({ effect: "win", target: "self_hero" })
 
-        expect(() => resolve(player, eff, game, player)).toThrow(GameOver)
+        const eff = makeEffect({
+            effect: "win",
+            target: "self_hero"
+        })
+
+        const result = resolve(player, eff, game, player)
+
+        expect(result).toBe(true)
+        expect(game.status).toBe("game_over")
     })
 
-    it('throw GameOver avec le bon gagnant', () => {
+    it('assigne le bon gagnant', () => {
         const player = makeHero()
         const opponent = makeHero()
         const game = makeGame(player, opponent)
-        const eff = makeEffect({ effect: "win", target: "self_hero" })
 
-        try {
-            resolve(player, eff, game, player)
-        } catch (e) {
-            expect(e).toBeInstanceOf(GameOver)
-            expect((e as GameOver).winner).toBe(player)
-        }
+        const eff = makeEffect({
+            effect: "win",
+            target: "self_hero"
+        })
+
+        resolve(player, eff, game, player)
+
+        expect(game.status).toBe("game_over")
+        expect(game.winner).toBe(player)
     })
 
-    it('ne throw pas si la cible est une carte', () => {
+    it('ne termine pas la partie si la cible est une carte', () => {
         const player = makeHero()
-        const game = makeGame(player)
+        const game = makeGame(player, player)
+
         const creature = makeCard()
-        const eff = makeEffect({ effect: "win", target: "self" })
 
-        expect(() => resolve(player, eff, game, creature)).not.toThrow()
+        const eff = makeEffect({
+            effect: "win",
+            target: "self"
+        })
+
+        const result = resolve(player, eff, game, creature)
+
+        expect(result).toBe(false)
+        expect(game.status).not.toBe("game_over")
+        expect(game.winner).toBeUndefined()
     })
 })

@@ -5,6 +5,8 @@ import { initSocket } from './socket/index.ts'
 import { prisma } from '../prisma/prisma.ts'
 import cors from 'cors'
 import path from 'path'
+import { fileURLToPath } from "url";
+
 import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
 import authRouter from './routes/auth.ts'
@@ -46,6 +48,10 @@ initSocket(io)
 httpServer.listen(3000, () => {
     console.log('Server running on port 3000')
 })
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(express.static(path.join(__dirname, "../front/out")));
 
 app.get("*", (req, res) => {

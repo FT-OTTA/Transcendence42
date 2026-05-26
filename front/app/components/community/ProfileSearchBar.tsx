@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
@@ -29,6 +30,7 @@ type SearchBarProps = {
 
 export default function ProfileSearchBar()
 {
+	const l = useTranslations("Profile");
 	const [search, setSearch] = useState("");
 	const router = useRouter();
 
@@ -45,7 +47,7 @@ export default function ProfileSearchBar()
 					value={search}
 					onChange={(e) => setSearch(e.target.value)
 					}
-					placeholder="Search player..."
+					placeholder= {l("search_placeholder")}
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							handleSearch();

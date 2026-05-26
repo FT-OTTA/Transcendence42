@@ -2,6 +2,7 @@ import AvatarFrame from "../AvatarFrame";
 import clsx from "clsx";
 import { cinzel } from "../../fonts";
 import ProfileMood from "./ProfileMood";
+import { useTranslations } from "next-intl";
 
 const profileBanner = clsx
 (
@@ -39,6 +40,7 @@ const onlineStatus = clsx
 export default function ProfileBanner({username, mood, isOnline}: ProfileBannerProps)
 {
 
+	const l = useTranslations("Profile");
 
 	return (
 		<section className={ profileBanner }>
@@ -55,7 +57,7 @@ export default function ProfileBanner({username, mood, isOnline}: ProfileBannerP
 			</div>
 
 			<div className={clsx(onlineStatus, isOnline ? "text-green-100" : "text-red-400")}>
-				● { isOnline ? "Online" : "Offline" }
+				● { isOnline ? l("online") : l("offline") }
 			</div>
 
 		</section>

@@ -1,0 +1,50 @@
+{
+  "Homepage": {
+    "start": "Get Started",
+    "whats_otta": "What is Otta?",
+    "log_status": "Log in to enjoy our incredible features",
+    "login_as": "Logged in as:",
+    "log_out": "Log Out"
+  },
+
+  "Navbar": {
+    "home": "Home",
+    "lobby": "Lobby",
+    "community": "Community"
+  },
+
+  "Auth": {
+    "username": "Username",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "create_account": "Create Account",
+    "welcome_back": "Welcome Back",
+    "hide": "Hide",
+    "show": "Show",
+    "register": "Register",
+    "login": "Login",
+    "already_have": "Already have an account?",
+    "dont_have": "Don't have an account?",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "loading": "Loading..."
+  },
+
+  "Profile": {
+    "online": "Online",
+    "offline": "Offline",
+    "set_mood": "Click to set your mood",
+    "loading": "Loading",
+    "search_placeholder": "Search player..."
+  },
+
+  "Stats": {
+    "num_played": "Played",
+    "wins": "Wins",
+    "losses": "Losses",
+    "draws": "Draws",
+    "best_friend": "Most Played with",
+    "worst_enemy": "Worst Enemy"
+  }
+
+}

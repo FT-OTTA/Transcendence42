@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { cinzel } from "../../fonts"
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 const loginCard = clsx
 (
@@ -18,7 +19,6 @@ const loginCard = clsx
 
 export default function LoginCard()
 {
-
     const [isRegisterMode, setisRegisterMode] = useState(false);
 
     const [showPassword, setshowPassword] = useState(false);
@@ -30,6 +30,8 @@ export default function LoginCard()
 
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const l = useTranslations("Auth");
 
     async function handleAuth()
     {
@@ -93,16 +95,15 @@ export default function LoginCard()
     }
 
     return (
-        
         <div className={ loginCard }>
 
             <h2 className="text-2xl md:text-3xl text-center mb-2">
-                {isRegisterMode ? "Create Account" : "Welcome Back"}
+                {isRegisterMode ? l("create_account") : l("welcome_back")}
             </h2>
 
             <input
                 type="text"
-                placeholder="Username"
+                placeholder={l("username")}
                 value={username}
                 onChange={(e) => { 
                     setUsername(e.target.value);
@@ -115,7 +116,7 @@ export default function LoginCard()
             <div className="relative">
                 <input
                     type={ showPassword ? "text" : "password"}
-                    placeholder="Password"
+                    placeholder={l("password")}
                     value={password}
                     onChange={(e) => {
                         setPassword(e.target.value);
@@ -133,7 +134,7 @@ export default function LoginCard()
                     onClick={() => setshowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-300 hover:text-white transition"
                 >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword ? l("hide") : l("show")}
                 </button>
             </div>
 
@@ -141,6 +142,7 @@ export default function LoginCard()
                 <div className="relative">
                     <input
                         type={ showConfirmPassword ? "text" : "password"}
+                        placeholder={l("confirm_password")}
                         value={confirmpassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         onKeyDown={(e) => {
@@ -148,7 +150,6 @@ export default function LoginCard()
                                 handleAuth();
                             }
                         }}
-                        placeholder="Confirm Password"
                         className="w-full px-3 py-2 pr-16 bg-transparent border border-blue-300 text-blue-200 outline-none"
                     />
                     <button
@@ -156,7 +157,7 @@ export default function LoginCard()
                         onClick={() => setshowConfirmPassword(!showConfirmPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-300 hover:text-white transition"
                     >
-                        {showConfirmPassword ? "Hide" : "Show"}
+                        {showConfirmPassword ? l("hide") : l("show")}
                     </button>
                 </div>
             )}
@@ -171,21 +172,21 @@ export default function LoginCard()
                 disabled={loading}
                 className="w-full py-2 border border-blue-300 text-blue-300 hover:bg-blue-300 hover:text-blue-950 transition">
                 {loading 
-                    ? "Loading..."
+                    ? l("loading")
                     : isRegisterMode
-                    ? "Register"
-                    : "Login"}
+                    ? l("register")
+                    : l("login")}
             </button>
 
             <div>
                 <p className="text-sm md:text-sm text-center mb-2">
-                    {isRegisterMode ? "Already have an account?" : "Don't have an account?"}
+                    {isRegisterMode ? l("already_have") : l("dont_have")}
                 </p>
                 <button 
                     type="button"
                     onClick={() => setisRegisterMode(!isRegisterMode)}
                     className="w-full py-2 text-sm text-blue-300/70 hover:text-blue-200 transition underline">
-                    {isRegisterMode ? "Sign in" : "Sign up"}
+                    {isRegisterMode ? l("sign_in") : l("sign_up")}
                 </button>
             </div>
         </div>

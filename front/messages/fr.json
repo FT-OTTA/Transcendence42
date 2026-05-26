@@ -1,0 +1,49 @@
+{
+"Homepage": {
+      "start": "Commencer",
+      "whats_otta": "Qu'est-ce qu'Otta ?",
+      "log_status": "Connectez-vous pour profiter de nos fonctionnalités incroyables",
+      "login_as": "Connecté en tant que :",
+      "log_out": "Se déconnecter"
+    },
+
+    "Navbar": {
+      "home": "Accueil",
+      "lobby": "Salon",
+      "community": "Communauté"
+    },
+
+    "Auth": {
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "confirm_password": "Confirmer le mot de passe",
+      "create_account": "Créer un compte",
+      "welcome_back": "Bon retour",
+      "hide": "Masquer",
+      "show": "Afficher",
+      "register": "S'inscrire",
+      "login": "Se connecter",
+      "already_have": "Vous avez déjà un compte ?",
+      "dont_have": "Vous n'avez pas de compte ?",
+      "sign_in": "Connexion",
+      "sign_up": "Inscription",
+      "loading": "Chargement..."
+    },
+
+    "Profile": {
+      "online": "En ligne",
+      "offline": "Hors ligne",
+      "set_mood": "Cliquez pour définir votre humeur",
+      "loading": "Chargement",
+      "search_placeholder": "Rechercher un joueur..."
+    },
+
+    "Stats": {
+      "num_played": "Parties jouées",
+      "wins": "Victoires",
+      "losses": "Défaites",
+      "draws": "Égalités",
+      "best_friend": "Le plus joué avec",
+      "worst_enemy": "Pire ennemi"
+    }
+}

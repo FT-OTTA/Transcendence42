@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function LoggedInBadge() {
+
+    const l = useTranslations("Homepage");
 
     const [username, setUsername] = useState<string | null>(() => {
         if (typeof window !== "undefined")
@@ -53,7 +56,7 @@ export default function LoggedInBadge() {
         return (
             <div className="fixed top-13 right-2 z-40 flex flex-col px-4 py-3 rounded-sm text-sm text-blue-200/70">
                     <span className="text-[11px] uppercase tracking-wider opacity-50">
-                        Log in to enjoy our incredible features
+                        ${l("log_status")};
                     </span>
             </div>
         );
@@ -62,7 +65,7 @@ export default function LoggedInBadge() {
         <div className="fixed top-13 right-2 z-40 flex flex-col px-4 py-3 rounded-sm text-sm text-blue-200/70">
             <div className="flex items-center gap-2 leading-tight">
                 <span className="text-[11px] uppercase tracking-wider opacity-50">
-                    Logged in as:
+                    {l("login_as")};
                 </span>
 
                 <span className="text-blue-100 font-medium">
@@ -73,7 +76,7 @@ export default function LoggedInBadge() {
             <button
                 onClick={logout}
                 className="w-full text-xs px-3 py-1.5 border border-blue-300/20 text-blue-200/60 hover:text-blue-100 hover:border-blue-300/50 transition">
-                Logout
+                ${l("logout")};
             </button>
         </div>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Pencil } from "lucide-react";
 
 type Props = {
@@ -14,6 +15,7 @@ export default function ProfileMood({ initialMood, username }: Props)
 	const [isOwner, setIsOwner] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [editing, setEditing] = useState(false);
+	const l = useTranslations("Profile");
 
 	useEffect(() => {
 		const storedUsername = localStorage.getItem("username");
@@ -36,7 +38,7 @@ export default function ProfileMood({ initialMood, username }: Props)
 
 
 	if (loading) {
-		return <p className="text-white/40 italic">Loading...</p>;
+		return <p className="text-white/40 italic">${l("loading")}</p>;
 	}
 
 	if (!isOwner) {
@@ -73,7 +75,7 @@ export default function ProfileMood({ initialMood, username }: Props)
 				className="text-white/60 italic cursor-pointer hover:text-white transition whitespace-normal break-words max-w-xs md:max-w-sm"
 				onClick={() => setEditing(true)}
 				>
-				{currentMood || "Click to set your mood"}
+				{currentMood || l("set_mood")}
 			</p>
 		</div>
 	);

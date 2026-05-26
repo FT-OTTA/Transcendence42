@@ -45,10 +45,15 @@ app.get('/', (req, res) => {
 
 initSocket(io)
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, "0.0.0.0", () => {
+httpServer.listen(PORT, () => {
   console.log("listening");
 });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.use(express.static(path.join(__dirname, "../front/out")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../front/out/index.html"));
+});

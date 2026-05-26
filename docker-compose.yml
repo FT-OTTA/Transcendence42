@@ -115,18 +115,18 @@ services:
         retries: 10
     labels:
       collect_logs: "true"
-  front:
-    build: ./front
-    container_name: front
-    env_file:
-      - ./.env
-    ports:
-      - "3001:3001"
-    networks:
-      - otta
-    restart: unless-stopped
-    labels:
-      collect_logs: "true"
+  # front:
+  #   build: ./front
+  #   container_name: front
+  #   env_file:
+  #     - ./.env
+  #   ports:
+  #     - "3001:3001"
+  #   networks:
+  #     - otta
+  #   restart: unless-stopped
+  #   labels:
+  #     collect_logs: "true"
     # volumes:
     #   - ./front:/app
     #   - /app/node_modules  # protège node_modules

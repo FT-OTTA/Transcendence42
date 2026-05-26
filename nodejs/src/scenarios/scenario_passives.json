@@ -1,0 +1,56 @@
+{
+  "description": "Passives: Druid gagne 1 rune/tour, Warrior gagne 1 armure/tour",
+  "players": [
+    {
+      "id": "Druid",
+      "kind": "hero",
+      "passive": [
+        {
+          "effect": "runes",
+          "value": 1,
+          "target": "self_hero",
+          "targetType": { "hero": true },
+          "timing": "start_turn"
+        }
+      ],
+      "board": [],
+      "battlefield": {},
+      "armor": 0,
+      "curRunes": 0,
+      "dmgDealt": 0
+    },
+    {
+      "id": "Warrior",
+      "kind": "hero",
+      "passive": [
+        {
+          "effect": "armor",
+          "value": 1,
+          "target": "self_hero",
+          "targetType": { "hero": true },
+          "timing": "start_turn"
+        }
+      ],
+      "board": [],
+      "battlefield": {},
+      "armor": 0,
+      "curRunes": 0,
+      "dmgDealt": 0
+    }
+  ],
+  "turn": 1,
+  "stack": [],
+  "actions": [
+    { "type": "start_turn" },
+    { "type": "end_turn", "player": "Druid" },
+    { "type": "end_turn", "player": "Warrior" },
+    { "type": "start_turn" },
+    { "type": "end_turn", "player": "Druid" },
+    { "type": "end_turn", "player": "Warrior" },
+    { "type": "start_turn" }
+  ],
+  "expected": {
+    "Druid_runes_after_3_turns": 3,
+    "Warrior_armor_after_3_turns": 3
+  }
+}

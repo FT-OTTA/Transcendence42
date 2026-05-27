@@ -214,6 +214,7 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
     }
     return target;
 }
+
 export function resolveEffect(
     player: Hero,
     eff: Effect,

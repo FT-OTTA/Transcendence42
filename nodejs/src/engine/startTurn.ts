@@ -10,6 +10,7 @@ export function fibonacci(n: number): number {
 }
 
 export function playerDraw(player: Hero, n: number): boolean {
+    if (n <= 0) return false;
     while (player.library.length > 0 && n--)
         player.hand.push(player.library.pop()!);
     if (player.library.length === 0)

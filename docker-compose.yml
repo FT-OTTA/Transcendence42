@@ -85,8 +85,8 @@ services:
     depends_on:
         mysql:
             condition: service_healthy
-        logstash:
-            condition: service_healthy
+        # logstash:
+        #     condition: service_healthy
     networks:
       - otta
     restart: unless-stopped

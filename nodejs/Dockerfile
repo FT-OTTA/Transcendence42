@@ -10,22 +10,22 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-COPY prisma ./prisma/
-RUN npx prisma generate
-
 # =========================
 # 2. FRONTEND (NEXT)
 # =========================
 COPY front/package*.json ./front/
 RUN cd front && npm install
 
-COPY front ./front
-RUN cd front && npm run build
-
 # =========================
-# 3. FULL SOURCE
+# 3. FULL SOURCE (avant les builds)
 # =========================
 COPY . .
+
+# Build Next.js
+RUN cd front && npm run build
+
+# Prisma generate (après COPY)
+RUN npx prisma generate
 
 EXPOSE 3000
 

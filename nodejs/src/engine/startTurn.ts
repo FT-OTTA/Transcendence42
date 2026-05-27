@@ -26,7 +26,7 @@ export function startTurn(game: Game): void {
         player.curRunes = fibonacci(game.turnNumber + 1);
         // player.curRunes = 999; // remove this line to have normal rune gain
         // playerDraw(player, 24 - player.hand.length);// remove this line to have normal hand refill
-        playerDraw(player, 8 - player.hand.length); 
+        playerDraw(player, (8 - player.hand.length > 0) ? 8 - player.hand.length : 0);
         console.log ("RESOLVING PASSIVE")
         for (const eff of player.passive) {
             resolveEffect(player, eff, { cardId: 0 }, game, 'start_turn', player)

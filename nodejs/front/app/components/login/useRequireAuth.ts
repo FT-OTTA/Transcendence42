@@ -8,7 +8,7 @@ export async function requireAuth() {
 
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/${username}`);
+            `/users/${username}`);
 
         console.log(res);
         if (!res.ok)

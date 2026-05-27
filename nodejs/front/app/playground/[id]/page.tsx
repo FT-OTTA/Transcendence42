@@ -43,9 +43,7 @@ export default function PlaygroundPage() {
   useEffect(() => {
     if (!selectedHero) return;
 
-    const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      transports: ['websocket', 'polling'],
-    });
+    const newSocket = io();
 
     newSocket.on('connect', () => console.log('Socket connected ✅', newSocket.id));
     newSocket.on('connect_error', (err) => console.error('Socket error ❌', err));    socketRef.current = newSocket;

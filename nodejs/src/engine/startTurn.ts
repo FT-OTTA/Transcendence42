@@ -24,9 +24,9 @@ export function startTurn(game: Game): void {
             if (card && card.state === "sick") card.state = "ready";
         }
         player.curRunes = fibonacci(game.turnNumber);
-        player.curRunes = 999; // remove this line to have normal rune gain
-        playerDraw(player, 24 - player.hand.length);// remove this line to have normal hand refill
-        // playerDraw(player, 8 - player.hand.length); 
+        // player.curRunes = 999; // remove this line to have normal rune gain
+        // playerDraw(player, 24 - player.hand.length);// remove this line to have normal hand refill
+        playerDraw(player, 8 - player.hand.length); 
         console.log ("RESOLVING PASSIVE")
         for (const eff of player.passive) {
             resolveEffect(player, eff, { cardId: 0 }, game, 'start_turn', player)

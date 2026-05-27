@@ -51,7 +51,7 @@ export function onConnection(io: Server, socket: Socket): void {
         player.curRunes -= card.runeCost
 
         if (card.timing === 'immediate') {
-            playCard(card, { cardId: data.cardId, zone: data.zone, targets: data.targets }, session.game)
+            playCard(card, { cardId: data.cardId, zone: data.zone, targets: data.targets }, session.game, 'immediate')
         } else {
             const zone = data.zone as BfZone
             if (session.game.players[playerIndex].battlefield[zone]) return

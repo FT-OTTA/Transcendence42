@@ -41,7 +41,7 @@ export function resolveRound(session: GameSession): void {
 
         for (const { card, payload } of cards) {
             if (!card) continue
-            playCard(card, payload, session.game)
+            playCard(card, payload, session.game, "end_of_turn")
         }
     }
     session.submittedCards.clear()

@@ -177,7 +177,9 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(Boolean) as Card[]));
+            pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature") as Card[]));
+        if (eff.targetType?.building)
+            pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "building") as Card[]));
         if (eff.targetType?.hero)
             pool.push(...opponents);
 
@@ -188,7 +190,9 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...Object.values(player.battlefield).filter(Boolean) as Card[]);
+            pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "creature") as Card[]);
+        if (eff.targetType?.building)
+            pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "building") as Card[]);
         if (eff.targetType?.hero)
             pool.push(player);
 
@@ -199,7 +203,9 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(Boolean) as Card[]));
+            pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature") as Card[]));
+        if (eff.targetType?.building)
+            pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "building") as Card[]));
         if (eff.targetType?.hero)
             pool.push(...game.players);
 

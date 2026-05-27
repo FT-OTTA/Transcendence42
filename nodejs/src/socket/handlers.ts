@@ -72,6 +72,7 @@ export function onConnection(io: Server, socket: Socket): void {
 
             session.readyPlayers.add(socket.id)
             if (session.readyPlayers.size === session.sockets.length) {
+                session.readyPlayers.clear() // ← reset avant le prochain tour
                 resolveRound(session)
                 session.sockets.forEach((s, id) => {
                     s.emit('game_update', { game: getPlayerPerspective(session.game, id) })

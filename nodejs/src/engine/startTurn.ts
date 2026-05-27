@@ -1,7 +1,7 @@
 import type { Hero } from '../types/hero.ts'
 import type { Game } from '../types/gamesession.ts'
 import { checkBoardState } from "./checks.ts";
-import { resolveBuildings, resolveEffect } from "./resolveEffects.ts";
+import { resolveStartTurnEffects, resolveEffect } from "./resolveEffects.ts";
 
 export function fibonacci(n: number): number {
     if (n === 0 || n === 1)
@@ -32,6 +32,6 @@ export function startTurn(game: Game): void {
             resolveEffect(player, eff, { cardId: 0 }, game, 'start_turn', player)
         }
     }
-    resolveBuildings(game);
+    resolveStartTurnEffects(game);
 }
 

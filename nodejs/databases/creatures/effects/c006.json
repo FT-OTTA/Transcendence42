@@ -4,7 +4,9 @@
             "effect": "armor",
             "value": -8,
             "target": "self_hero",
-            "targetType": { "hero": true }
+            "targetType": { "hero": true },
+            "timing": "end_of_turn"
+
         }
     ]
 }

@@ -3,7 +3,7 @@ Basic;1;2;2;« Quand vous jouez cette carte, vous mettez 1 degat a une cible, p
 Swap;2;1;2;« Quand vous jouez cette carte, vous pouvez échanger 2 cibles de votre champ de bataille. »;c002.json;common;c002.png;c002;2;[ « creature » | « building » ]
 Vanilla;3;3;1;« … »;c003.json;common;c003.png;c003;0;[]
 Pretre suceur de sang;2;1;1;« Quand vous jouez cette carte, la creature ciblee gagne -1/-1 »;c004.json;common;c004.png;c004;1;[ « creature » ]
-Caillou de runes animé;3;1;5;« Quand vous jouez cette carte, vous gagnez 1 rune »;c005.json;common;c005.png;c005;0;[]
+Caillou de runes animé;3;1;5;Au debut du tour, vous gagnez 1 rune »;c005.json;common;c005.png;c005;0;[]
 Auto-flagelleur sadique;3;8;8;« Quand vous jouez cette carte, vous perdez 8 d’armure »;c006.json;common;c006.png;c006;0;[]
 Sniper incontrôlé;4;3;2;« Quand vous jouez cette carte, détruisez la créature ciblée »;c007.json;common;c007.png;c007;1;[ « creature » ]
 Teddy;88;1;1;« Quand Teddy inflige des blessures, vous gagnez la partie instantanément »;c008.json;common;c008.png;c008;0;[]

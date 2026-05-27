@@ -4,7 +4,9 @@
             "effect": "addef_mod",
             "value": -1,
             "target": "opponent",
-            "targetType": { "creature": true }
+            "targetType": { "creature": true },
+            "timing": "end_of_turn"
+
         }
     ]
 }

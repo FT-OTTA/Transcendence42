@@ -3,7 +3,9 @@
         {
             "effect": "destroy",
             "target": "opponent",
-            "targetType": { "creature": true }
+            "targetType": { "creature": true },
+            "timing": "end_of_turn"
+
         }
     ]
 }

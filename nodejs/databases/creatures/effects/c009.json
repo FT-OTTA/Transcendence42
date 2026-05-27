@@ -3,7 +3,9 @@
         {
             "effect": "destroy",
             "target": "random_enemies",
-            "targetType": { "creature": true }
+            "targetType": { "creature": true },
+            "timing": "end_of_turn"
+
         }
     ]
 }

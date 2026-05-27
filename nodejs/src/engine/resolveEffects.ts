@@ -88,18 +88,18 @@ export function resolveCombat(game: Game) {
     }
 }
 
-export function resolveBuildings(game:Game) {
-    console.log("Résolution des bâtiments...")
+export function resolveStartTurnEffects(game:Game) {
+    console.log("Résolution des effets de début de tour...")
     for (let i = 1 ; i <= 8; i++)
     {
         const zone = `bf${i}` as BfZone;
         for (const player of game.players)
             {
-            const building = player.battlefield[zone];
-            if (building && building.type === "building") {
-                for (const effect of building.effects) {
+            const cardOnBf = player.battlefield[zone];
+            if (cardOnBf) {
+                for (const effect of cardOnBf.effects) {
                     // pourquoi y a pas besoin de l'argument fromtiming ici ?
-                    resolveEffect(player, effect, { cardId: building.idInGame }, game, "start_turn");
+                    resolveEffect(player, effect, { cardId: cardOnBf.idInGame }, game, "start_turn");
                 }
             }
         }

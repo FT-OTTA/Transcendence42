@@ -3,7 +3,9 @@
         {
             "effect": "swap",
             "target": "self",
-            "targetType": { "creature": true, "building": true }
+            "targetType": { "creature": true, "building": true },
+            "timing": "end_of_turn"
+
         }
     ]
 }

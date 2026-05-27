@@ -23,7 +23,7 @@ export function startTurn(game: Game): void {
         for (const card of Object.values(player.battlefield)) {
             if (card && card.state === "sick") card.state = "ready";
         }
-        player.curRunes = fibonacci(game.turnNumber);
+        player.curRunes = fibonacci(game.turnNumber + 1);
         // player.curRunes = 999; // remove this line to have normal rune gain
         // playerDraw(player, 24 - player.hand.length);// remove this line to have normal hand refill
         playerDraw(player, 8 - player.hand.length); 

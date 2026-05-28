@@ -3,15 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "next dev -p ${PORT}",
     "build": "next build",
-    "start": "next start -p 3001",
+    "start": "next start -p ${PORT}",
     "lint": "eslint"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "next": "16.2.6",
-    "otta-shared-types": "file:../nodejs/src/types",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "socket.io-client": "^4.8.3"

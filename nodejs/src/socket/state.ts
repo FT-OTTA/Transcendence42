@@ -1,4 +1,4 @@
-import type { GameSession, WaitingPlayer } from '../types/gamesession.ts'
+import type { GameSession, WaitingPlayer } from '../../types/gamesession.ts'
 import type { Socket } from 'socket.io'
 
 export let waitingPlayers: WaitingPlayer[] = []

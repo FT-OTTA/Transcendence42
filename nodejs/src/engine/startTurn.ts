@@ -1,5 +1,5 @@
-import type { Hero } from '../types/hero.ts'
-import type { Game } from '../types/gamesession.ts'
+import type { Hero } from '../../types/hero.ts'
+import type { Game } from '../../types/gamesession.ts'
 import { checkBoardState } from "./checks.ts";
 import { resolveBuildings, resolveEffect } from "./resolveEffects.ts";
 

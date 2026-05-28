@@ -1,4 +1,4 @@
-import type { Game } from '../types/gamesession.ts'
+import type { Game } from '../../types/gamesession.ts'
 export function getSpectatorPerspective(game: Game) {
     return JSON.parse(JSON.stringify(game, (key, value) => {
         if (key === 'owner') return undefined

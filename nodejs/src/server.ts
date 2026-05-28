@@ -1,6 +1,7 @@
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import next from 'next'
 import { initSocket } from './socket/index.ts'
 import { prisma } from '../prisma/prisma.ts'
 import cors from 'cors'
@@ -13,36 +14,34 @@ import friendRouter from './routes/friends.ts'
 import roomRouter from './routes/rooms.ts'
 import messageRouter from './routes/messages.ts'
 
-const app = express()
-// app.use(cors({ origin: '*' }))
-const httpServer = createServer(app)
-const io = new Server(httpServer, { cors: { origin: "*" } })
+const dev = process.env.NODE_ENV !== 'production'
+const nextApp = next({ dev, dir: './front' })
+const handle = nextApp.getRequestHandler()
 
-// PLUS BESOIN de mysql.createConnection ici !
-// Prisma gère la connexion tout seul dès que tu fais ton premier appel.
-console.log('Prisma Engine prêt ✅')
+nextApp.prepare().then(() => {
+  const app = express()
+  const httpServer = createServer(app)
+  const io = new Server(httpServer, { cors: { origin: "*" } })
 
-app.use(cors({
-    origin: "http://localhost:3001",
-    credentials: true,
-}));
+  console.log('Prisma Engine prêt ✅')
 
-app.use(express.json())
+  app.use(cors({ origin: "*", credentials: true }))
+  app.use(express.json())
 
-app.use('/cards', cardsRouter)
-app.use('/heroes', heroesRouter)
-app.use('/auth', authRouter)
-app.use('/users', usersRouter)
-app.use('/friends', friendRouter)
-app.use('/rooms', roomRouter)
-app.use('/messages', messageRouter)
+  app.use('/cards', cardsRouter)
+  app.use('/heroes', heroesRouter)
+  app.use('/auth', authRouter)
+  app.use('/users', usersRouter)
+  app.use('/friends', friendRouter)
+  app.use('/rooms', roomRouter)
+  app.use('/messages', messageRouter)
 
-app.get('/', (req, res) => {
-    res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')
-})
+  // Next.js gère tout le reste — doit être EN DERNIER  
+  app.all('/{*path}', (req, res) => handle(req, res))
 
-initSocket(io)
-
-httpServer.listen(3000, () => {
-    console.log('Server running on port 3000')
-})
+  initSocket(io)
+  const PORT = process.env.PORT || 3000
+  httpServer.listen(PORT, () => console.log(`Server on ${PORT} ✅`))
+}).catch( (err) =>
+    console.error('Next.js prepare() failed:', err)
+  )

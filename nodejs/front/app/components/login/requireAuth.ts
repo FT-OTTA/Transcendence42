@@ -8,7 +8,7 @@ export async function requireAuth() {
 
     try {
         const res = await fetch(
-            `http://localhost:3000/users/${username}`);
+            `/users/${username}`);
 
         console.log(res);
         if (!res.ok)

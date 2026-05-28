@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { resolveBuildings, resolveEffect } from '../resolveEffects.ts'
 import { makeCard, makeHero, makeGame, makeEffect, nextId } from './mocks.ts'
-import type { Hero } from '../../types/hero.ts'
-import type { Card } from '../../types/card.ts'
-import type { Game } from '../../types/gamesession.ts'
+import type { Hero } from '../../../types/hero.ts'
+import type { Card } from '../../../types/card.ts'
+import type { Game } from '../../../types/gamesession.ts'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 

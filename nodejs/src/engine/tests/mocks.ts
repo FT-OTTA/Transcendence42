@@ -1,7 +1,7 @@
-import type { Hero } from '../../types/hero.ts'
-import type { Card } from '../../types/card.ts'
-import type { Game } from '../../types/gamesession.ts'
-import type { Effect } from '../../types/effects.ts'
+import type { Hero } from '../../../types/hero.ts'
+import type { Card } from '../../../types/card.ts'
+import type { Game } from '../../../types/gamesession.ts'
+import type { Effect } from '../../../types/effects.ts'
 
 let _id = 1;
 export const nextId = () => _id++;

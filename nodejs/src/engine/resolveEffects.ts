@@ -1,8 +1,8 @@
-import type { Hero } from '../types/hero.ts'
-import type { Card, PlayCardPayload } from '../types/card.ts'
-import type { Game } from '../types/gamesession.ts'
-import type { BfZone } from '../types/zones.ts'
-import type { Effect, EffectTime, EffectContext } from '../types/effects.ts'
+import type { Hero } from '../../types/hero.ts'
+import type { Card, PlayCardPayload } from '../../types/card.ts'
+import type { Game } from '../../types/gamesession.ts'
+import type { BfZone } from '../../types/zones.ts'
+import type { Effect, EffectTime, EffectContext } from '../../types/effects.ts'
 import { playerDraw } from "./startTurn.ts";
 
 export function dealsDmg(player1: Hero, player2: Hero, x: number): void {

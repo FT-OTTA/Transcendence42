@@ -1,6 +1,6 @@
-import type { Hero } from '../types/hero.ts'
-import type { Game } from '../types/gamesession.ts'
-import type { BfZone } from '../types/zones.ts'
+import type { Hero } from '../../types/hero.ts'
+import type { Game } from '../../types/gamesession.ts'
+import type { BfZone } from '../../types/zones.ts'
 
 export function checkVictory(game: Game): Hero | null {
     if (game.status === "game_over") {

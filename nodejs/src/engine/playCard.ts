@@ -1,8 +1,8 @@
-import type { Card, PlayCardPayload } from '../types/card.ts'
-import { EffectContext } from '../types/effects.ts';
-import type { Game } from '../types/gamesession.ts'
-import { Hero } from '../types/hero.ts';
-import type { BfZone } from '../types/zones.ts'
+import type { Card, PlayCardPayload } from '../../types/card.ts'
+import { EffectContext } from '../../types/effects.ts';
+import type { Game } from '../../types/gamesession.ts'
+import { Hero } from '../../types/hero.ts';
+import type { BfZone } from '../../types/zones.ts'
 import { resolveEffect } from "./resolveEffects.ts";
 import { findById } from './utils.ts'
 

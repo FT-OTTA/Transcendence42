@@ -22,7 +22,7 @@ export default function LoggedInBadge() {
 
         try {
             const res = await fetch(
-                `http://localhost:3000/users/${storedUsername}`
+                `/users/${storedUsername}`
             );
 
             if (!res.ok)

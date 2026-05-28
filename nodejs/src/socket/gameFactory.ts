@@ -1,8 +1,8 @@
 
-import type { Hero } from '../types/hero.ts'
-import type { Card, CardClass, CardType, CreatureState } from '../types/card.ts'
-import type { Game, WaitingPlayer } from '../types/gamesession.ts'
-import type { Effect, EffectType, EffectTarget, EffectTime } from '../types/effects.ts'
+import type { Hero } from '../../types/hero.ts'
+import type { Card, CardClass, CardType, CreatureState } from '../../types/card.ts'
+import type { Game, WaitingPlayer } from '../../types/gamesession.ts'
+import type { Effect, EffectType, EffectTarget, EffectTime } from '../../types/effects.ts'
 import { Card as PrismaCard } from '@prisma/client'
 import { prisma } from '../../prisma/prisma.ts'
 import fs from 'fs'

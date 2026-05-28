@@ -9,11 +9,11 @@ import SpectatorBoard from '@/app/components/playground/SpectatorBoard'
 import PlayerHand from '../../components/playground/PlayerHand';
 import GameStats from '../../components/playground/GameStats';
 import ConfirmPlay from '../../components/playground/ConfirmPlay';
-import type { Card } from 'otta-shared-types/card';
+import type { Card } from '../../../../types/card';
+import { Hero } from '../../../../types/hero';
 import { io, Socket } from 'socket.io-client';
 import { useParams, useSearchParams } from 'next/navigation';
 import LargeCardView from '@/app/components/playground/LargeCardView';
-import { Hero } from 'otta-shared-types/hero';
 import { usePathname } from 'next/navigation'
 
 
@@ -76,7 +76,7 @@ export default function PlaygroundPage() {
   useEffect(() => {
     if (!isSpectator && !selectedHero) return;
 
-    const newSocket = io('http://localhost:3000');
+    const newSocket = io();
     socketRef.current = newSocket;
     setSocket(newSocket);
 
@@ -378,7 +378,7 @@ function pushSelectedTarget(target: Card | Hero) {
           {isLoading ? (
             <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
           ) : isSpectator ? (
-              <SpectatorBoard players={game?.players ?? []} />
+            <SpectatorBoard players={game?.players ?? []} turnNumber={game?.turnNumber ?? 0} />
           ) : (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">

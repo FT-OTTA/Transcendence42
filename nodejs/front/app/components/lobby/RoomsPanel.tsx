@@ -36,7 +36,7 @@ export default function RoomPanel() {
     async function fetchRooms() {
 
         const res = await fetch(
-            "http://localhost:3000/rooms"
+            "/rooms"
         );
 
         if (!res.ok) {
@@ -67,7 +67,7 @@ export default function RoomPanel() {
             return;
         }
         const res = await fetch(
-            "http://localhost:3000/rooms/create",
+            "/rooms/create",
             {
                 method: "POST",
                 headers: {
@@ -106,7 +106,7 @@ export default function RoomPanel() {
         }
 
         const res = await fetch(
-            `http://localhost:3000/rooms/${roomId}/join`,
+            `/rooms/${roomId}/join`,
             {
                 method: "POST",
                 headers: {

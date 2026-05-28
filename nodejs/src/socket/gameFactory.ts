@@ -115,6 +115,13 @@ async function buildHero(heroId: string): Promise<Hero> {
 
 export async function instantiateGame(players: WaitingPlayer[]): Promise<Game> {
     const heroes = await Promise.all(players.map(p => buildHero(p.playerData.heroId)))
+
+    heroes.forEach((hero, i) => {
+        hero.username = players[i].playerData.username
+        hero.userId = players[i].playerData.userId
+    })
+
+    
     for (const hero of heroes)
         for (const card of hero.library)
             card.owner = hero

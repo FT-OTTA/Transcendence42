@@ -214,6 +214,7 @@ async function importRooms() {
 }
 
 async function importMessages() {
+    await prisma.message.deleteMany()
     const rows = parseCSV('/app/databases/messages/MESSAGES_DB.csv')
 
     for (const row of rows) {

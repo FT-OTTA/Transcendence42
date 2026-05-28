@@ -19,6 +19,7 @@ interface GameStatsProps {
   highlightOpponentHero?: boolean;
   isOpponentHeroSelected?: boolean;
   isPlayerHeroSelected?: boolean;
+  onConcede?: () => void;
 
 }
 function formatHeroLabel(label: string, cls?: string)
@@ -35,7 +36,8 @@ export default function GameStats({
   highlightPlayerHero = false, 
   highlightOpponentHero = false,
   isOpponentHeroSelected = false,
-  isPlayerHeroSelected = false
+  isPlayerHeroSelected = false,
+  onConcede
 
 }: GameStatsProps) {
   return (
@@ -103,6 +105,12 @@ className={`border-b border-blue-300/30 pb-4
       <button onClick={onEndTurn} className="border border-blue-300 py-2 px-3 text-sm hover:bg-blue-300 hover:text-black transition mt-2">
         End Turn
       </button>
+      <button 
+        onClick={onConcede}
+        className="border border-red-400/40 py-2 px-3 text-sm text-red-400 hover:bg-red-400/20 transition mt-1">
+        Concede
+      </button>
+
     </div>
   );
 }

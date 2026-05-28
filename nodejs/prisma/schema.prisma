@@ -47,6 +47,22 @@ model User {
   createdRooms  Room[] @relation("Player1")
   joinedRooms   Room[] @relation("Player2")
   messages      Message[]
+
+  gamesWon  GameResult[] @relation("GameWinner")
+  gamesLost GameResult[] @relation("GameLoser")
+
+}
+
+model GameResult {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+
+    winnerId  Int
+    loserId   Int
+    turns     Int
+
+    winner    User @relation("GameWinner", fields: [winnerId], references: [id])
+    loser     User @relation("GameLoser", fields: [loserId], references: [id])
 }
 
 model Friendship {

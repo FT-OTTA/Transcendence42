@@ -6,25 +6,22 @@ import { playCard } from '../engine/playCard.ts'
 import { startTurn } from '../engine/startTurn.ts'
 import { checkBoardState, checkVictory } from '../engine/checks.ts'
 import { getPlayerPerspective } from './perspective.ts'
+import { prisma } from '../../prisma/prisma.ts'
 
-function findById(game: any, id: number): Hero | Card | undefined {
-    for (const player of game.players) {
-        if (player.idInGame === id) return player
-        const card = [
-            ...player.hand,
-            ...player.library,
-            ...Object.values(player.battlefield)
-        ].find((c: any) => c?.idInGame === id)
-        if (card) return card
-    }
-    return undefined
-}
-
-function emitGameOver(session: GameSession) {
+async function emitGameOver(session: GameSession) {
     const winnerIndex = session.game.winner ? session.game.players.indexOf(session.game.winner) : -1
     session.sockets.forEach((s, id) => {
         s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
     })
+    await prisma.room.delete({ where: { id: session.roomId } })
+    await prisma.gameResult.create({
+    data: {
+        winnerId: winnerIndex !== -1 ? session.game.players[winnerIndex].userId : undefined,
+        loserId: winnerIndex !== -1 ? session.game.players[1 - winnerIndex].userId : undefined,
+        turns: session.game.turnNumber
+        }
+    })
+
 }
 
 export function resolveRound(session: GameSession): void {

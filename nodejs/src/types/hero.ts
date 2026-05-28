@@ -15,4 +15,6 @@ export type Hero = {
     graveyard: Card[];
     hand: Card[];
     heroPicPath: string;
+    username?: string;
+    userId?: number;
 };

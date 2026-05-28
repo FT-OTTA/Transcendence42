@@ -5,18 +5,45 @@ import Navbar from '../../components/navigation/Navbar';
 import HeroSelection from '../../components/playground/HeroSelection';
 import OpponentBoard from '../../components/playground/OpponentBoard';
 import PlayerBoard from '../../components/playground/PlayerBoard';
+import SpectatorBoard from '@/app/components/playground/SpectatorBoard'
 import PlayerHand from '../../components/playground/PlayerHand';
 import GameStats from '../../components/playground/GameStats';
 import ConfirmPlay from '../../components/playground/ConfirmPlay';
 import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import LargeCardView from '@/app/components/playground/LargeCardView';
 import { Hero } from 'otta-shared-types/hero';
+import { usePathname } from 'next/navigation'
+
 
 export default function PlaygroundPage() {
   const { id } = useParams();
-  const [selectedHero, setSelectedHero] = useState<string | null>(null);
+  const pathname = usePathname()
+
+  // permet de restaurer la sélection du héros si la page est rechargée accidentellement (F5, crash, etc.) pendant une partie
+  const [selectedHero, setSelectedHero] = useState<string | null>(() => {
+      if (typeof window === 'undefined') return null
+      const saved = localStorage.getItem('currentGame')
+      if (!saved) return null
+      const { roomId: savedRoomId, heroId } = JSON.parse(saved)
+      if (savedRoomId === Number(id) && heroId) return heroId
+      return null
+  })
+  const [hydrated, setHydrated] = useState(false)
+
+// useEffect de restauration qui se déclenche à l'arrivée sur la page, et à chaque changement de pathname (permet de réinitialiser la sélection du héros si on quitte la page et qu'on y revient, ou si on recharge la page)
+  useEffect(() => {
+      const saved = localStorage.getItem('currentGame')
+      if (saved) {
+          const { roomId: savedRoomId, heroId } = JSON.parse(saved)
+          if (savedRoomId === Number(id) && heroId) {
+              setSelectedHero(heroId)
+          }
+      }
+      setHydrated(true)
+  }, [pathname])
+
   const [socket, setSocket] = useState<Socket | null>(null);
   const [game, setGame] = useState<any>(null);
   const [cards, setCards] = useState<Card[]>([]);
@@ -36,12 +63,18 @@ export default function PlaygroundPage() {
   const [pendingSlots, setPendingSlots] = useState<(Card | null)[]>(Array(8).fill(null));
   const [pendingSlotIndex, setPendingSlotIndex] = useState<number | null>(null); // Pour mémoriser le slot ciblé lors du play d'une créature
   const [currentEffectIndex, setCurrentEffectIndex] = useState<number>(0);
+  const [gameOverMessage, setGameOverMessage] = useState<string | null>(null)
 
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
+  const searchParams = useSearchParams()
+  const isSpectator = searchParams.get('spectate') === 'true'
+  const roomId = id
+  const socketDep = isSpectator ? 'spectator' : selectedHero
+
   useEffect(() => {
-    if (!selectedHero) return;
+    if (!isSpectator && !selectedHero) return;
 
     const newSocket = io('http://localhost:3000');
     socketRef.current = newSocket;
@@ -56,10 +89,26 @@ export default function PlaygroundPage() {
     };
 
     newSocket.on('connect', () => {
-        newSocket.emit('join_game', { heroId: selectedHero });
+      console.log('isSpectator:', isSpectator, 'selectedHero:', selectedHero)
+      if (isSpectator) {
+            // On prévient le serveur qu'on veut juste regarder
+            newSocket.emit('spectate', Number(roomId));
+        } else {
+            // Comportement normal pour les joueurs
+            localStorage.setItem('currentGame', JSON.stringify({ roomId: Number(id), heroId: selectedHero }))
+            console.log('Emitting join_game with heroId:', selectedHero, 'roomId:', roomId, 'username:', localStorage.getItem('username'))
+            newSocket.emit('join_game', {
+              heroId: selectedHero,
+              roomId: Number(roomId),
+              username: localStorage.getItem('username'),
+              token: localStorage.getItem('token')
+
+          });
+        }
     });
 
     newSocket.on('turn_start', (data) => {
+        if (isSpectator) return;
         if (myPlayerIndexRef.current === null) return;
         const me = data.game.players[myPlayerIndexRef.current];
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
@@ -75,23 +124,17 @@ export default function PlaygroundPage() {
     });
 
     newSocket.on('game_over', (data) => {
-        if (-1 === data.winner) {
-          alert("Game over! It's a draw!");
-        } else {
-          alert(`Game over! Winner: ${data.winner === myPlayerIndexRef.current ? "You" : "Opponent"}`);
-        }
-        setSelectedHero(null);
-        setGame(null);
-        setHand(Array(8).fill(null));
-        setPlayerSlots(Array(8).fill(null));
-        setOpponentSlots(Array(8).fill(null));
-        setRunes(0);
-        setMeStats(null);
-        setOpponentStats(null);
-        setTurnNumber(1);
+        const msg = data.message ?? (
+            data.winner === -1 ? "Match nul !" :
+            data.winner === myPlayerIndexRef.current ? "Vous avez gagné !" : "Vous avez perdu !"
+        )
+        setGameOverMessage(msg)
+        localStorage.removeItem('currentGame')
     });
 
     newSocket.on('game_start', (data) => {
+        console.log('game_start reçu', data.playerIndex)
+        if (isSpectator) return;
         myPlayerIndexRef.current = data.playerIndex;
         const me = data.game.players[data.playerIndex];
         const opponent = data.game.players[1 - data.playerIndex];
@@ -107,6 +150,18 @@ export default function PlaygroundPage() {
     });
 
     newSocket.on('game_update', (data) => {
+        if (isSpectator) {
+            // vue spectateur — on prend les deux joueurs directement
+            setGame(data.game)
+            setMeStats(data.game.players[0])
+            setOpponentStats(data.game.players[1])
+            setTurnNumber(data.game.turnNumber)
+            setPlayerSlots(battlefieldToSlots(data.game.players[0].battlefield))
+            setOpponentSlots(battlefieldToSlots(data.game.players[1].battlefield))
+            setIsLoading(false)
+            return
+        }
+
         if (myPlayerIndexRef.current === null) return;
         const me = data.game.players[myPlayerIndexRef.current];
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
@@ -118,42 +173,23 @@ export default function PlaygroundPage() {
         setRunes(me.curRunes);
         setPlayerSlots(battlefieldToSlots(me.battlefield));
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
+        setIsLoading(false)  
     });
 
     return () => { newSocket.disconnect(); };
-  }, [selectedHero]);
+  }, [socketDep]);
 
   const playerHandCards = useMemo(() => hand, [hand]);
   const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
 
-  function handlePlaySpell() {
-      if (!selectedCard || selectedCard.type !== "spell") return;
 
-      // 1. Vérification des runes
-      if (selectedCard.runeCost > runes) {
-          setRuneError("Not enough runes!");
-          return;
-      }
-
-      // 2. Vérification si le sort nécessite des cibles
-      const ef = Array.isArray(selectedCard.effects) ? selectedCard.effects : [];
-      const needsTarget = ef.some((e: any) => e.target === "opponent" || e.target === "self");
-
-      // Si le sort n'a pas besoin de cible, on l'émet immédiatement
-      if (!needsTarget) {
-          socketRef.current?.emit('play_card', {
-              cardId: selectedCard.idInGame,
-              zone: null, // Pas de zone pour un sort
-              targetId: null,
-              target2Id: null,
-          });
-          setSelectedCard(null);
-      } else {
-          // Sinon, on lance la phase de ciblage (ton code existant)
-          getTargets();
-      }
+  function handleConcede(){
+    if (!socketRef.current) return
+    if (confirm('You want to give up your runic power to Odin ?')) {
+        socketRef.current.emit('concede')
+    }
   }
-function handleConfirmSpell() {
+  function handleConfirmSpell() {
     if (!selectedCard) return;
 
     socketRef.current?.emit('play_card', {
@@ -329,16 +365,20 @@ function pushSelectedTarget(target: Card | Hero) {
 
     getTargets(nextEffectIndex, selectedCard);
 }
-
+    if (!hydrated) return (
+        <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
+    )
     return (
     <main className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80">
       <Navbar />
-      {!selectedHero ? (
-        <HeroSelection onSelect={(id) => setSelectedHero(id)} />
-      ) : (
+        {!isSpectator && !selectedHero ? (
+            <HeroSelection onSelect={(id) => setSelectedHero(id)} />
+        ) : (
         <>
           {isLoading ? (
             <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
+          ) : isSpectator ? (
+              <SpectatorBoard players={game?.players ?? []} />
           ) : (
             <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
               <div className="col-span-2 flex flex-col gap-4 min-h-0">
@@ -383,6 +423,7 @@ function pushSelectedTarget(target: Card | Hero) {
     console.log("hero trouvé:", hero);
     if (hero) pushSelectedTarget(hero);
   }}
+  onConcede={handleConcede}
 />
 <div className="flex flex-1 items-center justify-center gap-4 p-4">
   <LargeCardView
@@ -405,6 +446,22 @@ function pushSelectedTarget(target: Card | Hero) {
           )}
         </>
       )}
+
+      
+      {gameOverMessage && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="border border-blue-300 bg-black/90 p-8 flex flex-col items-center gap-6 rounded-sm">
+                <p className="text-2xl text-blue-200">{gameOverMessage}</p>
+                <button
+                    onClick={() => window.location.href = '/lobby'}
+                    className="border border-blue-300 px-6 py-2 hover:bg-blue-300 hover:text-black transition"
+                >
+                    Retour au lobby
+                </button>
+            </div>
+        </div>
+      )}
+
       {runeError && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-900/80 text-red-200 px-4 py-2 rounded border border-red-500 text-sm z-50">
           {runeError}

@@ -6,18 +6,19 @@ import type { Card } from 'otta-shared-types/card';
 
 interface OpponentBoardProps {
   cards: (Card | null)[];
+  label?: string;
   onPlay?: (cardId: string, targetIndex: number, isOpponent: boolean) => void;
   potentialTargets?: (Card | Hero)[];
   selectedTargets?: (Card | Hero)[];
   onClick?: (card: Card) => void;
 }
 
-export default function OpponentBoard({ cards, onPlay, potentialTargets, selectedTargets, onClick }: OpponentBoardProps) {
+export default function OpponentBoard({ cards, label="Opponent", onPlay, potentialTargets, selectedTargets, onClick }: OpponentBoardProps) {
   const opponentSlots = Array.from({ length: 8 }, (_, i) => `opponent-${i}`);
 
   return (
     <div className="border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4">
-      <h3 className="text-sm text-blue-300/60 mb-3 uppercase tracking-wider">Poman</h3>
+      <h3 className="text-sm text-blue-300/60 mb-3 uppercase tracking-wider">{label}</h3>
 
       <div className="grid grid-cols-8 gap-2">
         {opponentSlots.map((slot, index) => (

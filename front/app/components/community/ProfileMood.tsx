@@ -18,7 +18,7 @@ export default function ProfileMood({ initialMood, username }: Props)
 	useEffect(() => {
 		const storedUsername = localStorage.getItem("username");
 
-		setIsOwner(storedUsername === username);
+		setIsOwner(storedUsername?.toLowerCase() === username.toLowerCase());
 		setLoading(false);
 	}, [username]);
 	

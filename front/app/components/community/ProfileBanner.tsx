@@ -46,7 +46,7 @@ export default function ProfileBanner({username, mood, isOnline, avatarUrl}: Pro
 	useEffect(() => {
 		const storedUsername = localStorage.getItem("username");
 
-		setIsOwner(storedUsername === username);
+		setIsOwner(storedUsername?.toLowerCase() === username.toLowerCase());
 	}, [username]);
 
 	async function uploadAvatar(file: File)

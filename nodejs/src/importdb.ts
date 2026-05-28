@@ -2,11 +2,21 @@ import fs from 'fs'
 import { prisma } from '../prisma/prisma.ts'
 import bcrypt from 'bcrypt'
 
+function parseJSON(filePath: string): any {
+    try {
+        const content = fs.readFileSync(filePath, 'utf-8')
+        return content;
+    } catch (e) {
+        console.error(`Erreur de lecture ou de parsing du fichier JSON : ${filePath}`, e)
+        return null
+    }
+}
+
 function parseCSV(filePath: string): Record<string, string>[] {
     const content = fs.readFileSync(filePath, 'utf-8')
     const lines = content.split('\n').filter(l => l.trim() !== '')
     const headers = lines[0].split(';').map(h => h.trim())
-    
+
     return lines.slice(1).map(line => {
         const values = line.split(';').map(v => v.trim())
         const row: Record<string, string> = {}
@@ -15,7 +25,7 @@ function parseCSV(filePath: string): Record<string, string>[] {
     }).filter(row => row['CollectionID'] !== '' && row['CollectionID'] !== undefined || row['Id'] !== '')
 }
 
-// methode .upsert = mix de update et insert, insert l'entree 
+// methode .upsert = mix de update et insert, insert l'entree
 // update en cas de duplicate.
 
 async function importCreatures() {
@@ -30,7 +40,7 @@ async function importCreatures() {
                 force: parseInt(row['Force']),
                 endurance: parseInt(row['Endurance']),
                 effect_text: row['Effect (string)'],
-                effect_json_path: row['Effect (json path)'],
+                effect: parseJSON("/app/databases/creatures/effects/" + row['Effect (json path)']),
                 illustration: row['Illustration'],
                 target_number: parseInt(row['Target Number']),
                 target_type: row['Target Type']
@@ -55,7 +65,7 @@ async function importBuildings() {
                 rune_cost: parseInt(row['Rune Cost']),
                 endurance: parseInt(row['Life']), // On mappe "Life" vers endurance
                 effect_text: row['Effect (string)'],
-                effect_json_path: row['Effect (json path)'],
+                effect: parseJSON("/app/databases/buildings/effects/" + row['Effect (json path)']),
                 illustration: row['Illustration'],
             }
         await prisma.card.upsert({
@@ -77,10 +87,11 @@ async function importSpells() {
                 class: row['Class'],
                 rune_cost: parseInt(row['Rune Cost']),
                 effect_text: row['Effect (string)'],
-                effect_json_path: row['Effect (json path)'],
+                effect: parseJSON("/app/databases/spells/effects/" + row['Effect (json path)']),
                 illustration: row['Illustration (.png)'],
                 target_number: parseInt(row['Target Number']),
-                target_type: row['Target Type']
+                target_type: row['Target Type'],
+                timing: row['Timing'] === 'immediate' ? 'immediate' : 'end_of_turn'
 
             }
         await prisma.card.upsert({
@@ -181,7 +192,7 @@ async function importRooms() {
                 }
             })
         }
-        
+
         await prisma.room.upsert({
             where: { id: parseInt(row['id']) },
             update: {
@@ -203,6 +214,7 @@ async function importRooms() {
 }
 
 async function importMessages() {
+    await prisma.message.deleteMany()
     const rows = parseCSV('/app/databases/messages/MESSAGES_DB.csv')
 
     for (const row of rows) {

@@ -16,10 +16,12 @@ model Card {
   endurance Int?
   rune_cost Int
   effect_text String
-  effect_json_path String
+  effect String @db.Text
   illustration String
   target_number Int?
   target_type String?
+  timing String @default("end_of_turn")
+
 }
 
 model Hero {
@@ -45,6 +47,22 @@ model User {
   createdRooms  Room[] @relation("Player1")
   joinedRooms   Room[] @relation("Player2")
   messages      Message[]
+
+  gamesWon  GameResult[] @relation("GameWinner")
+  gamesLost GameResult[] @relation("GameLoser")
+
+}
+
+model GameResult {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+
+    winnerId  Int
+    loserId   Int
+    turns     Int
+
+    winner    User @relation("GameWinner", fields: [winnerId], references: [id])
+    loser     User @relation("GameLoser", fields: [loserId], references: [id])
 }
 
 model Friendship {

@@ -11,6 +11,7 @@ export type CardClass = "common" | "Warrior" | "Druid";
 export type Card = {
     kind: "card";
     zone: Zone;
+    effect: string; // JSON string des effets, à parser côté client
     effects: Effect[];
     timing: EffectTime;
     type: CardType;
@@ -31,10 +32,17 @@ export type Card = {
     cardBackPath: string;
 };
 
+// export type PlayCardPayload = {
+//     cardId: number;
+//     zone?: Zone;
+//     target?: Card | Hero;
+//     target2?: Card;
+
+// };
+
+
 export type PlayCardPayload = {
     cardId: number;
     zone?: Zone;
-    target?: Card | Hero;
-    target2?: Card;
-
-};
+    targets?: { targetId?: number, target2Id?: number }[];
+}

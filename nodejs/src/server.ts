@@ -1,7 +1,7 @@
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { initSocket } from './socket/game.ts'
+import { initSocket } from './socket/index.ts'
 import { prisma } from '../prisma/prisma.ts'
 import cors from 'cors'
 

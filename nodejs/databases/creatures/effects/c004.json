@@ -2,8 +2,8 @@
     "effects": [
         {
             "effect": "addef_mod",
-            "value": 1,
-            "target": "all_board",
+            "value": -1,
+            "target": "opponent",
             "targetType": { "creature": true }
         }
     ]

@@ -14,10 +14,16 @@ export default function RoomPanel() {
     const [roomDetails, setRoomDetails] = useState<Room[]>([]);
     const [error, setError] = useState("");
 
-
+    const [currentGame, setCurrentGame] = useState<{ roomId: number, heroId: string } | null>(null)
+    
     useEffect(() => {
-        fetchRooms();
-    }, []);
+// Permet de restaurer la sélection du héros si la page est rechargée accidentellement (F5, crash, etc.) pendant une partie
+        const saved = localStorage.getItem('currentGame')
+        if (saved) setCurrentGame(JSON.parse(saved))
+// 
+        fetchRooms()
+    }, [])
+
 
     function showError(message: string) {
         setError(message);
@@ -139,30 +145,32 @@ export default function RoomPanel() {
                         key={room.id}
                         className="grid grid-cols-4 gap-2 items-center border border-blue-300/40 p-2"
                     >
-                        {/* Room ID */}
-                        <div> #{room.id}</div>
-
-                        {/* Player 1 (should always be there since creator) */}
-                        <div>
-                            {room.p1}
-                        </div>
-
-                        {/* Player 2 (if not there join button) */}
+                        <div>#{room.id}</div>
+                        <div>{room.p1}</div>
                         <div>
                             {room.p2 ?? (
-                                <button
-                                    onClick={() => joinRoom(room.id)}
-                                    className="text-green-300 hover:text-green-100">Join</button>
+                                <button onClick={() => joinRoom(room.id)} className="text-green-300 hover:text-green-100">
+                                    Join
+                                </button>
                             )}
                         </div>
-
-                        {/* Spectate */}
-                        <button className="text-blue-300 hover:text-blue-100">
-                            Spectate
-                        </button>
-
+                        <div>
+                            {currentGame?.roomId === room.id ? (
+                                <button
+                                    onClick={() => window.location.href = `/playground/${room.id}`}
+                                    className="text-amber-300 hover:text-amber-100">
+                                    ▶ Rejoin
+                                </button>
+                            ) : room.p2 ? (
+                                <button
+                                    onClick={() => window.location.href = `/playground/${room.id}?spectate=true`}
+                                    className="text-blue-300 hover:text-blue-100">
+                                    👁 Spectate
+                                </button>
+                            ) : null}
+                        </div>
                     </div>
-            ))}
+                ))}
             </div>
 
             <button

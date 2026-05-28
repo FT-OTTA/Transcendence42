@@ -9,7 +9,7 @@
         {
             "effect": "dmg",
             "value": 0,
-            "valueFrom": "target.currForce",
+            "valueFrom": "context.targets[0].currForce",
             "target": "opponent_hero",
             "targetType": { "hero": true }
         }

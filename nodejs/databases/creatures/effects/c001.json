@@ -3,7 +3,7 @@
         {
             "effect": "dmg",
             "value": 1,
-            "target": "all_enemies",
+            "target": "all",
             "targetType": { "creature": true, "hero": true }
         },
         {

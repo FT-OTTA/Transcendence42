@@ -4,7 +4,6 @@ import LoggedInBadge from "../components/login/LoggedInBadge";
 import LoginCard from "../components/login/LoginCard"
 import Navbar from "../components/navigation/Navbar";
 import Hero from "../components/landing/Hero";
-import LanguageSwitcher from "../components/Language/LanguageSwitcher";
 import { useEffect, useState } from "react";
 
 

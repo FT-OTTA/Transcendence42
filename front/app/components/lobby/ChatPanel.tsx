@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { requireAuth } from "../login/RequireAuth";
 import { customScrollBar } from "../scrollBar";
 import { socket } from "@/lib/socket";
@@ -21,6 +21,30 @@ export default function ChatPanel() {
     const [error, setError] = useState("");
     const l = useTranslations("Lobby");
     const e = useTranslations("Error");
+    
+    const scrollRef = useRef<HTMLDivElement | null> (null);
+
+    const isNearBottom = () => {
+        const check = scrollRef.current;
+        if (!check)
+            return true;
+
+        return check.scrollHeight - check.scrollTop - check.clientHeight < 100;
+    }
+
+    useEffect(() => {
+        const scroll = scrollRef.current;
+        if (!scroll)
+            return;
+        
+        if (!isNearBottom())
+            return;
+
+        requestAnimationFrame(() => {
+            scroll.scrollTop = scroll.scrollHeight;
+        });
+    }, [chatMessages]);
+
 
     function showError(message: string) {
         setError(message);
@@ -120,7 +144,9 @@ export default function ChatPanel() {
                 {l("chat")}
             </h2>
 
-            <div className={`${customScrollBar} flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2`}>
+            <div 
+                ref = {scrollRef}
+                className={`${customScrollBar} flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2`}>
 
                 {chatMessages.map((msg, index) => (
                     <div

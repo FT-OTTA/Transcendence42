@@ -3,6 +3,7 @@ import AvatarFrame from "../AvatarFrame";
 import clsx from "clsx";
 import { cinzel } from "../../fonts";
 import ProfileMood from "./ProfileMood";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useEffect } from "react";
 
@@ -63,6 +64,9 @@ export default function ProfileBanner({username, mood, isOnline, avatarUrl}: Pro
 		// reload image (simple version)
 		window.location.reload();
 	}
+
+	const l = useTranslations("Profile");
+
 	return (
 		<section className={ profileBanner }>
 			<AvatarFrame 
@@ -82,7 +86,7 @@ export default function ProfileBanner({username, mood, isOnline, avatarUrl}: Pro
 			</div>
 
 			<div className={clsx(onlineStatus, isOnline ? "text-green-100" : "text-red-400")}>
-				● { isOnline ? "Online" : "Offline" }
+				● { isOnline ? l("online") : l("offline") }
 			</div>
 
 		</section>

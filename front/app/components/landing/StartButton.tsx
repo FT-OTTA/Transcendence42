@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { cinzel } from "../../fonts";
 import { useRouter } from "next/navigation";
 import { requireAuth } from "../login/RequireAuth";
+import { useTranslations } from "next-intl"; 
 
 const startButton = clsx
 (
@@ -21,6 +22,7 @@ export default function StartButton({setIsLogin}: StartButtonProps)
 {
 
   const router = useRouter();
+  const l = useTranslations("Homepage");
 
   async function HandleClick() {
     const user = await requireAuth();
@@ -33,7 +35,7 @@ export default function StartButton({setIsLogin}: StartButtonProps)
   };
     return (
     <button className={ startButton } onClick={() => HandleClick()}>
-      - get started -
+      {`- ${l("start")} -`}
     </button>
     );
 };

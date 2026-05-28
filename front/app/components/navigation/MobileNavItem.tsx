@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import { NavItemProps } from "./NavItem"
 import { bellefair } from "@/app/fonts";
 

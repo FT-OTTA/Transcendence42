@@ -1,11 +1,11 @@
 "use client";
 
-import ChatPanel from "../components/lobby/ChatPanel";
-import FriendsPanel from "../components/lobby/FriendsPanel";
-import ProfilePanel from "../components/lobby/ProfilePanel";
-import RoomsPanel from "../components/lobby/RoomsPanel";
-import Navbar from "../components/navigation/Navbar";
-import LoggedInBadge from "../components/login/LoggedInBadge";
+import ChatPanel from "../../components/lobby/ChatPanel";
+import FriendsPanel from "../../components/lobby/FriendsPanel";
+import ProfilePanel from "../../components/lobby/ProfilePanel";
+import RoomsPanel from "../../components/lobby/RoomsPanel";
+import Navbar from "../../components/navigation/Navbar";
+import LoggedInBadge from "../../components/login/LoggedInBadge";
 import { useState, useEffect } from "react";
 
 type ActivePanel = "friends" | "chat" | null;

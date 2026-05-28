@@ -3,6 +3,7 @@ import { requireAuth } from "../login/RequireAuth";
 import { customScrollBar } from "../scrollBar";
 import { useTranslations } from "next-intl";
 import { socket } from "@/lib/socket";
+import { useLocale } from 'next-intl';
 
 
 type Room = {
@@ -19,7 +20,7 @@ export default function RoomPanel() {
     const [error, setError] = useState("");
     const l = useTranslations("Lobby");
     const e = useTranslations("Error");
-
+    const locale = useLocale();
 
     const [currentGame, setCurrentGame] = useState<{ roomId: number, heroId: string } | null>(null)
     
@@ -128,7 +129,7 @@ export default function RoomPanel() {
         } else {
             const data = await res.json();
             console.log("Room created with ID:", data.id);
-            let href = `/playground/${data.id}`;
+            let href = `/${locale}/playground/${data.id}`;
             window.location.href = href;
         }
 
@@ -168,7 +169,7 @@ export default function RoomPanel() {
         {
             const data = await res.json();
             console.log("Room created with ID:", data.id);
-            let href = `/playground/${data.id}`;
+            let href = `/${locale}/playground/${data.id}`;
             window.location.href = href;
             fetchRooms();
         }
@@ -209,13 +210,13 @@ export default function RoomPanel() {
                         <div>
                             {currentGame?.roomId === room.id ? (
                                 <button
-                                    onClick={() => window.location.href = `/playground/${room.id}`}
+                                    onClick={() => window.location.href = `/${locale}/playground/${room.id}`}
                                     className="text-amber-300 hover:text-amber-100">
                                     ▶ Rejoin
                                 </button>
                             ) : room.p2 ? (
                                 <button
-                                    onClick={() => window.location.href = `/playground/${room.id}?spectate=true`}
+                                    onClick={() => window.location.href = `/${locale}/playground/${room.id}?spectate=true`}
                                     className="text-blue-300 hover:text-blue-100">
                                     👁 Spectate
                                 </button>

@@ -3,6 +3,7 @@ import NavItem from "./NavItem"
 import clsx from "clsx";
 import MobileNavbar from "./MobileNavbar"
 import {useTranslations, useLocale} from 'next-intl';
+import LanguageSwitcher from "../Language/LanguageSwitcher";
 
 
 const NavbarClassDesktop = clsx
@@ -26,6 +27,10 @@ export default function Navbar()
 	const locale = useLocale();
 	return (
 		<div>
+			
+			<div className="hidden md:flex">
+					<LanguageSwitcher />
+			</div>
 			<div className="hidden md:flex">
 				<nav className={ NavbarClassDesktop }>
 					<NavItem text={t("home")} href="/" />

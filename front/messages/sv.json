@@ -4,7 +4,8 @@
       "whats_otta": "Vad är Otta?",
       "log_status": "Logga in för att ta del av våra fantastiska funktioner",
       "login_as": "Inloggad som:",
-      "log_out": "Logga ut"
+      "log_out": "Logga ut",
+      "log_in": "Logga in"
     },
 
     "Navbar": {

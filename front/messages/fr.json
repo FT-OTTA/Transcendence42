@@ -4,7 +4,8 @@
       "whats_otta": "Qu'est-ce qu'Otta ?",
       "log_status": "Connectez-vous pour profiter de nos fonctionnalités incroyables",
       "login_as": "Connecté en tant que :",
-      "log_out": "Se déconnecter"
+      "log_out": "Se déconnecter",
+      "log_in": "Se connecter"
     },
 
     "Navbar": {

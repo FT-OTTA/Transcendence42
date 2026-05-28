@@ -16,7 +16,6 @@ export default function Home() {
     <main 
       className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
       <Navbar />
-      <LanguageSwitcher />
       <LoggedInBadge/>
 
       <Hero setIsLogin={setIsLogin}/>

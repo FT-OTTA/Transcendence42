@@ -5,8 +5,10 @@ import { useRouter, usePathname } from '@/navigation';
 
 export default function LanguageSwitcher() {
   const router = useRouter();
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  console.log("DEBUG [LanguageSwitcher]: Current framework pathname:", pathname);
 
   const changeLanguage = (nextLocale: 'en' | 'fr' | 'sv') => {
     router.replace(pathname, { locale: nextLocale });

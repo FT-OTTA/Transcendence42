@@ -45,5 +45,35 @@
       "draws": "Égalités",
       "best_friend": "Le plus joué avec",
       "worst_enemy": "Pire ennemi"
+    },
+
+    "Lobby": {
+      "friends": "Amis",
+      "add_a_friend": "Ajouter un ami",
+      "no_friends": "Aucun ami pour le moment",
+      "loading_friends": "Chargement des amis...",
+      "create_room": "Créer une salle",
+      "type_message": "Tapez un message...",
+      "add_friend": "Ajouter un ami",
+      "send": "Envoyer",
+      "adding": "Ajout en cours...",
+      "cancel": "Annuler",
+      "username": "Nom d'utilisateur",
+      "join": "Rejoindre",
+      "spectate": "Observer",
+      "dm": "MP",
+      "chat": "Discussion",
+      "profile": "Profil",
+      "rooms": "Salles"
+    },
+
+    "Error": {
+      "server_error": "Une erreur serveur est survenue.",
+      "need_login": "Vous devez être connecté pour utiliser cette fonctionnalité.",
+      "room_full": "Cette salle est déjà pleine.",
+      "game_server_error": "Impossible de se connecter au serveur de jeu.",
+      "fail_friend_fetch": "Échec du chargement des amis.",
+      "no_username": "Veuillez entrer un nom d'utilisateur.",
+      "fail_add": "Échec de l'ajout d'un ami."
     }
 }

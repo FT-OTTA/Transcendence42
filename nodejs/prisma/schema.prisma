@@ -18,6 +18,8 @@ model Card {
   effect_text String
   effect_json_path String
   illustration String
+  target_number Int?
+  target_type String?
 }
 
 model Hero {
@@ -27,6 +29,7 @@ model Hero {
   passive_text String
   passive_json_path String
   illustration String
+  deck String @db.Text
 }
 
 model User {

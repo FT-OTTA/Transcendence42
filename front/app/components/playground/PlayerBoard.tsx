@@ -1,12 +1,13 @@
 "use client";
 
 import CardSlot from "./CardSlot";
-import type { PlaygroundCard } from "./types";
+import type { Card } from 'otta-shared-types/card';
 
 interface PlayerBoardProps {
-  cards: (PlaygroundCard | null)[];
-  onPlay?: (cardId: string, targetIndex: number, isOpponent: boolean) => void;
+  cards: (Card | null)[];
+  onPlay?: (slotIndex: number) => void;  // simplifié
 }
+
 
 export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
   const playerSlots = Array.from({ length: 8 }, (_, i) => `player-${i}`);
@@ -17,17 +18,14 @@ export default function PlayerBoard({ cards, onPlay }: PlayerBoardProps) {
 
       <div className="grid grid-cols-8 gap-2">
         {playerSlots.map((slot, index) => (
-          <CardSlot
+        <CardSlot
             key={slot}
             id={slot}
             card={cards[index] ?? undefined}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              const cardId = e.dataTransfer.getData("cardId");
-              if (!cardId) return;
-              if (onPlay) onPlay(cardId, index, false);
+            onClick={() => {
+                if (!cards[index]) onPlay?.(index)  // ✅ seulement si slot vide
             }}
-          />
+        />
         ))}
       </div>
     </div>

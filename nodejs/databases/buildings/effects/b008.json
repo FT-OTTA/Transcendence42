@@ -2,15 +2,21 @@
     "effects": [
         {
             "effect": "draw",
-            "value": 8
+            "value": 8,
+            "target": "self_hero",
+            "targetType": { "hero": true }
         },
         {
             "effect": "armor",
-            "value": 8
+            "value": 8,
+            "target": "self_hero",
+            "targetType": { "hero": true }
         },
         {
             "effect": "runes",
-            "value": 8
+            "value": 8,
+            "target": "self_hero",
+            "targetType": { "hero": true }
         }
     ]
 }

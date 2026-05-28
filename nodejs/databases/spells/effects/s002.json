@@ -3,7 +3,8 @@
         {
             "effect": "draw",
             "value": 4,
-            "target": "self_hero"
+            "target": "self_hero",
+            "targetType": { "hero": true }
         }
     ]
 }

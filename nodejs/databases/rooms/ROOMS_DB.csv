@@ -1,5 +1,4 @@
-Player1;Player2;Status
-Poman;Alice;playing
-Alice;Bob;playing
-Tonyo;;waiting
-Teddy;;waiting
+id;Player1;Player2;Status
+1;Poman;Alice;waiting
+2;Alice;Bob;waiting
+3;Tonyo;;waiting

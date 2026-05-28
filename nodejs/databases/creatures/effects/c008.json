@@ -1,3 +1,10 @@
 {
-    "vous etes": "encore la ?"
+    "effects": [
+        {
+            "effect": "win",
+            "target": "self_hero",
+            "targetType": { "hero": true },
+            "trigger": "on_deal_damage"
+        }
+    ]
 }

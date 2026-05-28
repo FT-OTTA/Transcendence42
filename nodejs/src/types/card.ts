@@ -2,7 +2,7 @@ import type { Zone, BfZone } from './zones.ts'
 import type { EffectType, EffectTarget, EffectTime, TargetType, Effect } from './effects.ts'
 import type { Hero } from './hero.ts'
 
-export type CardType = "creature" | "sortilege" | "building";
+export type CardType = "creature" | "spell" | "building";
 
 export type CreatureState = "sick" | "ready";
 
@@ -25,6 +25,7 @@ export type Card = {
     baseEndurance: number;
     currEndurance: number;
     cardName: string;
+    effectText: string;
     fullPicPath: string;
     smallPicPath: string;
     cardBackPath: string;

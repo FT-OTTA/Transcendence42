@@ -1,22 +1,22 @@
 "use client";
 
 import type React from 'react';
-import type { PlaygroundCard } from "./types";
+import type { Card } from 'otta-shared-types/card';
 
 interface CardSlotProps {
   id: string;
   isHand?: boolean;
   isOpponentSlot?: boolean;
-  card?: PlaygroundCard;
-  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
-  onDragOver?: (e: React.DragEvent<HTMLDivElement>) => void;
+  showEffectText?: boolean;
+  card?: Card | null;
+  onClick?: (card: Card | null) => void
 }
 
-export default function CardSlot({ id, isHand = false, isOpponentSlot = false, card, onDrop, onDragOver }: CardSlotProps) {
+export default function CardSlot({ id, isHand = false, isOpponentSlot = false, showEffectText = false, card, onClick }: CardSlotProps) {
   return (
     <div
       id={id}
-      draggable={isHand && Boolean(card)}
+      onClick={() => onClick?.(card ?? null)}
       className={`
         aspect-square rounded border transition-all cursor-pointer p-1
         ${isHand
@@ -26,31 +26,17 @@ export default function CardSlot({ id, isHand = false, isOpponentSlot = false, c
         ${isOpponentSlot ? 'opacity-80' : ''}
         flex flex-col items-center justify-center text-blue-300/40 text-xs
       `}
-      onDragStart={(e) => {
-        if (isHand && card) {
-          e.dataTransfer.effectAllowed = "move";
-          e.dataTransfer.setData("cardSlotId", id);
-          e.dataTransfer.setData("cardId", card.id);
-        }
-      }}
-      onDragOver={(e) => {
-        if (onDragOver) {
-          e.preventDefault();
-          onDragOver(e);
-        }
-      }}
-      onDrop={(e) => {
-        e.preventDefault();
-        if (onDrop) onDrop(e);
-      }}
     >
       {card ? (
         <>
-          <span className="text-[9px] text-blue-100/90 leading-tight text-center line-clamp-2">{card.name}</span>
+          <span className="text-[9px] text-blue-100/90 leading-tight text-center line-clamp-2">{card.cardName}</span>
           <span className="text-[9px] text-blue-200/70 uppercase mt-0.5">{card.type}</span>
-          <span className="text-[10px] text-yellow-200 mt-1">{card.rune_cost} R</span>
-          {card.force !== null && card.endurance !== null ? (
-            <span className="text-[10px] text-red-200 mt-0.5">{card.force}/{card.endurance}</span>
+          <span className="text-[10px] text-yellow-200 mt-1">{card.runeCost} R</span>
+          {card.currForce !== null && card.currEndurance !== null ? (
+            <span className="text-[10px] text-red-200 mt-0.5">{card.currForce}/{card.currEndurance}</span>
+          ) : null}
+          {showEffectText && card.effectText ? (
+            <p className="text-[8px] text-slate-200 mt-1 leading-tight text-center line-clamp-2">{card.effectText}</p>
           ) : null}
         </>
       ) : (

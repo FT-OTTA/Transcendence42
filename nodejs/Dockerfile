@@ -12,4 +12,4 @@ RUN npx prisma generate
 COPY . .
 
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma db push && node src/importdb.ts && node src/server.ts"]
+CMD ["sh", "-c", "npx prisma db push && npx tsx src/importdb.ts && npx tsx src/server.ts"]

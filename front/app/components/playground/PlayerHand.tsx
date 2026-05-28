@@ -1,13 +1,14 @@
 "use client";
 
 import CardSlot from "./CardSlot";
-import type { PlaygroundCard } from "./types";
+import type { Card } from 'otta-shared-types/card';
 
 interface PlayerHandProps {
-  cards: (PlaygroundCard | null)[];
+  cards: (Card | null)[];
+  onClick: (card: Card | null) => void;
 }
 
-export default function PlayerHand({ cards }: PlayerHandProps) {
+export default function PlayerHand({ cards, onClick }: PlayerHandProps) {
   const handSlots = Array.from({ length: 8 }, (_, i) => `hand-${i}`);
 
   return (
@@ -16,7 +17,7 @@ export default function PlayerHand({ cards }: PlayerHandProps) {
 
       <div className="grid grid-cols-8 gap-2">
         {handSlots.map((slot, index) => (
-          <CardSlot key={slot} id={slot} isHand={true} card={cards[index] ?? undefined} />
+          <CardSlot key={slot} id={slot} isHand={true} card={cards[index] ?? undefined} onClick={onClick} />
         ))}
       </div>
     </div>

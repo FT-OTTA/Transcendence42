@@ -21,71 +21,40 @@ export default function RoomPanel() {
     const e = useTranslations("Error");
 
     useEffect(() => {
-
         fetchRooms();
-
-        socket.on('room_updated', (room) => {
-            const formatted = {
-                id: room.id,
-                p1: room.player1.username,
-                p2: room.player2?.username ?? null,
-            };
-
-            setRoomDetails((prev) => {
-                const exists = prev.find(r => r.id === room.id);
-
-                if (!exists)
-                {
-                    return [formatted, ...prev];
-                }
-
-                return prev.map(r => 
-                    r.id === room.id ? formatted : r
-                );
-            });
-        })
-        
-        socket.on('room_error', (err) => {
-            showError(err.message);
-        });
-
-        return () => {
-            socket.off('room_updated');
-            socket.off('room_error');
-        };
-
+    
         const handleRoomUpdated = (room: any) => {
             const formatted = {
                 id: room.id,
                 p1: room.player1.username,
                 p2: room.player2?.username ?? null,
             };
-
+        
             setRoomDetails((prev) => {
-                const exists = prev.find(r => r.id === room.id);
+                const exists = prev.find((r) => r.id === room.id);
+            
+            if (!exists) {
+                return [formatted, ...prev];
+            }
 
-                if (!exists) {
-                    return [formatted, ...prev];
-                }
+            return prev.map((r) =>
+                r.id === room.id ? formatted : r
+            );
+        });
+    };
 
-                return prev.map(r => 
-                    r.id === room.id ? formatted : r
-                );
-            });
-        };
+    const handleRoomError = (err: any) => {
+        showError(err.message);
+    };
 
-        const handleRoomError = (err: any) => {
-            showError(err.message);
-        };
+    socket.on("room_updated", handleRoomUpdated);
+    socket.on("room_error", handleRoomError);
 
-        socket.on('room_updated', handleRoomUpdated);
-        socket.on('room_error', handleRoomError);
-
-        return () => {
-            socket.off('room_updated', handleRoomUpdated);
-            socket.off('room_error', handleRoomError);
-        };
-    }, []);
+    return () => {
+        socket.off("room_updated", handleRoomUpdated);
+        socket.off("room_error", handleRoomError);
+    };
+}, []);
 
     function showError(message: string) {
         setError(message);

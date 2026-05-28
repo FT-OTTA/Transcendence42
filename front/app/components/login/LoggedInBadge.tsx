@@ -99,7 +99,7 @@ export default function LoggedInBadge() {
             <button
                 onClick={logout}
                 className="w-full text-xs px-3 py-1.5 border border-blue-300/20 text-blue-200/60 hover:text-blue-100 hover:border-blue-300/50 transition">
-                {l("logout")}
+                {l("log_out")}
             </button>
         </div>
     );

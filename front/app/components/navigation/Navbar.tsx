@@ -2,7 +2,7 @@
 import NavItem from "./NavItem"
 import clsx from "clsx";
 import MobileNavbar from "./MobileNavbar"
-import {useTranslations, useLocale} from 'next-intl';
+import {useTranslations} from 'next-intl';
 import LanguageSwitcher from "../Language/LanguageSwitcher";
 
 
@@ -24,7 +24,6 @@ const NavLine = clsx
 export default function Navbar()
 {
 	const t = useTranslations('Navbar');
-	const locale = useLocale();
 	return (
 		<div>
 			

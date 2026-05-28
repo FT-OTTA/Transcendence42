@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
@@ -35,6 +35,8 @@ export default function ProfileSearchBar()
 	const [error, setError] = useState("");
 	const [shake, setShake] = useState(false);
 	const router = useRouter();
+	const locale = useLocale();
+
 
 	async function handleSearch() {
 		if (!search.trim().toLowerCase())
@@ -55,7 +57,7 @@ export default function ProfileSearchBar()
 			}, 400);
 			return;
 		}
-		router.push(`/community/${search.trim()}`);
+		router.push(`/${locale}/community/${search.trim()}`);
 	};
 
 	return (

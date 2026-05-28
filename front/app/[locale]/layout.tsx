@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Cinzel, Inter, Bellefair } from "next/font/google";
 import localFont from "next/font/local";
-import "../globals.css";
 import {NextIntlClientProvider} from 'next-intl';
 import {notFound} from 'next/navigation';
+import "../globals.css";
 
 const locales = ['en', 'fr', 'sv'];
 
@@ -27,7 +27,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
         </NextIntlClientProvider>
       </body>

@@ -2,11 +2,12 @@
 import AvatarFrame from "../AvatarFrame"
 import { requireAuth } from "../login/RequireAuth";
 import { useEffect, useState } from "react";
-
+import { useTranslations } from "next-intl";
 
 export default function ProfilePanel() {
 
     const [username, setUsername] = useState("Placeholder");
+    const l = useTranslations("Lobby");
 
     useEffect(() => {
 
@@ -24,7 +25,7 @@ export default function ProfilePanel() {
     return (
         <div className="h-half border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm h-1/3 flex flex-col p-4">
         
-            <h2 className="text-xl mb-2 text-center py-2">Profile</h2>
+            <h2 className="text-xl mb-2 text-center py-2">{l("profile")}</h2>
         
             <div className="flex gap-4 items-start">
                 

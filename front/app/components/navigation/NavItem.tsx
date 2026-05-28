@@ -20,7 +20,7 @@ export type NavItemProps = {
 
 export default function NavItem({ text, href }: NavItemProps)
 {
-
+	console.log(`DEBUG [NavItem]: Rendering link for [${text}]. Raw destination prop href is: [${href}]`);
 	return (
 		<Link href={href} className={NavItemClass}>
 		  {text}

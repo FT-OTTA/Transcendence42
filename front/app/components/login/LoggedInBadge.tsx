@@ -56,7 +56,7 @@ export default function LoggedInBadge() {
         return (
             <div className="fixed top-13 right-2 z-40 flex flex-col px-4 py-3 rounded-sm text-sm text-blue-200/70">
                     <span className="text-[11px] uppercase tracking-wider opacity-50">
-                        ${l("log_status")};
+                        {l("log_status")}
                     </span>
             </div>
         );
@@ -76,7 +76,7 @@ export default function LoggedInBadge() {
             <button
                 onClick={logout}
                 className="w-full text-xs px-3 py-1.5 border border-blue-300/20 text-blue-200/60 hover:text-blue-100 hover:border-blue-300/50 transition">
-                ${l("logout")};
+                {l("logout")}
             </button>
         </div>
     );

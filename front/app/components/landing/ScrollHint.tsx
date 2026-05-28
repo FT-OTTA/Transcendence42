@@ -19,7 +19,7 @@ export default function ScrollHint()
 		<div className={ ScrollHintClass }>
 			<h2 className={bellefair.className + " flex text-xl md:text-2xl lg:text-2xl items-center justify-center"}
 			>
-				{l("whats_otta")};
+				{l("whats_otta")}
 			</h2>
 		
 			<div className="w-80 h-[1px] bg-white/50" />

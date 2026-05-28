@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
 import { customScrollBar } from "../scrollBar";
+import { useTranslations } from "next-intl";
 import { socket } from "@/lib/socket";
 
 
@@ -16,6 +17,9 @@ export default function RoomPanel() {
 
     const [roomDetails, setRoomDetails] = useState<Room[]>([]);
     const [error, setError] = useState("");
+    const l = useTranslations("Lobby");
+    const e = useTranslations("Error");
+
 
     const [currentGame, setCurrentGame] = useState<{ roomId: number, heroId: string } | null>(null)
     
@@ -95,7 +99,7 @@ export default function RoomPanel() {
 
         if (!username)
         {
-            showError("You need to be logged in for this feature.");
+            showError("need_login");
             return;
         }
 
@@ -138,7 +142,7 @@ export default function RoomPanel() {
 
         if (!username)
         {
-            showError("You need to be logged in for this feature.");
+            showError("need_login");
             return;
         }
 
@@ -177,11 +181,11 @@ export default function RoomPanel() {
     return (
         <div className="h-full min-h-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
 
-            <h2 className="text-xl mb-2 text-center ">Rooms</h2>
+            <h2 className="text-xl mb-2 text-center ">{l("rooms")}</h2>
 
             {error && (
                 <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
-                    {error}
+                    {e(error)}
                 </p>
             )}
             {/* Rajouter flex-1 si on veut que create room soit fixe' a la meme place en bas,
@@ -217,6 +221,12 @@ export default function RoomPanel() {
                                 </button>
                             ) : null}
                         </div>
+
+                        {/* Spectate */}
+                        <button className="text-blue-300 hover:text-blue-100">
+                            {l("spectate")}
+                        </button>
+
                     </div>
                 ))}
             </div>
@@ -225,7 +235,7 @@ export default function RoomPanel() {
                 className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
                 onClick={createRoom}
             >
-                + Create room
+                + {l("create_room")}
             </button>
 
         </div>

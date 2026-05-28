@@ -45,5 +45,35 @@
       "draws": "Oavgjorda",
       "best_friend": "Spelat mest med",
       "worst_enemy": "Värsta fiende"
+    },
+
+    "Lobby": {
+      "friends": "Vänner",
+      "add_a_friend": "Lägg till en vän",
+      "no_friends": "Inga vänner ännu",
+      "loading_friends": "Laddar vänner...",
+      "create_room": "Skapa rum",
+      "type_message": "Skriv ett meddelande...",
+      "add_friend": "Lägg till vän",
+      "send": "Skicka",
+      "adding": "Lägger till...",
+      "cancel": "Avbryt",
+      "username": "Användarnamn",
+      "join": "Gå med",
+      "spectate": "Titta på",
+      "dm": "DM",
+      "chat": "Chatt",
+      "profile": "Profil",
+      "rooms": "Rum"
+    },
+
+    "Error": {
+      "server_error": "Ett serverfel har inträffat.",
+      "need_login": "Du måste vara inloggad för att använda den här funktionen.",
+      "room_full": "Det här rummet är redan fullt.",
+      "game_server_error": "Det gick inte att ansluta till spelservern.",
+      "fail_friend_fetch": "Det gick inte att hämta vänner.",
+      "no_username": "Ange ett användarnamn.",
+      "fail_add": "Det gick inte att lägga till vän."
     }
 }

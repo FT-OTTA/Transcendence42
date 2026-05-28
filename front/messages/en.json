@@ -45,6 +45,36 @@
     "draws": "Draws",
     "best_friend": "Most Played with",
     "worst_enemy": "Worst Enemy"
+  },
+
+  "Lobby": {
+    "friends": "Friends",
+    "add_a_friend": "Add a friend",
+    "no_friends": "No friends yet",
+    "loading_friends": "Loading friends...",
+    "create_room": "Create Room",
+    "type_message": "Type a message...",
+    "add_friend": "Add Friend",
+    "send": "Send",
+    "adding": "Adding...",
+    "cancel": "Cancel",
+    "username": "Username",
+    "join": "Join",
+    "spectate": "Spectate",
+    "dm": "DM",
+    "chat": "Chat",
+    "profile": "Profile",
+    "rooms": "Rooms"
+  },
+
+  "Error": {
+    "server_error": "A server error has been encountered.",
+    "need_login": "You need to be logged in for this feature.",
+    "room_full": "This room is already full.",
+    "game_server_error": "Unable to connect to the game server.",
+    "fail_friend_fetch": "Failed to fetch friends.",
+    "no_username": "Please enter a username.",
+    "fail_add": "Failed to add friend."
   }
 
 }

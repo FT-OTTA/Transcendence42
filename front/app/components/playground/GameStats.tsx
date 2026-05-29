@@ -13,7 +13,6 @@ interface GameStatsProps {
   turnNumber?: number;
   me?: PlayerStats;
   opponent?: PlayerStats;
-  onEndTurn?: () => void;
   onHeroClick?: (type: "self" | "opponent") => void; // Ajouté ici
   highlightPlayerHero?: boolean;
   highlightOpponentHero?: boolean;
@@ -31,7 +30,6 @@ export default function GameStats({
   turnNumber = 1, 
   me, 
   opponent, 
-  onEndTurn, 
   onHeroClick, // Ajouté ici
   highlightPlayerHero = false, 
   highlightOpponentHero = false,
@@ -102,9 +100,6 @@ className={`border-b border-blue-300/30 pb-4
         </div>
       </div>
 
-      <button onClick={onEndTurn} className="border border-blue-300 py-2 px-3 text-sm hover:bg-blue-300 hover:text-black transition mt-2">
-        End Turn
-      </button>
       <button 
         onClick={onConcede}
         className="border border-red-400/40 py-2 px-3 text-sm text-red-400 hover:bg-red-400/20 transition mt-1">

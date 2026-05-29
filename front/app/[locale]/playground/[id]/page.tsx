@@ -475,13 +475,6 @@ function pushSelectedTarget(target: Card | Hero) {
                     }}
                 />
                 
-                {/* Bouton stats flottant */}
-                <button
-                    onClick={() => setShowStats(true)}
-                    className="fixed bottom-4 right-4 bg-blue-900/80 border border-blue-400 rounded-full w-12 h-12 flex items-center justify-center z-40 text-lg"
-                >
-                    ⚔️
-                </button>
                 {/* Bandeau bas mobile — pas de carte sélectionnée */}
                 {!selectedCard && (
                 <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 border-t border-blue-400/40 px-4 py-2 flex items-center justify-between">

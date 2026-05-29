@@ -138,7 +138,7 @@ export default function RoomPanel() {
         const data = await res.json();
         
         socket.emit('create_room', { username });
-        router.push(`/playground/${data.id}`);
+        router.push(`/${locale}/playground/${data.id}`);
     }
 
     async function joinRoom(roomId: number) {
@@ -170,7 +170,7 @@ export default function RoomPanel() {
             username,
         });
 
-        router.push(`/playground/${data.id}`);
+        router.push(`/${locale}/playground/${data.id}`);
     }
 
     return (

@@ -5,7 +5,9 @@ import localFont from "next/font/local";
 import {NextIntlClientProvider} from 'next-intl';
 import {notFound} from 'next/navigation';
 import "../globals.css";
+import { getMessages } from 'next-intl/server';
 
+// Dans ton layout :
 const locales = ['en', 'fr', 'sv'];
 
 export default async function LocaleLayout({
@@ -22,10 +24,11 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const messages = (await import(`../../messages/${locale}.json`)).default;
+const messages = await getMessages(); // apres
+  // const messages = (await import(`../../messages/${locale}.json`)).default; //avant
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}

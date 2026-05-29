@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from 'react';
-import Navbar from '../../components/navigation/Navbar';
-import HeroSelection from '../../components/playground/HeroSelection';
-import OpponentBoard from '../../components/playground/OpponentBoard';
-import PlayerBoard from '../../components/playground/PlayerBoard';
+import Navbar from '../../../components/navigation/Navbar';
+import HeroSelection from '../../../components/playground/HeroSelection';
+import OpponentBoard from '../../../components/playground/OpponentBoard';
+import PlayerBoard from '../../../components/playground/PlayerBoard';
 import SpectatorBoard from '@/app/components/playground/SpectatorBoard'
-import PlayerHand from '../../components/playground/PlayerHand';
-import GameStats from '../../components/playground/GameStats';
-import ConfirmPlay from '../../components/playground/ConfirmPlay';
+import PlayerHand from '../../../components/playground/PlayerHand';
+import GameStats from '../../../components/playground/GameStats';
+import ConfirmPlay from '../../../components/playground/ConfirmPlay';
 import type { Card } from 'otta-shared-types/card';
 import { io, Socket } from 'socket.io-client';
 import { useParams, useSearchParams } from 'next/navigation';

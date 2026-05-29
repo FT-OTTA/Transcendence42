@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { requireAuth } from "../login/RequireAuth";
 import { customScrollBar } from "../scrollBar";
 import { useTranslations } from "next-intl";
@@ -14,23 +15,28 @@ type Room = {
 
 
 export default function RoomPanel() {
-
+    const router = useRouter();
     const [roomDetails, setRoomDetails] = useState<Room[]>([]);
     const [error, setError] = useState("");
     const l = useTranslations("Lobby");
     const e = useTranslations("Error");
 
+    const [currentGame, setCurrentGame] = useState<{
+        roomId: number;
+        heroId: string;
+    } | null>(null);
 
-    const [currentGame, setCurrentGame] = useState<{ roomId: number, heroId: string } | null>(null)
-    
     useEffect(() => {
-// Permet de restaurer la sélection du héros si la page est rechargée accidentellement (F5, crash, etc.) pendant une partie
-        const saved = localStorage.getItem('currentGame')
-        if (saved) setCurrentGame(JSON.parse(saved))
-// 
+    // Permet de restaurer la sélection du héros si la page 
+    // est rechargée accidentellement (F5, crash, etc.) pendant une partie
+        const saved = localStorage.getItem("currentGame");
+        if (saved) {
+            setCurrentGame(JSON.parse(saved));
+        }
+
         fetchRooms();
 
-        socket.on('room_updated', (room) => {
+        const handleRoomUpdated = (room: any) => {
             const formatted = {
                 id: room.id,
                 p1: room.player1.username,
@@ -38,39 +44,50 @@ export default function RoomPanel() {
             };
 
             setRoomDetails((prev) => {
-                const exists = prev.find(r => r.id === room.id);
+                const exists = prev.find(
+                    (r) => r.id === room.id
+                );
 
-                if (!exists)
-                {
+                if (!exists) {
                     return [formatted, ...prev];
                 }
 
-                return prev.map(r => 
-                    r.id === room.id ? formatted : r
+                return prev.map((r) =>
+                    r.id === room.id
+                        ? formatted
+                        : r
                 );
             });
-        })
-        
-        socket.on('room_error', (err) => {
+        };
+
+        const handleRoomError = (err: any) => {
             showError(err.message);
-        });
+        };
+
+        socket.on(
+            "room_updated",
+            handleRoomUpdated
+        );
+
+        socket.on(
+            "room_error",
+            handleRoomError
+        );
 
         return () => {
-            socket.off('room_updated');
-            socket.off('room_error');
+            socket.off("room_updated", handleRoomUpdated);
+            socket.off("room_error", handleRoomError);
         };
     }, []);
 
     function showError(message: string) {
         setError(message);
-
         setTimeout(() => {
             setError("");
         }, 3000);
     }
 
     async function fetchRooms() {
-
         const res = await fetch(
             "http://localhost:3000/rooms"
         );
@@ -83,41 +100,32 @@ export default function RoomPanel() {
 
         const data = await res.json();
 
-        const formatted = data.map((room: any) => ({
-            id: room.id,
-            p1: room.player1.username,
-            p2: room.player2?.username ?? null,
-        }));
+        const formatted = data.map(
+            (room: any) => ({
+                id: room.id,
+                p1: room.player1.username,
+                p2:
+                    room.player2?.username ??
+                    null,
+            })
+        );
 
         setRoomDetails(formatted);
     }
 
     async function createRoom() {
-
-        const username =
-            await requireAuth();
-
-        if (!username)
-        {
+        const username = await requireAuth();
+        if (!username) {
             showError("need_login");
             return;
         }
-
-        socket.emit('create_room', {
-            username
-        });
 
         const res = await fetch(
             "http://localhost:3000/rooms/create",
             {
                 method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify({
-                    username
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username }),
             }
         );
 
@@ -125,23 +133,17 @@ export default function RoomPanel() {
             const err = await res.json();
             alert(err.error);
             return;
-        } else {
-            const data = await res.json();
-            console.log("Room created with ID:", data.id);
-            let href = `/playground/${data.id}`;
-            window.location.href = href;
         }
 
-
-        fetchRooms();
+        const data = await res.json();
+        
+        socket.emit('create_room', { username });
+        router.push(`/playground/${data.id}`);
     }
 
     async function joinRoom(roomId: number) {
-
         const username = await requireAuth();
-
-        if (!username)
-        {
+        if (!username) {
             showError("need_login");
             return;
         }
@@ -150,32 +152,25 @@ export default function RoomPanel() {
             `http://localhost:3000/rooms/${roomId}/join`,
             {
                 method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify({
-                    username
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username }),
             }
         );
+
         if (!res.ok) {
-                const err = await res.json();
-                alert(err.error);
-                return;
+            const err = await res.json();
+            alert(err.error);
+            return;
         }
-        else 
-        {
-            const data = await res.json();
-            console.log("Room created with ID:", data.id);
-            let href = `/playground/${data.id}`;
-            window.location.href = href;
-            fetchRooms();
-        }
+
+        const data = await res.json();
+        
         socket.emit('join_room', {
             roomId,
             username,
         });
+
+        router.push(`/playground/${data.id}`);
     }
 
     return (

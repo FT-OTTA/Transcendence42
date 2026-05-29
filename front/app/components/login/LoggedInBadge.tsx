@@ -5,54 +5,50 @@ import { useTranslations } from "next-intl";
 import LoginCard from "./LoginCard";
 
 export default function LoggedInBadge() {
-
     const l = useTranslations("Homepage");
     const [showLogin, setShowLogin] = useState(false);
+    
+    const [username, setUsername] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
 
-    const [username, setUsername] = useState<string | null>(() => {
-        if (typeof window !== "undefined")
-        {
-            return localStorage.getItem("username");
-        }
-        return null;
-        });
-
-    function logout()
-    {
+    function logout() {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         window.location.reload();
     }
 
     async function uservalidation() {
+        const storedUsername = localStorage.getItem("username");
 
-        const storedUsername = localStorage.getItem("username")
-
-        if (!storedUsername)
-            return;
+        if (!storedUsername) return;
 
         try {
             const res = await fetch(
                 `http://localhost:3000/users/${storedUsername}`
             );
 
-            if (!res.ok)
-            {
+            if (!res.ok) {
                 localStorage.removeItem("token");
                 localStorage.removeItem("username");
-            }
-            else
+            } else {
                 setUsername(storedUsername);
-        }
-        catch (err) {
+            }
+        } catch (err) {
             console.error(err);
         }   
     }
 
-
     useEffect(() => {
+        setMounted(true);
+        const localUser = localStorage.getItem("username");
+        if (localUser) {
+            setUsername(localUser);
+        }
         uservalidation();
     }, []);
+
+    if (!mounted)
+        return null;
 
     if (!username) {
         return (
@@ -88,7 +84,7 @@ export default function LoggedInBadge() {
         <div className="fixed top-13 right-2 z-40 flex flex-col px-4 py-3 rounded-sm text-sm text-blue-200/70">
             <div className="flex items-center gap-2 leading-tight">
                 <span className="text-[11px] uppercase tracking-wider opacity-50">
-                    {l("login_as")};
+                    {l("login_as")}
                 </span>
 
                 <span className="text-blue-100 font-medium">

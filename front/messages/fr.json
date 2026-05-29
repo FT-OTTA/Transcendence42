@@ -65,7 +65,8 @@
       "dm": "MP",
       "chat": "Discussion",
       "profile": "Profil",
-      "rooms": "Salles"
+      "rooms": "Salles",
+      "rejoin": "Reprendre"
     },
 
     "Error": {

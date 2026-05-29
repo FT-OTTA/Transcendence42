@@ -14,12 +14,16 @@ import { io, Socket } from 'socket.io-client';
 import { useParams, useSearchParams } from 'next/navigation';
 import LargeCardView from '@/app/components/playground/LargeCardView';
 import { Hero } from 'otta-shared-types/hero';
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useLocale } from 'next-intl';
 
 
 export default function PlaygroundPage() {
   const { id } = useParams();
   const pathname = usePathname()
+  const router = useRouter();
+  const locale = useLocale();
+
 
   // permet de restaurer la sélection du héros si la page est rechargée accidentellement (F5, crash, etc.) pendant une partie
   const [selectedHero, setSelectedHero] = useState<string | null>(() => {
@@ -550,7 +554,7 @@ function pushSelectedTarget(target: Card | Hero) {
             <div className="border border-blue-300 bg-black/90 p-8 flex flex-col items-center gap-6 rounded-sm">
             <p className="text-2xl text-blue-200">{gameOverMessage}</p>
             <button
-                onClick={() => window.location.href = '/lobby'}
+                onClick={() => router.push(`/${locale}/lobby`)}
                 className="border border-blue-300 px-6 py-2 hover:bg-blue-300 hover:text-black transition"
             >
                 Retour au lobby

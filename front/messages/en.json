@@ -65,7 +65,8 @@
     "dm": "DM",
     "chat": "Chat",
     "profile": "Profile",
-    "rooms": "Rooms"
+    "rooms": "Rooms",
+    "rejoin": "Rejoin"
   },
 
   "Error": {

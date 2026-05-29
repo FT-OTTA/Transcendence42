@@ -27,11 +27,36 @@ export default function RoomPanel() {
     const [currentGame, setCurrentGame] = useState<{ roomId: number, heroId: string } | null>(null)
     
     useEffect(() => {
-    // Permet de restaurer la sélection du héros si la page 
-    // est rechargée accidentellement (F5, crash, etc.) pendant une partie
+        // Permet de restaurer la sélection du héros si la page 
+        // est rechargée accidentellement (F5, crash, etc.) pendant une partie
         const saved = localStorage.getItem("currentGame");
         if (saved) {
             setCurrentGame(JSON.parse(saved));
+        }
+
+        // Moved inside the effect to safely remove it from the dependency array
+        async function fetchRooms() {
+            const res = await fetch(
+                "http://localhost:3000/rooms"
+            );
+
+            if (!res.ok) {
+                const err = await res.json();
+                alert(err.error);
+                return;
+            }
+
+            const data = await res.json();
+
+            const formatted = data.map(
+                (room: any) => ({
+                    id: room.id,
+                    p1: room.player1.username,
+                    p2: room.player2?.username ?? null,
+                })
+            );
+
+            setRoomDetails(formatted);
         }
 
         fetchRooms();
@@ -87,58 +112,20 @@ export default function RoomPanel() {
         }, 3000);
     }
 
-    async function fetchRooms() {
-        const res = await fetch(
-            "http://localhost:3000/rooms"
-        );
-
-        if (!res.ok) {
-            const err = await res.json();
-            alert(err.error);
-            return;
-        }
-
-        const data = await res.json();
-
-        const formatted = data.map(
-            (room: any) => ({
-                id: room.id,
-                p1: room.player1.username,
-                p2:
-                    room.player2?.username ??
-                    null,
-            })
-        );
-
-        setRoomDetails(formatted);
-    }
-
     async function createRoom() {
         const username = await requireAuth();
         if (!username) {
             showError("need_login");
             return;
         }
-
-        const res = await fetch(
-            "http://localhost:3000/rooms/create",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username }),
+    
+       socket.emit(
+            "create_room",
+            { username },
+            (room: any) => {
+                router.push(`/${locale}/playground/${room.id}`);
             }
         );
-
-        if (!res.ok) {
-            const err = await res.json();
-            alert(err.error);
-            return;
-        }
-
-        const data = await res.json();
-        
-        socket.emit('create_room', { username });
-        router.push(`/${locale}/playground/${data.id}`);
     }
 
     async function joinRoom(roomId: number) {
@@ -147,30 +134,14 @@ export default function RoomPanel() {
             showError("need_login");
             return;
         }
-
-        const res = await fetch(
-            `http://localhost:3000/rooms/${roomId}/join`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username }),
+        
+        socket.emit(
+            "join_room",
+            { roomId, username },
+            (room: any) => {
+                router.push(`/${locale}/playground/${room.id}`);
             }
         );
-
-        if (!res.ok) {
-            const err = await res.json();
-            alert(err.error);
-            return;
-        }
-
-        const data = await res.json();
-        
-        socket.emit('join_room', {
-            roomId,
-            username,
-        });
-
-        router.push(`/${locale}/playground/${data.id}`);
     }
 
     return (
@@ -197,30 +168,25 @@ export default function RoomPanel() {
                         <div>
                             {room.p2 ?? (
                                 <button onClick={() => joinRoom(room.id)} className="text-green-300 hover:text-green-100">
-                                    Join
+                                    {l("join")}
                                 </button>
                             )}
                         </div>
                         <div>
                             {currentGame?.roomId === room.id ? (
                                 <button
-                                    onClick={() => window.location.href = `/${locale}/playground/${room.id}`}
+                                    onClick={() => router.push(`/${locale}/playground/${room.id}`)}
                                     className="text-amber-300 hover:text-amber-100">
-                                    ▶ Rejoin
+                                    ▶ {l("rejoin")}
                                 </button>
                             ) : room.p2 ? (
                                 <button
-                                    onClick={() => window.location.href = `/${locale}/playground/${room.id}?spectate=true`}
+                                    onClick={() => router.push(`/${locale}/playground/${room.id}?spectate=true`)}
                                     className="text-blue-300 hover:text-blue-100">
-                                    👁 Spectate
+                                    👁 {l("spectate")}
                                 </button>
                             ) : null}
                         </div>
-
-                        {/* Spectate */}
-                        <button className="text-blue-300 hover:text-blue-100">
-                            {l("spectate")}
-                        </button>
 
                     </div>
                 ))}

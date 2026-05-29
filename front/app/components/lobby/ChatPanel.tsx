@@ -13,9 +13,7 @@ type Message = {
     isSelf: boolean;
 };
 
-
 export default function ChatPanel() {
-
     const [chatMessages, setChatMessages] = useState<Message[]>([]);
     const [messageInput, setMessageInput] = useState("");
     const [error, setError] = useState("");
@@ -26,41 +24,29 @@ export default function ChatPanel() {
 
     const isNearBottom = () => {
         const check = scrollRef.current;
-        if (!check)
-            return true;
-
+        if (!check) return true;
         return check.scrollHeight - check.scrollTop - check.clientHeight < 100;
     }
 
     useEffect(() => {
         const scroll = scrollRef.current;
-        if (!scroll)
-            return;
-        
-        if (!isNearBottom())
-            return;
+        if (!scroll || !isNearBottom()) return;
 
         requestAnimationFrame(() => {
             scroll.scrollTop = scroll.scrollHeight;
         });
     }, [chatMessages]);
 
-
     function showError(message: string) {
         setError(message);
-
         setTimeout(() => {
             setError("");
         }, 3000);
     }
 
     async function fetchMessages() {
-
         const username = localStorage.getItem("username");
-
-        const res = await fetch(
-            "http://localhost:3000/messages/global"
-        );
+        const res = await fetch("http://localhost:3000/messages/global");
 
         if (!res.ok) {
             const err = await res.json();
@@ -70,34 +56,26 @@ export default function ChatPanel() {
 
         const data = await res.json();
 
-        console.log(data);
-
         if (!Array.isArray(data)){
-            console.error("Expected array:",data);
+            console.error("Expected array:", data);
             return;
         }
 
-        const formatted: Message[] =
-            data.map((msg: any) => ({
-                id: msg.id,
-                name: msg.sender.username,
-                message: msg.content,
-
-                isSelf: msg.sender.username === username,
-            }));
+        const formatted: Message[] = data.map((msg: any) => ({
+            id: msg.id,
+            name: msg.sender.username,
+            message: msg.content,
+            isSelf: msg.sender.username === username,
+        }));
         
         setChatMessages(formatted);
     }
 
-    async function sendMessage() 
-    {
-        if (!messageInput.trim())
-            return;
+    async function sendMessage() {
+        if (!messageInput.trim()) return;
 
         const username = await requireAuth();
-
-        if (!username)
-        {
+        if (!username) {
             showError("need_login");
             return;
         }
@@ -113,70 +91,48 @@ export default function ChatPanel() {
 
     useEffect(() => {
         fetchMessages();
-
         const username = localStorage.getItem("username");
 
-        socket.on('new_message', (msg) =>  {
+        // Named handler for accurate synchronization tear-down
+        const handleNewMessage = (msg: any) => {
             const formatted: Message = {
                 id: msg.id,
                 name: msg.sender.username,
                 message: msg.content,
-                isSelf:
-                    msg.sender.username === username,
+                isSelf: msg.sender.username === username,
             };
 
-            setChatMessages((prev) => [
-                ...prev,
-                formatted
-            ]);
-        });
+            setChatMessages((prev) => [...prev, formatted]);
+        };
+
+        socket.on('new_message', handleNewMessage);
 
         return () => {
-            socket.off('new_message');
+            socket.off('new_message', handleNewMessage);
         };
     }, []);
 
-
     return (
         <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm h-2/3">
-
-            <h2 className="text-xl mb-2 text-center py-2">
-                {l("chat")}
-            </h2>
+            <h2 className="text-xl mb-2 text-center py-2">{l("chat")}</h2>
 
             <div 
-                ref = {scrollRef}
+                ref={scrollRef}
                 className={`${customScrollBar} flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2`}>
-
-                {chatMessages.map((msg, index) => (
+                {chatMessages.map((msg) => (
                     <div
                         key={msg.id}
-                        className={`flex ${
-                            msg.isSelf
-                                ? "justify-end"
-                                : "justify-start"
-                        }`}
+                        className={`flex ${msg.isSelf ? "justify-end" : "justify-start"}`}
                     >
                         <div
-                            className={`
-                                max-w-[75%]
-                                rounded-sm
-                                p-3
-                                border
-                                ${
-                                    msg.isSelf
-                                        ? "bg-blue-400/20 border-blue-300 text-blue-100"
-                                        : "bg-black/40 border-blue-300/40 text-blue-200"
-                                }
-                            `}
+                            className={`max-w-[75%] rounded-sm p-3 border ${
+                                msg.isSelf
+                                    ? "bg-blue-400/20 border-blue-300 text-blue-100"
+                                    : "bg-black/40 border-blue-300/40 text-blue-200"
+                            }`}
                         >
-                            <p className="text-xs opacity-60 mb-1">
-                                {msg.name}
-                            </p>
-
-                            <p>
-                                {msg.message}
-                            </p>
+                            <p className="text-xs opacity-60 mb-1">{msg.name}</p>
+                            <p>{msg.message}</p>
                         </div>
                     </div>
                 ))}
@@ -189,14 +145,11 @@ export default function ChatPanel() {
                     </p>
                 )}
                 <div className="flex gap-2">
-
                     <input
                         className="w-full p-2 border border-blue-300 bg-transparent text-blue-200 outline-none"
                         type="text"
                         value={messageInput}
-                        onChange={(e) =>
-                            setMessageInput(e.target.value)
-                        }
+                        onChange={(e) => setMessageInput(e.target.value)}
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
                                 sendMessage();
@@ -204,17 +157,14 @@ export default function ChatPanel() {
                         }}
                         placeholder={l("type_message")}
                     />
-
                     <button
                         onClick={sendMessage}
                         className="px-4 border border-blue-300 hover:bg-blue-300 hover:text-black transition"
                     >
                         {l("send")}
                     </button>
-
                 </div>
             </div>
-
         </div>
     );
 }

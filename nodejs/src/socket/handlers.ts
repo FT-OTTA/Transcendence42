@@ -172,4 +172,119 @@ export function onConnection(io: Server, socket: Socket): void {
     socket.on('disconnect', () => {
         console.log('Joueur déconnecté :', socket.id)
     })
+
+    socket.on('send_message', async (data) => {
+        try{
+            const { username, content, roomId } = data;
+            if (!username || !content?.trim())
+                return;
+            const user = await prisma.user.findUnique({
+                where: { username }
+            });
+            if (!user)
+                return;
+            
+            const message = await prisma.message.create({
+                data: {
+                    senderId: user.id,
+                    content: content.trim(),
+                    roomId: roomId ?? null,
+                },
+                include: {
+                    sender: true,
+                }
+            });
+            io.emit('new_message', message);
+        }
+        catch (error)
+        {
+            console.error(error);
+            socket.emit('chat_error', {
+                message: "Failed to send message"
+            });
+        }
+    });
+
+    socket.on('create_room', async (data) => {
+        try {
+            const { username } = data;
+            if ( !username )
+                return;
+            const user = 
+                await prisma.user.findUnique({
+                    where: {
+                        username
+                    }
+            });
+            if (!user)
+                return;
+            const room =
+                await prisma.room.create({
+                data: {
+                    player1Id: user.id,
+                    status: "waiting",
+                },
+                include: {
+                    player1: true,
+                    player2: true,
+                }
+            });
+            io.emit('room_updated', room);
+        }
+        catch (error)
+        {
+            console.error(error);
+            socket.emit('room_error', {
+                message: "Failed to create a room"
+            });
+        }
+    });
+
+    socket.on('join_room', async (data) => {
+        try{
+            const { roomId, username } = data;
+            if (!roomId || !username)
+                return;
+            
+            const user = await prisma.user.findUnique({
+                where: {username}
+            });
+            if (!user)
+                return;
+            
+            const room = await prisma.room.findUnique({
+                where: {id: roomId}
+            });
+            if (!room)
+                return;
+            if (room.player2Id) {
+                socket.emit('room_error', {
+                    message: 'Room is full'
+                });
+                return;
+            }
+        
+            const updateRoom = 
+                await prisma.room.update({
+                    where: { id: roomId },
+                    data: {
+                        player2Id: user.id,
+                        status: "ready",
+                    },
+                    include: {
+                        player1: true,
+                        player2: true,
+                    }
+                });
+            io.emit('room_updated', updateRoom);
+        }
+        catch (error)
+        {
+            console.error(error);
+            socket.emit('room_error', {
+                message: 'Failed to join room'
+            });
+        }
+    });
+
 }

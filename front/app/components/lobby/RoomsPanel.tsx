@@ -22,11 +22,6 @@ export default function RoomPanel() {
     const l = useTranslations("Lobby");
     const e = useTranslations("Error");
 
-    const [currentGame, setCurrentGame] = useState<{
-        roomId: number;
-        heroId: string;
-    } | null>(null);
-
     const locale = useLocale();
 
     const [currentGame, setCurrentGame] = useState<{ roomId: number, heroId: string } | null>(null)

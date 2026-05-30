@@ -36,6 +36,12 @@ export default function Community() {
 					</div>
 				</div>
 			</section>
+			
+			<section className="flex-1 flex gap-4 items-center justify-center">
+					<GameCard name="Porte-Hache du seigneur du sang" cardType="creature" cost={4} runeUrl="/default_avatar.png" attack={4} defense={2} ability={true}/>
+					<GameCard name="Lance Givre" cardType="spell" cost={4} runeUrl="/default_avatar.png" attack={0} defense={0} ability={false}/>
+					<GameCard name="Taverne" cardType="building" cost={4} runeUrl="/default_avatar.png" attack={0} defense={8} ability={false}/>
+			</section>
 		</main>
 	);
 }

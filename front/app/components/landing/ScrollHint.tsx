@@ -1,5 +1,6 @@
 import { nordic, bellefair } from "../../fonts"
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 
 const ScrollHintClass = clsx
 (
@@ -12,11 +13,13 @@ const ScrollHintClass = clsx
 
 export default function ScrollHint()
 {
+	const l = useTranslations("Homepage");
+
 	return (
 		<div className={ ScrollHintClass }>
 			<h2 className={bellefair.className + " flex text-xl md:text-2xl lg:text-2xl items-center justify-center"}
 			>
-				What is Otta ?
+				{l("whats_otta")}
 			</h2>
 		
 			<div className="w-80 h-[1px] bg-white/50" />

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import { cinzel } from "@/app/fonts";
 const NavItemClass = clsx
 (
@@ -20,7 +20,7 @@ export type NavItemProps = {
 
 export default function NavItem({ text, href }: NavItemProps)
 {
-
+	console.log(`DEBUG [NavItem]: Rendering link for [${text}]. Raw destination prop href is: [${href}]`);
 	return (
 		<Link href={href} className={NavItemClass}>
 		  {text}

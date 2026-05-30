@@ -1,3 +1,97 @@
+# services:
+# #   elasticsearch:
+# #     image: elasticsearch:8.11.0
+# #     environment:
+# #       - discovery.type=single-node
+# #       - xpack.security.enabled=false
+# #     ports:
+# #       - "9200:9200"
+
+#   # logstash:
+#   #   image: logstash:8.11.0
+#   #   volumes:
+#   #     - ./logstash/pipeline:/usr/share/logstash/pipeline
+#   #   ports:
+#   #     - "5044:5044"
+#   #   depends_on:
+#   #     - elasticsearch
+
+#   # kibana:
+#   #   image: kibana:8.11.0
+#   #   ports:
+#   #     - "5601:5601"
+#   #   depends_on:
+#   #     - elasticsearch
+
+#   nginx:
+#     image: nginx:alpine
+#     container_name: nginx
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+#       - ./nginx/certs:/etc/nginx/certs:ro
+#     depends_on:
+#       - nodejs
+#     networks:
+#       - otta
+#     restart: unless-stopped
+
+#   nodejs:
+#     build: ./nodejs
+#     container_name: nodejs
+#     env_file:
+#       - ./.env
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#         mysql:
+#             condition: service_healthy
+#     networks:
+#       - otta
+#     restart: unless-stopped
+
+#   mysql:
+#     build: ./mysql
+#     container_name: mysql
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - db_data:/var/lib/mysql
+#     env_file:
+#       - ./.env
+#     networks:
+#       - otta
+#     restart: unless-stopped
+#     healthcheck:
+#         test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+#         interval: 5s
+#         timeout: 5s
+#         retries: 10
+#   front:
+#     build: ./front
+#     container_name: front
+#     env_file:
+#       - ./.env
+#     ports:
+#       - "3001:3001"
+#     volumes:
+#       - ./front:/app
+#       - /app/node_modules
+#       - /app/.next
+#     command: npm run dev
+#     networks:
+#       - otta
+#     restart: unless-stopped
+
+# volumes:
+#   db_data:
+#     name: db_data
+
+# networks:
+#   otta:
+#     driver: bridge
 services:
   nginx:
     image: nginx:alpine
@@ -10,33 +104,46 @@ services:
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - nodejs
+      - front
     networks:
       - otta
     restart: unless-stopped
-    labels:
-      collect_logs: "true"
 
   nodejs:
-    build: ./nodejs
+    image: node:lts-alpine
     container_name: nodejs
+    working_dir: /app
+    command: sh -c "apk add --no-cache openssl && npm install && npx prisma generate && npx prisma db push && npx tsx watch src/server.ts"
     env_file:
       - ./.env
     ports:
       - "3000:3000"
     depends_on:
-        mysql:
-            condition: service_healthy
-        # logstash:
-        #     condition: service_healthy
+      mysql:
+        condition: service_healthy
     networks:
       - otta
     restart: unless-stopped
-    volumes: # only for dev purpose gotta remove later
-      - ./nodejs/src:/app/src
-      - ./nodejs/databases:/app/databases
-      - /app/node_modules
-    labels:
-      collect_logs: "true"
+    volumes:
+      - ./nodejs:/app
+      - nodejs_node_modules:/app/node_modules
+
+  front:
+    image: node:lts-alpine
+    container_name: front
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- -H 0.0.0.0"
+    env_file:
+      - ./.env
+    ports:
+      - "3001:3001"
+    networks:
+      - otta
+    restart: unless-stopped
+    volumes:
+      - ./front:/app
+      - front_node_modules:/app/node_modules
+
   mysql:
     build: ./mysql
     container_name: mysql
@@ -50,44 +157,19 @@ services:
       - otta
     restart: unless-stopped
     healthcheck:
-        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-        interval: 5s
-        timeout: 5s
-        retries: 10
-    labels:
-      collect_logs: "true"
-  front:
-    build: ./front
-    container_name: front
-    env_file:
-      - ./.env
-    ports:
-      - "3001:3001"
-    networks:
-      - otta
-    restart: unless-stopped
-    labels:
-      collect_logs: "true"
-    volumes:
-      - ./front:/app
-      - /app/node_modules  # protège node_modules
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   db_data:
     name: db_data
-  elastic_data:
-    name: elastic_data
+  nodejs_node_modules:
+    name: nodejs_node_modules
+  front_node_modules:
+    name: front_node_modules
 
 networks:
   otta:
     driver: bridge
-  # kibana-setup:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-  #   depends_on:
-  #     - elasticsearch
-  #   networks:
-  #     - otta
-  #   restart: "no"
-  #   entrypoint: ["bash", "-c", "sleep 10 && curl -s -X POST -u elastic:$$ELASTIC_PASSWORD http://elasticsearch:9200/_security/service/elastic/kibana/credential/token/kibana_token"]
-  #   env_file:
-  #     - ./.env

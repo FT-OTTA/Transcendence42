@@ -133,11 +133,13 @@ async function importUsers() {
             update: {
                 username: row['Username'],
                 passwordHash: await bcrypt.hash("prout", 10),
+                moodphrase: row['MoodPhrase'],
             },
             create: {
                 id: parseInt(row['Id']),
                 username: row['Username'],
                 passwordHash: await bcrypt.hash("prout", 10),
+                moodphrase: row['MoodPhrase'],
             }
         })
 
@@ -146,6 +148,8 @@ async function importUsers() {
 }
 
 async function importFriendships() {
+    await prisma.friendship.deleteMany()
+    await prisma.$executeRaw`ALTER TABLE Room AUTO_INCREMENT = 1`;
     const rows = parseCSV('/app/databases/friends/FRIENDS.csv')
 
     for (const row of rows) {
@@ -168,6 +172,7 @@ async function importFriendships() {
 }
 
 async function importRooms() {
+    await prisma.room.deleteMany()
     const rows = parseCSV('/app/databases/rooms/ROOMS_DB.csv')
 
     for (const row of rows) {
@@ -256,7 +261,8 @@ async function main() {
         await importUsers()
         await importFriendships()
         await importMessages()
-        await importRooms()
+        // await importRooms()
+        await prisma.room.deleteMany() // On nettoie les rooms à part car elles sont liées à des données en temps réel (sockets)
         console.log('Import terminé ✅')
     } catch (e) {
         console.error("Erreur d'import :", e)

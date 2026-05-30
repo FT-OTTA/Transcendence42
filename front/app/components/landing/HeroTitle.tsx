@@ -15,6 +15,7 @@ const titleClassTxt = clsx
   nordic.className,
   "translate-x-1.5 md:translate-x-3",
   "translate-y-2 md:translate-y-5",
+  "cursor-default select-none",
   "text-8xl md:text-[12rem] lg:text-[13rem]",
   "text-blue-200 drop-shadow-[0_0_20px_rgba(100,200,255,0.2)]"
 );

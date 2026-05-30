@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
+import { customScrollBar } from "../scrollBar";
+import { useTranslations } from "next-intl";
 
 type FriendStatus = "online" | "offline" | "in room" | "playing";
 
@@ -28,6 +30,9 @@ export default function FriendsPanel() {
     const [friendUsername, setFriendUsername] = useState("");
     const [error, setError] = useState("");
     const [adding, setAdding] = useState(false);
+
+    const l = useTranslations("Lobby");
+    const e = useTranslations("Error");
 
     async function fetchFriends() {
         try {
@@ -67,13 +72,13 @@ export default function FriendsPanel() {
 
         if (!username) 
         {
-            setError("You must be logged in to use this feature.");
+            setError("need_login");
             return;
         }
 
         console.log(username);
         if (!friendUsername.trim()) {
-            setError("Please enter a username");
+            setError("no_username");
             return;
         }
 
@@ -98,7 +103,7 @@ export default function FriendsPanel() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || "Failed to add friend");
+                setError("fail_add");
                 return;
             }
 
@@ -108,7 +113,7 @@ export default function FriendsPanel() {
             setShowAddPopup(false);
 
         } catch {
-            setError("Server error");
+            setError("server_error");
         } finally {
             setAdding(false);
         }
@@ -121,7 +126,7 @@ export default function FriendsPanel() {
     if (loading) {
         return (
             <div className="h-full p-3 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm flex items-center justify-center text-blue-200">
-                Loading friends...
+                {l("loading_friends")}
             </div>
         );
     }
@@ -131,21 +136,21 @@ export default function FriendsPanel() {
             <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm">
 
                 <h2 className="text-xl mb-2 text-center py-2">
-                    Friends
+                    {l("friends")}
                 </h2>
 
                 <button
                     onClick={() => setShowAddPopup(true)}
                     className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
                 >
-                    + Add a friend
+                    + {l("add_friend")}
                 </button>
 
-                <div className="flex flex-col gap-2 flex-1 py-4 overflow-y-auto pr-1">
+                <div className={`${customScrollBar} flex flex-col gap-2 flex-1 py-4 overflow-y-auto pr-1`}>
 
                     {friends.length === 0 && (
                         <p className="text-center text-blue-200/50 text-sm mt-4">
-                            No friends yet
+                            {l("no_friends")}
                         </p>
                     )}
 
@@ -168,18 +173,18 @@ export default function FriendsPanel() {
 
                                 {friend.status === "in room" && (
                                     <button className="text-xs border border-green-300 px-2 py-1 text-green-300 hover:bg-green-300 hover:text-black">
-                                        Join
+                                        {l("join")}
                                     </button>
                                 )}
 
                                 {friend.status === "playing" && (
                                     <button className="text-xs border border-blue-400 px-2 py-1 text-blue-300 hover:bg-blue-300 hover:text-black">
-                                        Spectate
+                                        {l("spectate")}
                                     </button>
                                 )}
 
                                 <button className="text-xs border border-blue-300 px-2 py-1 hover:bg-blue-300 hover:text-black">
-                                    DM
+                                    {l("dm")}
                                 </button>
 
                             </div>
@@ -198,7 +203,7 @@ export default function FriendsPanel() {
                         className="w-full max-w-sm border border-blue-300 bg-black/80 backdrop-blur-sm p-6 rounded-sm flex flex-col gap-4"
                     >
                         <h3 className="text-xl text-center text-blue-100">
-                            Add Friend
+                            {l("add_friend")}
                         </h3>
 
                         <input
@@ -212,14 +217,14 @@ export default function FriendsPanel() {
                                     handleAddFriend();
                                 }
                             }}
-                            placeholder="Username..."
+                            placeholder= {l("username")}
                             className="w-full px-3 py-2 bg-transparent border border-blue-300 text-blue-200 outline-none"
                         />
 
 
                         {error && (
                             <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
-                                {error}
+                                {e(error)}
                             </p>
                         )}
 
@@ -234,7 +239,7 @@ export default function FriendsPanel() {
                                 }
                                 className="flex-1 border border-gray-500 py-2 hover:bg-gray-700 transition"
                             >
-                                Cancel
+                                {l("cancel")}
                             </button>
 
                             <button
@@ -243,8 +248,8 @@ export default function FriendsPanel() {
                                 className="flex-1 border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
                             >
                                 {adding
-                                    ? "Adding..."
-                                    : "Add Friend"}
+                                    ? l("adding")
+                                    : l("add_friend")}
                             </button>
                         </div>
                     </div>

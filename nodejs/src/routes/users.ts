@@ -36,4 +36,41 @@ router.get('/:username', async (req, res) => {
     return res.json(user);
 });
 
+router.patch('/:login', async (req, res) => {
+	try {
+		const { login } = req.params;
+		const { moodphrase } = req.body;
+
+		if (!moodphrase)
+        {
+			return res.status(400).json({ error: "moodPhrase is required" });
+		}
+
+        console.log("LEN = ", moodphrase.length)
+
+        if (moodphrase.length > 100)
+        {
+            return res.status(413).json({ error: "moodPhrase too long"});
+        }
+
+		const updatedUser = await prisma.user.update({
+			where: {
+				username: login,
+			},
+			data: {
+				moodphrase: moodphrase,
+			},
+		});
+
+		return res.json(updatedUser);
+
+	} catch (error) {
+		console.error(error);
+
+		return res.status(500).json({
+			error: "Error while updating moodPhrase" + error,
+		});
+	}
+});
+
 export default router

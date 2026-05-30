@@ -368,7 +368,9 @@ function pushSelectedTarget(target: Card | Hero) {
       : currentEffectIndex;
 
     getTargets(nextEffectIndex, selectedCard);
-}   const locale = useLocale();
+}
+
+const locale = useLocale();
     if (!hydrated) return (
         <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
     )
@@ -538,7 +540,8 @@ function pushSelectedTarget(target: Card | Hero) {
                         onHeroClick={(type: "self" | "opponent") => {
                             const index = type === "opponent" ? 1 - myPlayerIndexRef.current! : myPlayerIndexRef.current!;
                             const hero = game?.players[index];
-                            if (hero) pushSelectedTarget(hero);
+                            if (hero)
+                                pushSelectedTarget(hero);
                             setShowStats(false);
                         }}
                         onConcede={handleConcede}

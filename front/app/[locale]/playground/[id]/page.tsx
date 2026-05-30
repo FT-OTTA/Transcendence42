@@ -47,6 +47,7 @@ export default function PlaygroundPage() {
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [game, setGame] = useState<any>(null);
+  const [waitingEndTurn, setWaitingEndTurn] = useState(false);
   const [cards, setCards] = useState<Card[]>([]);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [selectedTargets, setSelectedTargets] = useState<Array<{ target: Card | Hero; effectIndex: number }>>([]);
@@ -175,6 +176,7 @@ export default function PlaygroundPage() {
         setPlayerSlots(battlefieldToSlots(me.battlefield));
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
         setIsLoading(false)  
+        setWaitingEndTurn(false);
     });
 
     return () => { newSocket.disconnect(); };
@@ -273,6 +275,7 @@ function getNextEffectIndex(card: Card, targets: Array<{ target: Card | Hero; ef
 
 function handleEndTurn() {
     if (!socketRef.current) return;
+    setWaitingEndTurn(true);
     socketRef.current.emit('end_turn');
   }
 
@@ -428,9 +431,10 @@ function pushSelectedTarget(target: Card | Hero) {
                     />
                     <button
                     onClick={handleEndTurn}
+                    disabled={waitingEndTurn}
                     className="border border-blue-300 py-2 px-3 text-sm hover:bg-blue-300 hover:text-black transition"
                     >
-                    End Turn
+                    {waitingEndTurn ? "Waiting For Opponent..." : "End Turn"}
                     </button>
                     <div className="flex flex-1 items-center justify-center gap-4 p-4">
                     <LargeCardView
@@ -483,9 +487,10 @@ function pushSelectedTarget(target: Card | Hero) {
                     <span className="text-yellow-400 font-semibold text-sm">⬡ {runes} runes</span>
                     <button
                     onClick={handleEndTurn}
+                    disabled={waitingEndTurn}
                     className="border border-blue-300 px-4 py-1 text-sm text-blue-200 hover:bg-blue-300 hover:text-black transition"
                     >
-                    End Turn
+                    {waitingEndTurn ? "Waiting For Opponent..." : "End Turn"}
                     </button>
                     <button
                     onClick={() => setShowStats(true)}

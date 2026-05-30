@@ -30,13 +30,9 @@ const messages = await getMessages(); // apres
 console.log("messages reçus:", Object.keys(messages));
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body>
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
         </NextIntlClientProvider>
-      </body>
-    </html>
   );
 }
 

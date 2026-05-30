@@ -22,7 +22,7 @@ export default function PlayerHand({ cards, onClick, onConfirm }: PlayerHandProp
       <div className="overflow-x-auto">
         <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
           {realCards.map((card, index) => (
-            <div key={card.idInGame} className="w-20 flex-shrink-0">
+            <div key={index} className="w-20 flex-shrink-0">
               <CardSlot
                 id={`hand-${index}`}
                 isHand={true}

@@ -7,6 +7,7 @@ import { customScrollBar } from "../scrollBar";
 import { useTranslations } from "next-intl";
 import { socket } from "@/lib/socket";
 import { useLocale } from 'next-intl';
+import clsx from 'clsx';
 
 type Room = {
     id: number;
@@ -84,12 +85,16 @@ export default function RoomPanel() {
     async function joinRoom(roomId: number) {
         const username = await requireAuth();
         if (!username) { showError("need_login"); return; }
+        const room = roomDetails.find(r => r.id === roomId);
+        if (room?.p1 === username) { showError("cant_join_own_room"); return; }
         socket.emit("join_room", { roomId, username }, (room: any) => {
             router.push(`/${locale}/playground/${room.id}`);
         });
     }
 
-    const myRoom = roomDetails.find((r: Room) => r.p1 === me && r.p2 === null);
+    const myRoom = roomDetails.find((r: Room) => r.p1 === me || r.p2 === me);
+    const isMyRoom = (room: Room) => room.p1 === me || room.p2 === me;
+    const isFull = (room: Room) => room.p2 !== null;
 
     return (
         <div className="h-full min-h-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
@@ -102,27 +107,51 @@ export default function RoomPanel() {
                 </p>
             )}
 
-            <div className={`${customScrollBar} flex flex-col flex-1 min-h-0 overflow-y-auto mb-4`}>
+            <div className={clsx(customScrollBar, "flex flex-col flex-1 min-h-0 overflow-y-auto mb-4")}>
                 {roomDetails.map((room) => (
-                    <div key={room.id} className="grid grid-cols-4 gap-2 items-center border border-blue-300/40 p-2">
-                        <div>#{room.id}</div>
-                        <div>{room.p1}</div>
-                        <div>
-                            {room.p2 ?? (
-                                room.p1 === me ? (
-                                    <span className="text-gray-400 text-sm">waiting...</span>
-                                ) : (
-                                    <button onClick={() => joinRoom(room.id)} className="text-green-300 hover:text-green-100">
-                                        {l("join")}
-                                    </button>
-                                )
+                    <div
+                        key={room.id}
+                        className={clsx(
+                            "grid grid-cols-4 gap-2 items-center border p-2 transition",
+                            isMyRoom(room)
+                                ? "border-amber-300/60 bg-amber-500/5"
+                                : "border-blue-300/40"
+                        )}
+                    >
+                        <div className={clsx("text-sm", isMyRoom(room) && "text-amber-300")}>
+                            #{room.id}
+                        </div>
+
+                        <div className="text-sm">{room.p1}</div>
+
+                        <div className="text-sm">
+                            {room.p2 ? (
+                                <span className="text-blue-200/60">{room.p2}</span>
+                            ) : isMyRoom(room) ? (
+                                <span className="text-gray-400 text-sm">waiting...</span>
+                            ) : (
+                                <button
+                                    onClick={() => joinRoom(room.id)}
+                                    className="text-green-300 hover:text-green-100 transition"
+                                >
+                                    {l("join")}
+                                </button>
                             )}
                         </div>
-                        <div>
-                            {room.p2 && room.p1 !== me ? (
+
+                        <div className="text-sm">
+                            {isMyRoom(room) ? (
+                                <button
+                                    onClick={() => router.push(`/${locale}/playground/${room.id}`)}
+                                    className="text-amber-300 hover:text-amber-100 transition"
+                                >
+                                    ▶ {l("rejoin")}
+                                </button>
+                            ) : isFull(room) ? (
                                 <button
                                     onClick={() => router.push(`/${locale}/playground/${room.id}?spectate=true`)}
-                                    className="text-blue-300 hover:text-blue-100">
+                                    className="text-blue-300 hover:text-blue-100 transition"
+                                >
                                     👁 {l("spectate")}
                                 </button>
                             ) : null}
@@ -131,21 +160,20 @@ export default function RoomPanel() {
                 ))}
             </div>
 
-            {myRoom ? (
-                <button
-                    className="border border-amber-300 py-2 hover:bg-amber-300 hover:text-black transition"
-                    onClick={() => router.push(`/${locale}/playground/${myRoom.id}`)}
-                >
-                    ▶ {l("rejoin")}
-                </button>
-            ) : (
-                <button
-                    className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
-                    onClick={createRoom}
-                >
-                    + {l("create_room")}
-                </button>
-            )}
+            <button
+                className={clsx(
+                    "border py-2 transition",
+                    myRoom
+                        ? "border-amber-300 hover:bg-amber-300 hover:text-black"
+                        : "border-blue-300 hover:bg-blue-300 hover:text-black"
+                )}
+                onClick={myRoom
+                    ? () => router.push(`/${locale}/playground/${myRoom.id}`)
+                    : createRoom
+                }
+            >
+                {myRoom ? `▶ ${l("rejoin")}` : `+ ${l("create_room")}`}
+            </button>
         </div>
     );
 }

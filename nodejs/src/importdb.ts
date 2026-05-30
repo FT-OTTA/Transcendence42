@@ -261,7 +261,8 @@ async function main() {
         await importUsers()
         await importFriendships()
         await importMessages()
-        await importRooms()
+        // await importRooms()
+        await prisma.room.deleteMany() // On nettoie les rooms à part car elles sont liées à des données en temps réel (sockets)
         console.log('Import terminé ✅')
     } catch (e) {
         console.error("Erreur d'import :", e)

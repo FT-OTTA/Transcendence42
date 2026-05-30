@@ -21,10 +21,9 @@ async function emitGameOver(session: GameSession) {
         turns: session.game.turnNumber
         }
     })
-
 }
 
-export function resolveRound(session: GameSession): void {
+export async function resolveRound(session: GameSession): Promise<void> {
     console.log('Résolution du tour', session.game.turnNumber)
     if (session.timer === null)
         session.sockets.forEach(s => s.emit('timeout', {}))
@@ -45,25 +44,23 @@ export function resolveRound(session: GameSession): void {
     session.readyPlayers.clear()
 
     if (checkBoardState(session.game) === "game_over") {
-        emitGameOver(session)
+        await emitGameOver(session)
         return;
     }
 
     resolveCombat(session.game)
 
     if (checkBoardState(session.game) === "game_over") {
-        emitGameOver(session)
+        await emitGameOver(session)
         return;
     }
 
     session.game.turnNumber += 1
 
-    if (session.game.turnNumber > 8) {
+    if (session.game.turnNumber > 1) {
         const winner = checkVictory(session.game)
-        const winnerIndex = winner ? session.game.players.indexOf(winner) : -1
-        session.sockets.forEach((s, id) => {
-            s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
-        })
+        session.game.winner = winner ?? undefined
+        await emitGameOver(session)
     } else {
         startTurn(session.game)
         checkBoardState(session.game);

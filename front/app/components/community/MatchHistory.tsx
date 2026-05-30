@@ -1,30 +1,9 @@
+"use client";
+
 import clsx from "clsx";
 import MatchCard from "./MatchCard";
 import { customScrollBar } from "../scrollBar";
-
-// placeholder datas
-const matches = [
-	{ opponent: "Kaiba", score: "2 - 1", result: "win"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "5 - 5", result: "draw"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-	{ opponent: "Tonio", score: "0 - 3", result: "loss"},
-]
+import { useEffect, useState } from "react";
 
 const matchBox = clsx
 (
@@ -32,8 +11,14 @@ const matchBox = clsx
 	"gap-1 max-h-[500px]"
 )
 
-export default function MatchHistory()
-{
+export default function MatchHistory({ username }: { username: string }) {
+	const [matches, setMatches] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetch(`http://localhost:3000/users/history/${username}`)
+            .then(r => r.json())
+            .then(setMatches);
+    }, [username]);
 
 	const lastMatches = matches.slice(-20);
 

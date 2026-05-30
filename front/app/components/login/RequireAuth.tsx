@@ -16,7 +16,7 @@ export async function requireAuth(): Promise<string | null> {
     try {
         console.log("SILLY BILLY USERNAME:", username);
         const res = await fetch(
-            `http://localhost:3000/users/${username}`
+            `/api/users/${username}`
         );
 
         if (!res.ok)

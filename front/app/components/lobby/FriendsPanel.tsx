@@ -46,7 +46,7 @@ export default function FriendsPanel() {
             }
 
             const res = await fetch(
-                `http://localhost:3000/friends/${username}`
+                `/api/friends/${username}`
             );
 
             const data = await res.json();
@@ -87,7 +87,7 @@ export default function FriendsPanel() {
             setError("");
 
             const res = await fetch(
-                "http://localhost:3000/friends/add",
+                "/api/friends/add",
                 {
                     method: "POST",
                     headers: {

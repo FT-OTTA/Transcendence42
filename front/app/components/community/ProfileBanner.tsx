@@ -55,7 +55,7 @@ export default function ProfileBanner({username, mood, isOnline, avatarUrl}: Pro
 		const formData = new FormData();
 		formData.append("avatar", file);
 
-		await fetch(`http://localhost:3000/users/${username}/avatar`,
+		await fetch(`/api/${username}/avatar`,
 		{
 			method: "POST",
 			body: formData,

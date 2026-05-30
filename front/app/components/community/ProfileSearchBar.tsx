@@ -45,7 +45,7 @@ export default function ProfileSearchBar()
 		setError("");
 
 		const res = await fetch(
-			`http://localhost:3000/users/${search}`
+			`/api/users/${search}`
 		);
 
 		if (!res.ok)

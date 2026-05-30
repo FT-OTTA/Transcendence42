@@ -25,7 +25,7 @@ export default function ProfileMood({ initialMood, username }: Props)
 	}, [username]);
 	
 	async function saveMood(newMood: string) {
-	const res =	await fetch(`http://localhost:3000/users/${username}`, {
+	const res =	await fetch(`/api/users/${username}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",

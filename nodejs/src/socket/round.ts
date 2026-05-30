@@ -10,9 +10,6 @@ import { prisma } from '../../prisma/prisma.ts'
 
 async function emitGameOver(session: GameSession) {
     const winnerIndex = session.game.winner ? session.game.players.indexOf(session.game.winner) : -1
-    session.sockets.forEach((s, id) => {
-        s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
-    })
     await prisma.room.delete({ where: { id: session.roomId } })
     await prisma.gameResult.create({
     data: {
@@ -20,6 +17,9 @@ async function emitGameOver(session: GameSession) {
         loserId: winnerIndex !== -1 ? session.game.players[1 - winnerIndex].userId : undefined,
         turns: session.game.turnNumber
         }
+    })
+    session.sockets.forEach((s, id) => {
+        s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
     })
 
 }
@@ -58,12 +58,10 @@ export function resolveRound(session: GameSession): void {
 
     session.game.turnNumber += 1
 
-    if (session.game.turnNumber > 8) {
+    if (session.game.turnNumber > 1) {
         const winner = checkVictory(session.game)
         const winnerIndex = winner ? session.game.players.indexOf(winner) : -1
-        session.sockets.forEach((s, id) => {
-            s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
-        })
+        emitGameOver(session)
     } else {
         startTurn(session.game)
         checkBoardState(session.game);

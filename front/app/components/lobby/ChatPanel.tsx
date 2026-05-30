@@ -46,7 +46,7 @@ export default function ChatPanel() {
 
     async function fetchMessages() {
         const username = localStorage.getItem("username");
-        const res = await fetch("http://localhost:3000/messages/global");
+        const res = await fetch("/api/messages/global");
 
         if (!res.ok) {
             const err = await res.json();

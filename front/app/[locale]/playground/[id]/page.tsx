@@ -78,7 +78,7 @@ export default function PlaygroundPage() {
   useEffect(() => {
     if (!isSpectator && !selectedHero) return;
 
-    const newSocket = io('http://localhost:3000');
+    const newSocket = io();
     socketRef.current = newSocket;
     setSocket(newSocket);
 

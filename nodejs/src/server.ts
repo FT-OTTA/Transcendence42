@@ -19,7 +19,7 @@ const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, { 
     cors: {
-        origin: "http://localhost:3001",
+        origin: "/",
         credentials: true,
         methods: ["GET", "POST"],        
     }, 
@@ -30,22 +30,22 @@ const io = new Server(httpServer, {
 console.log('Prisma Engine prêt ✅')
 
 app.use(cors({
-    origin: "http://localhost:3001",
+    origin: "/",
     credentials: true,
 }));
 
 app.use(express.json());
 app.use(fileUpload());
-app.use('/avatars', express.static('/app/databases/users/avatars'));
-app.use('/cards', cardsRouter);
-app.use('/heroes', heroesRouter);
-app.use('/auth', authRouter);
-app.use('/users', usersRouter);
-app.use('/friends', friendRouter);
-app.use('/rooms', roomRouter);
-app.use('/messages', messageRouter);
-app.use('/users', avatarRouter);
-app.get('/', (req, res) => {
+app.use('/api/avatars', express.static('/app/databases/users/avatars'));
+app.use('/api/cards', cardsRouter);
+app.use('/api/heroes', heroesRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/friends', friendRouter);
+app.use('/api/rooms', roomRouter);
+app.use('/api/messages', messageRouter);
+app.use('/api/users', avatarRouter);
+app.get('/api', (req, res) => {
     res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')
 })
 app.use((req, res, next) => {

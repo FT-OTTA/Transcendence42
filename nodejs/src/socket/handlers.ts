@@ -168,6 +168,9 @@ export function onConnection(io: Server, socket: Socket): void {
         })
         await prisma.room.delete({ where: { id: session.roomId } })
         sessions.splice(sessions.indexOf(session), 1)
+
+        io.emit('room_deleted', { roomId: session.roomId })
+
     })
     socket.on('disconnect', () => {
         console.log('Joueur déconnecté :', socket.id)

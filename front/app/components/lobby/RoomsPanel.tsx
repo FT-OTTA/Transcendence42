@@ -59,13 +59,18 @@ export default function RoomPanel() {
         };
 
         const handleRoomError = (err: any) => showError(err.message);
+        const handleRoomDeleted = ({ roomId }: { roomId: number }) => {
+            setRoomDetails(prev => prev.filter(r => r.id !== roomId));
+        };
 
         socket.on("room_updated", handleRoomUpdated);
         socket.on("room_error", handleRoomError);
+        socket.on("room_deleted", handleRoomDeleted);
 
         return () => {
             socket.off("room_updated", handleRoomUpdated);
             socket.off("room_error", handleRoomError);
+            socket.off("room_deleted", handleRoomDeleted);
         };
     }, []);
 

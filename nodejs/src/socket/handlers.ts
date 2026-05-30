@@ -205,7 +205,7 @@ export function onConnection(io: Server, socket: Socket): void {
         }
     });
 
-    socket.on('create_room', async (data) => {
+    socket.on('create_room', async (data, callback) => {
         try {
             const { username } = data;
             if ( !username )
@@ -230,6 +230,7 @@ export function onConnection(io: Server, socket: Socket): void {
                 }
             });
             io.emit('room_updated', room);
+            callback(room);
         }
         catch (error)
         {
@@ -240,7 +241,7 @@ export function onConnection(io: Server, socket: Socket): void {
         }
     });
 
-    socket.on('join_room', async (data) => {
+    socket.on('join_room', async (data, callback) => {
         try{
             const { roomId, username } = data;
             if (!roomId || !username)
@@ -277,6 +278,7 @@ export function onConnection(io: Server, socket: Socket): void {
                     }
                 });
             io.emit('room_updated', updateRoom);
+            callback(room);
         }
         catch (error)
         {

@@ -5,7 +5,6 @@ import { initSocket } from './socket/index.ts'
 import { prisma } from '../prisma/prisma.ts'
 import cors from 'cors'
 import fileUpload from 'express-fileupload'
-
 import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
 import authRouter from './routes/auth.ts'

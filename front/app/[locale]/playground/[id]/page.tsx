@@ -15,6 +15,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import LargeCardView from '@/app/components/playground/LargeCardView';
 import { Hero } from 'otta-shared-types/hero';
 import { usePathname } from 'next/navigation'
+import { useLocale } from 'next-intl';
 
 
 export default function PlaygroundPage() {
@@ -65,7 +66,6 @@ export default function PlaygroundPage() {
   const [currentEffectIndex, setCurrentEffectIndex] = useState<number>(0);
   const [gameOverMessage, setGameOverMessage] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(false);
-
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -365,7 +365,7 @@ function pushSelectedTarget(target: Card | Hero) {
       : currentEffectIndex;
 
     getTargets(nextEffectIndex, selectedCard);
-}
+}   const locale = useLocale();
     if (!hydrated) return (
         <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
     )
@@ -379,7 +379,7 @@ function pushSelectedTarget(target: Card | Hero) {
             {isLoading ? (
             <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
             ) : isSpectator ? (
-            <SpectatorBoard players={game?.players ?? []} />
+            <SpectatorBoard players={game?.players ?? []} turnNumber={game?.turnNumber ?? 0} />
             ) : (
             <>
                 {/* ── DESKTOP ── */}
@@ -407,6 +407,7 @@ function pushSelectedTarget(target: Card | Hero) {
                         setSelectedCard(card);
                         if (card.type === "spell") getTargets(0, card);
                     }}
+                    onConfirm={handleConfirmSpell}
                     />
                 </div>
                 <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
@@ -467,6 +468,7 @@ function pushSelectedTarget(target: Card | Hero) {
                 />
                 <PlayerHand
                     cards={playerHandCards}
+                    onConfirm={handleConfirmSpell}
                     onClick={(card) => {
                     if (!card) return;
                     abortPlay();
@@ -475,15 +477,8 @@ function pushSelectedTarget(target: Card | Hero) {
                     }}
                 />
                 
-                {/* Bouton stats flottant */}
-                <button
-                    onClick={() => setShowStats(true)}
-                    className="fixed bottom-4 right-4 bg-blue-900/80 border border-blue-400 rounded-full w-12 h-12 flex items-center justify-center z-40 text-lg"
-                >
-                    ⚔️
-                </button>
                 {/* Bandeau bas mobile — pas de carte sélectionnée */}
-                {!selectedCard && (
+                {
                 <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 border-t border-blue-400/40 px-4 py-2 flex items-center justify-between">
                     <span className="text-yellow-400 font-semibold text-sm">⬡ {runes} runes</span>
                     <button
@@ -499,7 +494,7 @@ function pushSelectedTarget(target: Card | Hero) {
                     ⚔️
                     </button>
                 </div>
-                )}
+                }
                 {/* LargeCardView en overlay si une carte est sélectionnée */}
                 {selectedCard && (
                     <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2">
@@ -557,7 +552,7 @@ function pushSelectedTarget(target: Card | Hero) {
             <div className="border border-blue-300 bg-black/90 p-8 flex flex-col items-center gap-6 rounded-sm">
             <p className="text-2xl text-blue-200">{gameOverMessage}</p>
             <button
-                onClick={() => window.location.href = '/lobby'}
+                onClick={() => window.location.href = `/${locale}/lobby`}
                 className="border border-blue-300 px-6 py-2 hover:bg-blue-300 hover:text-black transition"
             >
                 Retour au lobby

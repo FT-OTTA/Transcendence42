@@ -8,19 +8,28 @@ import { checkBoardState, checkVictory } from '../engine/checks.ts'
 import { getPlayerPerspective } from './perspective.ts'
 import { prisma } from '../../prisma/prisma.ts'
 
-async function emitGameOver(session: GameSession) {
+export async function emitGameOver(session: GameSession) {
     const winnerIndex = session.game.winner ? session.game.players.indexOf(session.game.winner) : -1
     session.sockets.forEach((s, id) => {
         s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
     })
     await prisma.room.delete({ where: { id: session.roomId } })
-    await prisma.gameResult.create({
-    data: {
-        winnerId: winnerIndex !== -1 ? session.game.players[winnerIndex].userId : undefined,
-        loserId: winnerIndex !== -1 ? session.game.players[1 - winnerIndex].userId : undefined,
-        turns: session.game.turnNumber
-        }
-    })
+    try {
+        await prisma.gameResult.create({
+        data: {
+            winnerId: winnerIndex !== -1 ? session.game.players[winnerIndex].userId : null,
+            loserId: winnerIndex !== -1 ? session.game.players[1 - winnerIndex].userId : null,
+            player1Id: session.game.players[0].userId,
+            player2Id: session.game.players[1].userId,
+            turns: session.game.turnNumber
+            }
+        })
+    } catch (error) {
+        console.error('Error saving game result:', error)
+    }
+    console.log('emitGameOver winnerIndex:', winnerIndex)
+    console.log('players:', session.game.players.map(p => p.userId))
+
 }
 
 export async function resolveRound(session: GameSession): Promise<void> {

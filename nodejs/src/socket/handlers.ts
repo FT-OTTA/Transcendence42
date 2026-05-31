@@ -1,14 +1,13 @@
 import { Server, Socket } from 'socket.io'
 import type { BfZone } from '../types/zones.ts'
 import type { Card } from '../types/card.ts'
-import type { Hero } from '../types/hero.ts'
 import type { GameSession } from '../types/gamesession.ts'
 import { instantiateGame } from './gameFactory.ts'
 import { launchGame, resolveRound } from './round.ts'
 import { getPlayerPerspective, getSpectatorPerspective } from './perspective.ts'
 import { waitingPlayers, sessions, clearWaitingPlayers, addSession, findSession, findSessionByRoomId, addSpectator, removeSpectator } from './state.ts'
 import { playCard } from '../engine/playCard.ts'
-import { findById } from '../engine/utils.ts'
+import { emitGameOver } from './round.ts'
 import { prisma } from '../../prisma/prisma.ts'
 import jwt from 'jsonwebtoken'
 const JWT_SECRET = process.env.JWT_SECRET ?? 'changeme'
@@ -143,31 +142,7 @@ export function onConnection(io: Server, socket: Socket): void {
 
         session.game.status = 'game_over'
         session.game.winner = session.game.players[winnerIndex]
-        
-        session.sockets.forEach((s, id) => {
-            if (id === playerIndex) {
-                s.emit('game_over', { winner: winnerIndex, message: 'Vous avez concédé.' })
-            } else {
-                s.emit('game_over', { winner: winnerIndex, message: 'Votre adversaire a concédé. Vous gagnez !' })
-            }
-        })
-        session.spectators.forEach(s => {
-            s.emit('game_over', { 
-                winner: winnerIndex, 
-                message: `${session.game.players[playerIndex].username} a concédé.` 
-            })
-        })
-        
-        // Nettoie la session
-        await prisma.gameResult.create({
-        data: {
-            winnerId: session.game.players[winnerIndex].userId,
-            loserId: session.game.players[1 - winnerIndex].userId,
-            turns: session.game.turnNumber
-            }
-        })
-        await prisma.room.delete({ where: { id: session.roomId } })
-        sessions.splice(sessions.indexOf(session), 1)
+        await emitGameOver(session)
     })
     socket.on('disconnect', () => {
         console.log('Joueur déconnecté :', socket.id)

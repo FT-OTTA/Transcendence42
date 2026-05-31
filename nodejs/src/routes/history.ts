@@ -12,7 +12,13 @@ router.get('/history/:username', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const results = await prisma.gameResult.findMany({
-        where: { OR: [{ winnerId: user.id }, { loserId: user.id }] },
+        where: {
+            OR: [
+                { winnerId: user.id },
+                { loserId: user.id },
+                { winnerId: null, loserId: null } // ← draws
+            ]
+        },
         include: { winner: true, loser: true },
         orderBy: { createdAt: 'desc' },
         take: 20,
@@ -21,8 +27,11 @@ router.get('/history/:username', async (req, res) => {
     const formatted = results.map((r: any) => {
         const isWin = r.winnerId === user.id;
         const isDraw = r.winnerId === null;
+            const opponent = isDraw
+        ? (r.player1Id === user.id ? r.player2?.username : r.player1?.username)
+        : (isWin ? r.loser?.username : r.winner?.username);
         return {
-            opponent: isDraw ? '?' : (isWin ? r.loser?.username : r.winner?.username),
+            opponent,
             result: isDraw ? 'draw' : (isWin ? 'win' : 'loss'),
             turns: r.turns,
         };

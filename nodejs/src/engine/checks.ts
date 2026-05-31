@@ -34,6 +34,9 @@ export function checkBoardState(game: Game): "continue" | "game_over" {
         for (const player of game.players) {
             const card = player.battlefield[zone];
 
+            if (card && card.type === "creature" && card.currForce < 0) {
+                card.currForce = 0;
+            }
             if (card && card.currEndurance <= 0) {
                 card.zone = "graveyard";
                 player.battlefield[zone] = undefined;

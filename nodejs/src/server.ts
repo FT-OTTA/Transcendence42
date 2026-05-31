@@ -20,7 +20,7 @@ const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:3001",
+        origin: '*',
         credentials: true,
         methods: ["GET", "POST"],
     },
@@ -29,11 +29,12 @@ const io = new Server(httpServer, {
 console.log('Prisma Engine prêt ✅')
 
 app.use(cors({
-    origin: "http://localhost:3001",
-    credentials: true,
-}))
-app.use(express.json())
-app.use(fileUpload())
+    origin: "*"
+}));
+
+app.use(express.json());
+app.use(fileUpload());
+
 
 // ─── Middleware métriques (avant toutes les routes) ───────────────
 app.use((req, res, next) => {
@@ -60,15 +61,12 @@ app.use('/messages', messageRouter)
 app.use('/users', avatarRouter)
 
 // ─── Endpoint Prometheus ──────────────────────────────────────────
+
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', register.contentType)
     res.end(await register.metrics())
 })
 // ─────────────────────────────────────────────────────────────────
-
-app.get('/', (req, res) => {
-    res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')
-})
 
 app.use((req, res, next) => {
     console.log("REQ:", req.url)

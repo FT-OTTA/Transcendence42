@@ -11,7 +11,7 @@ npm install socket.io-client
 ```js
 import { io } from 'socket.io-client'
 
-const socket = io('https://localhost', {
+const socket = io({
     rejectUnauthorized: false // ignore le certificat auto-signé en local
 })
 

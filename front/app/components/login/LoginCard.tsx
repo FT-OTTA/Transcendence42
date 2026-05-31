@@ -53,8 +53,8 @@ export default function LoginCard()
           setLoading(true);
 
           const endpoint = isRegisterMode
-            ? "http://localhost:3000/auth/register"
-            : "http://localhost:3000/auth/login";
+            ? "/auth/register"
+            : "/auth/login";
 
           const response = await fetch(endpoint, {
             method: "POST",

@@ -1,6 +1,6 @@
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-    const socket = io('https://localhost', { rejectUnauthorized: false });
+    const socket = io({ rejectUnauthorized: false });
 
     socket.on('connect', () => {
         console.log('Connecté :', socket.id);

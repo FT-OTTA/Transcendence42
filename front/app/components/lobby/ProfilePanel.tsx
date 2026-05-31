@@ -18,7 +18,7 @@ export default function ProfilePanel() {
             const user = await requireAuth();
             setUsername(user ?? "Placeholder");
             if (!user) return;
-            const res = await fetch(`http://localhost:3000/users/history/${user}`);
+            const res = await fetch(`/users/history/${user}`);
             const data = await res.json();
             setMatches(Array.isArray(data) ? data : []);
             

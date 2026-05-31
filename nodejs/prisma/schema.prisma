@@ -53,6 +53,8 @@ model User {
 
   gamesWon  GameResult[] @relation("GameWinner")
   gamesLost GameResult[] @relation("GameLoser")
+  gamesAsP1   GameResult[] @relation("GamePlayer1")
+  gamesAsP2   GameResult[] @relation("GamePlayer2")
 
 }
 
@@ -60,12 +62,18 @@ model GameResult {
     id        Int      @id @default(autoincrement())
     createdAt DateTime @default(now())
 
-    winnerId  Int
-    loserId   Int
+    winnerId  Int?
+    loserId   Int?
+    player1Id Int
+    player2Id Int
+
     turns     Int
 
-    winner    User @relation("GameWinner", fields: [winnerId], references: [id])
-    loser     User @relation("GameLoser", fields: [loserId], references: [id])
+    winner    User? @relation("GameWinner", fields: [winnerId], references: [id])
+    loser     User? @relation("GameLoser", fields: [loserId], references: [id])
+    player1   User  @relation("GamePlayer1", fields: [player1Id], references: [id])
+    player2   User  @relation("GamePlayer2", fields: [player2Id], references: [id])
+
 }
 
 model Friendship {

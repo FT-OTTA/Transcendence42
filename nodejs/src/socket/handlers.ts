@@ -42,8 +42,10 @@ export function onConnection(io: Server, socket: Socket): void {
             }
         }
 
-
-        waitingPlayers.push({ socket, playerData: { ...data, userId } })
+        const alreadyWaiting = waitingPlayers.some(p => p.playerData.username === data.username);
+        if (!alreadyWaiting) {
+            waitingPlayers.push({ socket, playerData: { ...data, userId } });
+        }
 
         if (waitingPlayers.length === 2) {
             const players = [...waitingPlayers]
@@ -233,6 +235,11 @@ export function onConnection(io: Server, socket: Socket): void {
             });
             if (!room)
                 return;
+            if (room.player1Id === user.id)
+            {
+                callback(room);
+                return;
+            }
             if (room.player2Id) {
                 socket.emit('room_error', {
                     message: 'Room is full'

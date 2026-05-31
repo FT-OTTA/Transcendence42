@@ -16,27 +16,27 @@ router.get('/history/:username', async (req, res) => {
             OR: [
                 { winnerId: user.id },
                 { loserId: user.id },
-                { winnerId: null, loserId: null } // ← draws
+                { player1Id: user.id },
+                { player2Id: user.id },
             ]
         },
-        include: { winner: true, loser: true },
+        include: { winner: true, loser: true, player1: true, player2: true },
         orderBy: { createdAt: 'desc' },
         take: 20,
     });
 
     const formatted = results.map((r: any) => {
-        const isWin = r.winnerId === user.id;
         const isDraw = r.winnerId === null;
-            const opponent = isDraw
-        ? (r.player1Id === user.id ? r.player2?.username : r.player1?.username)
-        : (isWin ? r.loser?.username : r.winner?.username);
+        const isWin = r.winnerId === user.id;
+        const opponent = isDraw
+            ? (r.player1Id === user.id ? r.player2?.username : r.player1?.username)
+            : (isWin ? r.loser?.username : r.winner?.username);
         return {
             opponent,
             result: isDraw ? 'draw' : (isWin ? 'win' : 'loss'),
             turns: r.turns,
         };
     });
-
     res.json(formatted);
 });
 

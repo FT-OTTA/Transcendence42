@@ -7,20 +7,25 @@ import { useTranslations } from "next-intl";
 export default function ProfilePanel() {
 
     const [username, setUsername] = useState("Placeholder");
+    const [matches, setMatches] = useState<any[]>([]);
     const l = useTranslations("Lobby");
 
     useEffect(() => {
-
-        async function namer()
-        {
+        async function init() {
             const user = await requireAuth();
-            console.log("USER IS: ", user);
-            setUsername( user ?? "Placeholder");
+            setUsername(user ?? "Placeholder");
+            
+            if (!user) return;
+            const res = await fetch(`http://localhost:3000/users/history/${user}`);
+            const data = await res.json();
+            setMatches(Array.isArray(data) ? data : []);
         }
-
-        namer();
+        init();
     }, []);
 
+    const winsNumber = matches.filter(m => m.result === 'win').length;
+    const lossesNumber = matches.filter(m => m.result === 'loss').length;
+    const drawsNumber = matches.filter(m => m.result === 'draw').length;
 
     return (
         <div className="h-half border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm h-1/3 flex flex-col p-4">
@@ -49,7 +54,7 @@ export default function ProfilePanel() {
                         Favorite class: Mage
                     </p>
                     <p className="text-sm text-blue-200/60">
-                        17W - 42L
+                        {winsNumber}W - {lossesNumber}L - {drawsNumber}D
                     </p>
                     <p className="text-xs italic text-blue-200/40 mt-1">
                         Deep message cuz cool guy

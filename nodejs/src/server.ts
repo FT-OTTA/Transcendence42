@@ -21,6 +21,7 @@ const httpServer = createServer(app)
 const io = new Server(httpServer, {
     cors: {
         origin: '*',
+        origin: '*',
         credentials: true,
         methods: ["GET", "POST"],
     },
@@ -29,6 +30,7 @@ const io = new Server(httpServer, {
 console.log('Prisma Engine prêt ✅')
 
 app.use(cors({
+    origin: "*"
     origin: "*"
 }));
 

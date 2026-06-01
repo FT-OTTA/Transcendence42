@@ -113,12 +113,12 @@ export default function ChatPanel() {
     }, []);
 
     return (
-        <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm h-2/3">
+        <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm">
             <h2 className="text-xl mb-2 text-center py-2">{l("chat")}</h2>
 
             <div 
                 ref={scrollRef}
-                className={`${customScrollBar} flex flex-col gap-2 flex-1 py-6 overflow-y-auto pr-1 px-2`}>
+                className={`${customScrollBar} flex flex-col gap-2 flex-1 py-6 pr-1 px-2`}>
                 {chatMessages.map((msg) => (
                     <div
                         key={msg.id}

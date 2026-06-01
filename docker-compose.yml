@@ -1,4 +1,28 @@
 services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - otta
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - otta
+    restart: unless-stopped
+
 #   elasticsearch:
 #     image: elasticsearch:8.11.0
 #     environment:
@@ -88,6 +112,8 @@ services:
 volumes:
   db_data:
     name: db_data
+  grafana_data:
+
 
 networks:
   otta:

@@ -14,48 +14,74 @@ import roomRouter from './routes/rooms.ts'
 import messageRouter from './routes/messages.ts'
 import avatarRouter from './routes/avatar.ts'
 import historyRouter from './routes/history.ts'
+import { register, httpRequestsTotal, httpRequestDuration, activeConnections } from './routes/metrics.ts'
 
 const app = express()
-// app.use(cors({ origin: '*' }))
 const httpServer = createServer(app)
-const io = new Server(httpServer, { 
+const io = new Server(httpServer, {
     cors: {
         origin: "http://localhost:3001",
         credentials: true,
-        methods: ["GET", "POST"],        
-    }, 
-});
+        methods: ["GET", "POST"],
+    },
+})
 
-// PLUS BESOIN de mysql.createConnection ici !
-// Prisma gère la connexion tout seul dès que tu fais ton premier appel.
 console.log('Prisma Engine prêt ✅')
 
 app.use(cors({
     origin: "http://localhost:3001",
     credentials: true,
-}));
+}))
+app.use(express.json())
+app.use(fileUpload())
 
-app.use(express.json());
-app.use(fileUpload());
-app.use('/avatars', express.static('/app/databases/users/avatars'));
-app.use('/cards', cardsRouter);
-app.use('/heroes', heroesRouter);
-app.use('/auth', authRouter);
-app.use('/users', historyRouter);
-console.log('historyRouter registered');
+// ─── Middleware métriques (avant toutes les routes) ───────────────
+app.use((req, res, next) => {
+    const end = httpRequestDuration.startTimer()
+    res.on('finish', () => {
+        const route = req.route?.path ?? req.path
+        httpRequestsTotal.inc({ method: req.method, route, status: res.statusCode })
+        end({ method: req.method, route, status: res.statusCode })
+    })
+    next()
+})
+// ─────────────────────────────────────────────────────────────────
 
-app.use('/users', usersRouter);
-app.use('/friends', friendRouter);
-app.use('/rooms', roomRouter);
-app.use('/messages', messageRouter);
-app.use('/users', avatarRouter);
+app.use('/avatars', express.static('/app/databases/users/avatars'))
+app.use('/cards', cardsRouter)
+app.use('/heroes', heroesRouter)
+app.use('/auth', authRouter)
+app.use('/users', historyRouter)
+console.log('historyRouter registered')
+app.use('/users', usersRouter)
+app.use('/friends', friendRouter)
+app.use('/rooms', roomRouter)
+app.use('/messages', messageRouter)
+app.use('/users', avatarRouter)
+
+// ─── Endpoint Prometheus ──────────────────────────────────────────
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', register.contentType)
+    res.end(await register.metrics())
+})
+// ─────────────────────────────────────────────────────────────────
+
 app.get('/', (req, res) => {
     res.send('TCG Dev Edition — API OK (Powered by Prisma) ✅')
 })
+
 app.use((req, res, next) => {
-	console.log("REQ:", req.url);
-	next();
-});
+    console.log("REQ:", req.url)
+    next()
+})
+
+// ─── Socket.IO ────────────────────────────────────────────────────
+io.on('connection', (socket) => {
+    activeConnections.inc()
+    socket.on('disconnect', () => activeConnections.dec())
+})
+// ─────────────────────────────────────────────────────────────────
+
 initSocket(io)
 
 httpServer.listen(3000, () => {

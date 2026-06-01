@@ -5,7 +5,7 @@ import type { GameSession } from '../types/gamesession.ts'
 import { instantiateGame } from './gameFactory.ts'
 import { launchGame, resolveRound } from './round.ts'
 import { getPlayerPerspective, getSpectatorPerspective } from './perspective.ts'
-import { waitingPlayers, sessions, clearWaitingPlayers, addSession, findSession, findSessionByRoomId, addSpectator, removeSpectator } from './state.ts'
+import { waitingPlayers, sessions, addSession, findSession, findSessionByRoomId, addSpectator, removeSpectator, filterWaitingPlayers } from './state.ts'
 import { playCard } from '../engine/playCard.ts'
 import { emitGameOver } from './round.ts'
 import { prisma } from '../../prisma/prisma.ts'
@@ -16,24 +16,22 @@ export function onConnection(io: Server, socket: Socket): void {
 
     socket.on('join_game', async (data) => {
 
-    let userId: number | null = null
-    if (data.token) {
-        try {
-            const decoded = jwt.verify(data.token, JWT_SECRET) as any
-            userId = decoded.userId
-        } catch {}
-    }
-    
-    const existingSession = findSessionByRoomId(Number(data.roomId))
+        let userId: number | null = null
+        if (data.token) {
+            try {
+                const decoded = jwt.verify(data.token, JWT_SECRET) as any
+                userId = decoded.userId
+            } catch {}
+        }
+
+        // Reconnexion à une session existante
+        const existingSession = findSessionByRoomId(Number(data.roomId))
         if (existingSession) {
-            // Trouve quel joueur c'est selon son username
             const playerIndex = existingSession.game.players.findIndex(
                 (p: any) => p.username === data.username
             )
             if (playerIndex !== -1) {
-                // Remplace le vieux socket par le nouveau
                 existingSession.sockets[playerIndex] = socket
-                // Renvoie l'état de la game
                 socket.emit('game_start', {
                     playerIndex,
                     game: getPlayerPerspective(existingSession.game, playerIndex)
@@ -42,26 +40,35 @@ export function onConnection(io: Server, socket: Socket): void {
             }
         }
 
-        const alreadyWaiting = waitingPlayers.some(p => p.playerData.username === data.username);
+        const roomId = Number(data.roomId)
+
+        // Évite les doublons
+        const alreadyWaiting = waitingPlayers.some(
+            p => p.playerData.username === data.username && Number(p.playerData.roomId) === roomId
+        )
         if (!alreadyWaiting) {
-            waitingPlayers.push({ socket, playerData: { ...data, userId } });
+            waitingPlayers.push({ socket, playerData: { ...data, userId } })
         }
 
-        if (waitingPlayers.length === 2) {
-            const players = [...waitingPlayers]
-            clearWaitingPlayers()
+        // ✅ Cherche un autre joueur dans la MÊME room, pas n'importe qui
+        const playersInRoom = waitingPlayers.filter(
+            p => Number(p.playerData.roomId) === roomId
+        )
+
+        if (playersInRoom.length === 2) {
+            filterWaitingPlayers(Number(data.roomId))
             try {
-                const gameInstance = await instantiateGame(players)
+                const gameInstance = await instantiateGame(playersInRoom)
                 const newSession: GameSession = {
-                    roomId: Number(players[0].playerData.roomId), // les deux ont le même
+                    roomId,
                     game: gameInstance,
-                    sockets: players.map(p => p.socket),
+                    sockets: playersInRoom.map(p => p.socket),
                     submittedCards: new Map(),
                     readyPlayers: new Set(),
                     timer: null,
                     spectators: []
                 }
-                
+
                 addSession(newSession)
                 launchGame(newSession)
             } catch (error) {
@@ -70,7 +77,6 @@ export function onConnection(io: Server, socket: Socket): void {
             }
         }
     })
-
     socket.on('play_card', (data) => {
         console.log('Reçu play_card', { data })
         const session = findSession(socket.id)

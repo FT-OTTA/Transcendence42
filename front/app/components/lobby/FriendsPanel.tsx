@@ -31,6 +31,7 @@ export default function FriendsPanel() {
     const [friendUsername, setFriendUsername] = useState("");
     const [error, setError] = useState("");
     const [adding, setAdding] = useState(false);
+    const [removing, setRemoving] = useState(false);
 
     const l = useTranslations("Lobby");
     const p = useTranslations("Profile");
@@ -106,6 +107,59 @@ export default function FriendsPanel() {
 
             if (!res.ok) {
                 setError("fail_add");
+                return;
+            }
+
+            await fetchFriends();
+
+            setFriendUsername("");
+            setShowAddPopup(false);
+
+        } catch {
+            setError("server_error");
+        } finally {
+            setAdding(false);
+        }
+    }
+
+    async function handleRemoveFriend(targetName: string) {
+    
+        const username = await requireAuth();
+
+        if (!username) 
+        {
+            setError("need_login");
+            return;
+        }
+
+        console.log(username);
+        if (!targetName.trim()) {
+            setError("no_username");
+            return;
+        }
+
+        try {
+            setAdding(true);
+            setError("");
+
+            const res = await fetch(
+                "http://localhost:3000/friends/remove",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username,
+                        friendUsername: targetName,
+                    }),
+                }
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError("fail_remove");
                 return;
             }
 
@@ -219,8 +273,10 @@ export default function FriendsPanel() {
                                     </button>
                                 )}
 
-                                <button className="text-xs border border-blue-300 px-2 py-1 hover:bg-blue-300 hover:text-black">
-                                    {l("dm")}
+                                <button 
+                                    onClick={ () => handleRemoveFriend(friend.name)}
+                                    className="text-xs border border-red-300 px-2 py-1 hover:bg-red-300 hover:text-black">
+                                    {l("remove")}
                                 </button>
 
                             </div>

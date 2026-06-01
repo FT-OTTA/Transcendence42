@@ -1,7 +1,7 @@
 "use client";
-
-import type React from 'react';
+import clsx from "clsx";
 import type { Card } from 'otta-shared-types/card';
+import GameCard from "./GameCard";
 
 interface CardSlotProps {
   id: string;
@@ -14,36 +14,48 @@ interface CardSlotProps {
   isSelected?: boolean;
 }
 
-export default function CardSlot({ id, isHand = false, isOpponentSlot = false, showEffectText = false,  card, onClick, isHighlighted = false, isSelected = false}: CardSlotProps) {
+export default function CardSlot({
+  id,
+  isHand = false,
+  isOpponentSlot = false,
+  card,
+  onClick,
+  isHighlighted = false,
+  isSelected = false,
+}: CardSlotProps) {
+
+  const wrapperClass = clsx(
+    "aspect-square rounded transition-all cursor-pointer",
+    isHand && "hover:scale-110",
+    isOpponentSlot && "opacity-80",
+    isHighlighted && "ring-2 ring-yellow-400/80 scale-105",
+    isSelected && "ring-4 ring-orange-500 scale-105 shadow-lg shadow-orange-500/50",
+  );
+
+  const emptySlotClass = clsx(
+    "aspect-square rounded lg:w-30",
+    "bg-sky-300/10 transition-all cursor-pointer",
+    "flex items-center justify-center text-xs opacity-60",
+  );
+
   return (
     <div
       id={id}
       onClick={() => onClick?.(card ?? null)}
-      className={`
-        aspect-square rounded border transition-all cursor-pointer p-1
-        ${isHand
-          ? 'border-green-400/60 bg-green-900/20 hover:border-green-300 hover:bg-green-900/40 hover:scale-110 hover:shadow-lg hover:shadow-green-500/50'
-          : 'border-blue-300/40 bg-blue-900/20 hover:border-blue-300 hover:bg-blue-900/40'
-        }
-        ${isOpponentSlot ? 'opacity-80' : ''}
-        flex flex-col items-center justify-center text-blue-300/40 text-xs
-        ${isHighlighted ? 'ring-2 ring-yellow-400/80 scale-105 shadow-lg' : ''}
-        ${isSelected ? 'ring-4 ring-orange-500 bg-orange-500/30 scale-105 shadow-lg shadow-orange-500/50' : ''}      `}
+      className={card ? wrapperClass : emptySlotClass}
     >
       {card ? (
-        <>
-          <span className="text-[9px] text-blue-100/90 leading-tight text-center line-clamp-2">{card.cardName}</span>
-          <span className="text-[9px] text-blue-200/70 uppercase mt-0.5">{card.type}</span>
-          <span className="text-[10px] text-yellow-200 mt-1">{card.runeCost} R</span>
-          {card.currForce !== null && card.currEndurance !== null ? (
-            <span className="text-[10px] text-red-200 mt-0.5">{card.currForce}/{card.currEndurance}</span>
-          ) : null}
-          {showEffectText && card.effectText ? (
-            <p className="text-[8px] text-slate-200 mt-1 leading-tight text-center line-clamp-2">{card.effectText}</p>
-          ) : null}
-        </>
+        <GameCard
+          name={card.cardName}
+          cardType={card.type}
+          cost={card.runeCost}
+          runeUrl={"/default_avatar.png"}
+          attack={card.currForce}
+          defense={card.currEndurance}
+          ability={card.effects.length > 0}
+        />
       ) : (
-        <span className="text-[10px] opacity-60">Empty</span>
+        <></>
       )}
     </div>
   );

@@ -5,7 +5,7 @@ import ProfileStats from "../../components/community/ProfileStats"
 import MatchHistory from "../../components/community/MatchHistory"
 import ProfileSearchBar from "../../components/community/ProfileSearchBar"
 import LoggedInBadge from "../../components/login/LoggedInBadge"
-
+import GameCard from "@/app/components/playground/GameCard";
 
 
 export default function Community() {
@@ -34,7 +34,6 @@ export default function Community() {
 					<div className="w-full">
 						<ProfileSearchBar />
 					</div>
-
 				</div>
 			</section>
 		</main>

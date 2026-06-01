@@ -16,7 +16,9 @@ import LargeCardView from '@/app/components/playground/LargeCardView';
 import { Hero } from 'otta-shared-types/hero';
 import { usePathname } from 'next/navigation'
 import { useLocale } from 'next-intl';
-
+import HeroStrip from '@/app/components/playground/HeroStripProps';
+import ChatPanel from '@/app/components/lobby/ChatPanel';
+import CardDetails from '@/app/components/playground/CardDetails';
 
 export default function PlaygroundPage() {
   const { id } = useParams();
@@ -69,6 +71,11 @@ export default function PlaygroundPage() {
   const [showStats, setShowStats] = useState(false);
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
+
+const highlightOpponentHero = potentialTargets.some(t => t.kind === "hero" && t !== game?.players[myPlayerIndexRef.current!]);
+const highlightPlayerHero = potentialTargets.some(t => t.kind === "hero" && t === game?.players[myPlayerIndexRef.current!]);
+const isOpponentHeroSelected = selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[1 - myPlayerIndexRef.current!]?.idInGame);
+const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[myPlayerIndexRef.current!]?.idInGame);
 
   const searchParams = useSearchParams()
   const isSpectator = searchParams.get('spectate') === 'true'
@@ -317,7 +324,7 @@ function getTargets(effectIndex: number = 0, card: Card | null = selectedCard) {
     if (!e.targetType?.creature) pool = pool.filter(c => !('type' in c) || c.type !== "creature");
     if (!e.targetType?.building) pool = pool.filter(c => !('type' in c) || c.type !== "building");
 
-console.log("game:", game, "myPlayerIndex:", myPlayerIndexRef.current, "e.targetType:", e.targetType)
+    console.log("game:", game, "myPlayerIndex:", myPlayerIndexRef.current, "e.targetType:", e.targetType)
     setPotentialTargets(pool);
     setCurrentEffectIndex(effectIndex);
     console.log("Potential targets for effect", { effect: e, pool });
@@ -368,188 +375,245 @@ function pushSelectedTarget(target: Card | Hero) {
       : currentEffectIndex;
 
     getTargets(nextEffectIndex, selectedCard);
-}   const locale = useLocale();
+}
+
+const onHeroClick = (type: "self" | "opponent") => {
+    const index = type === "opponent" ? 1 - myPlayerIndexRef.current! : myPlayerIndexRef.current!;
+    const hero = game?.players[index];
+    if (hero)
+        pushSelectedTarget(hero);
+};
+
+const locale = useLocale();
     if (!hydrated) return (
         <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
     )
     return (
-    <main className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80">
+    <main className="overflow-x-hidden h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80 overflow-y-hidden">
         <Navbar />
+
         {!isSpectator && !selectedHero ? (
-        <HeroSelection onSelect={(id) => setSelectedHero(id)} />
+            <HeroSelection onSelect={(id) => setSelectedHero(id)} />
         ) : (
-        <>
-            {isLoading ? (
-            <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
-            ) : isSpectator ? (
-            <SpectatorBoard players={game?.players ?? []} turnNumber={game?.turnNumber ?? 0} />
-            ) : (
             <>
-                {/* ── DESKTOP ── */}
-                <div className="hidden md:grid grid-cols-3 gap-4 pt-16 min-h-[calc(100vh-6rem)]">
-                <div className="col-span-2 flex flex-col gap-4 min-h-0">
-                    <OpponentBoard
-                    cards={opponentSlots}
-                    onPlay={() => {}}
-                    potentialTargets={potentialTargets}
-                    selectedTargets={selectedTargets.map(st => st.target)}
-                    onClick={pushSelectedTarget}
-                    />
-                    <PlayerBoard
-                    cards={displaySlots}
-                    onPlay={handlePlayToSlot}
-                    potentialTargets={potentialTargets}
-                    selectedTargets={selectedTargets.map(st => st.target)}
-                    onClick={pushSelectedTarget}
-                    />
-                    <PlayerHand
-                    cards={playerHandCards}
-                    onClick={(card) => {
-                        if (!card) return;
-                        abortPlay();
-                        setSelectedCard(card);
-                        if (card.type === "spell") getTargets(0, card);
-                    }}
-                    onConfirm={handleConfirmSpell}
-                    />
-                </div>
-                <div className="max-h-[calc(100vh-6rem)] overflow-y-auto flex flex-col gap-4">
-                    <GameStats
-                    turnNumber={turnNumber}
-                    me={meStats}
-                    opponent={opponentStats}
-                    highlightOpponentHero={potentialTargets.some(t => t.kind === "hero" && t !== game?.players[myPlayerIndexRef.current!])}
-                    highlightPlayerHero={potentialTargets.some(t => t.kind === "hero" && t === game?.players[myPlayerIndexRef.current!])}
-                    isOpponentHeroSelected={selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[1 - myPlayerIndexRef.current!]?.idInGame)}
-                    isPlayerHeroSelected={selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[myPlayerIndexRef.current!]?.idInGame)}
-                    onHeroClick={(type: "self" | "opponent") => {
-                        const index = type === "opponent" ? 1 - myPlayerIndexRef.current! : myPlayerIndexRef.current!;
-                        const hero = game?.players[index];
-                        if (hero) pushSelectedTarget(hero);
-                    }}
-                    onConcede={handleConcede}
-                    />
-                    <button
-                    onClick={handleEndTurn}
-                    disabled={waitingEndTurn}
-                    className="border border-blue-300 py-2 px-3 text-sm hover:bg-blue-300 hover:text-black transition"
-                    >
-                    {waitingEndTurn ? "Waiting For Opponent..." : "End Turn"}
-                    </button>
-                    <div className="flex flex-1 items-center justify-center gap-4 p-4">
-                    <LargeCardView
-                        card={selectedCard}
-                        onClick={getTargets}
-                        onConfirm={handleConfirmSpell}
-                        hasTargets={
-                        selectedCard
-                            ? (selectedCard.type === "spell"
-                            ? selectedTargets.length >= getRequiredTargetCount(selectedCard)
-                            : pendingSlotIndex !== null)
-                            : false
-                        }
-                    />
-                    <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} />
+                {isLoading ? (
+                    <div className="pt-20 text-center text-blue-200/70">
+                        Loading game...
                     </div>
-                </div>
-                </div>
 
-                {/* ── MOBILE ── */}
-                <div className="flex flex-col md:hidden pt-14 h-[calc(100vh-3.5rem)] overflow-hidden">
-                <OpponentBoard
-                    cards={opponentSlots}
-                    onPlay={() => {}}
-                    potentialTargets={potentialTargets}
-                    selectedTargets={selectedTargets.map(st => st.target)}
-                    onClick={pushSelectedTarget}
-                />
-                <PlayerBoard
-                    cards={displaySlots}
-                    onPlay={handlePlayToSlot}
-                    potentialTargets={potentialTargets}
-                    selectedTargets={selectedTargets.map(st => st.target)}
-                    onClick={pushSelectedTarget}
-                />
-                <PlayerHand
-                    cards={playerHandCards}
-                    onConfirm={handleConfirmSpell}
-                    onClick={(card) => {
-                    if (!card) return;
-                    abortPlay();
-                    setSelectedCard(card);
-                    if (card.type === "spell") getTargets(0, card);
-                    }}
-                />
-                
-                {/* Bandeau bas mobile — pas de carte sélectionnée */}
-                {
-                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 border-t border-blue-400/40 px-4 py-2 flex items-center justify-between">
-                    <span className="text-yellow-400 font-semibold text-sm">⬡ {runes} runes</span>
-                    <button
-                    onClick={handleEndTurn}
-                    disabled={waitingEndTurn}
-                    className="border border-blue-300 px-4 py-1 text-sm text-blue-200 hover:bg-blue-300 hover:text-black transition"
-                    >
-                    {waitingEndTurn ? "Waiting For Opponent..." : "End Turn"}
-                    </button>
-                    <button
-                    onClick={() => setShowStats(true)}
-                    className="border border-blue-400/40 px-3 py-1 text-sm text-blue-300"
-                    >
-                    ⚔️
-                    </button>
-                </div>
-                }
-                {/* LargeCardView en overlay si une carte est sélectionnée */}
-                {selectedCard && (
-                    <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2">
-                    <LargeCardView
-                        card={selectedCard}
-                        onClick={getTargets}
-                        onConfirm={handleConfirmSpell}
-                        hasTargets={
-                        selectedCard.type === "spell"
-                            ? selectedTargets.length >= getRequiredTargetCount(selectedCard)
-                            : pendingSlotIndex !== null
-                        }
-                    />
-                    {/* <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} /> */}
-                    </div>
-                )}
+                    ) : isSpectator ? (
+                        <SpectatorBoard players={game?.players ?? []} turnNumber={game?.turnNumber ?? 0} />
+                    ) : (
+                    <>
 
-                {/* Stats drawer */}
-                {showStats && (
-                    <div className="fixed inset-0 bg-black/80 z-50 flex items-end">
-                    <div className="w-full bg-slate-900 border-t border-blue-400 p-4 rounded-t-xl flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
-                        <button
-                        onClick={() => setShowStats(false)}
-                        className="self-end text-blue-300 text-lg"
-                        >
-                        ✕
-                        </button>
-                        <GameStats
-                        turnNumber={turnNumber}
-                        me={meStats}
-                        opponent={opponentStats}
-                        highlightOpponentHero={potentialTargets.some(t => t.kind === "hero" && t !== game?.players[myPlayerIndexRef.current!])}
-                        highlightPlayerHero={potentialTargets.some(t => t.kind === "hero" && t === game?.players[myPlayerIndexRef.current!])}
-                        isOpponentHeroSelected={selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[1 - myPlayerIndexRef.current!]?.idInGame)}
-                        isPlayerHeroSelected={selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[myPlayerIndexRef.current!]?.idInGame)}
-                        onHeroClick={(type: "self" | "opponent") => {
-                            const index = type === "opponent" ? 1 - myPlayerIndexRef.current! : myPlayerIndexRef.current!;
-                            const hero = game?.players[index];
-                            if (hero) pushSelectedTarget(hero);
-                            setShowStats(false);
-                        }}
-                        onConcede={handleConcede}
-                        />
-                    </div>
-                    </div>
+                        {/* ── DESKTOP ── */}
+                        <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-3 gap-4 pt-16 h-[calc(100vh-6rem)]">
+
+                            {/* Colonne principale — 3/4 */}
+                            <div className="col-span-3 lg:col-span-2 flex flex-col gap-2 min-h-0">
+
+                                <HeroStrip
+                                    label="Opponent"
+                                    playerClass={opponentStats?.class}
+                                    armor={opponentStats?.armor ?? 0}
+                                    dmgDealt={opponentStats?.dmgDealt ?? 0}
+                                    deckCount={opponentStats?.library.length ?? 0}
+                                    isHighlighted={highlightOpponentHero}
+                                    isSelected={isOpponentHeroSelected}
+                                    onClick={() => onHeroClick?.("opponent")}
+                                    isOpponent
+                                />
+                                
+                                <OpponentBoard
+                                    cards={opponentSlots}
+                                    onPlay={() => {}}
+                                    potentialTargets={potentialTargets}
+                                    selectedTargets={selectedTargets.map(st => st.target)}
+                                    onClick={pushSelectedTarget}
+                                />
+
+                                <PlayerBoard
+                                    cards={displaySlots}
+                                    onPlay={handlePlayToSlot}
+                                    potentialTargets={potentialTargets}
+                                    selectedTargets={selectedTargets.map(st => st.target)}
+                                    onClick={pushSelectedTarget}
+                                />
+
+                                <HeroStrip
+                                    label="You"
+                                    playerClass={meStats?.class}
+                                    armor={meStats?.armor ?? 0}
+                                    dmgDealt={meStats?.dmgDealt ?? 0}
+                                    curRunes={meStats?.curRunes}
+                                    handCount={meStats?.hand.length}
+                                    deckCount={meStats?.library.length ?? 0}
+                                    isHighlighted={highlightPlayerHero}
+                                    isSelected={isPlayerHeroSelected}
+                                    onClick={() => onHeroClick?.("self")}
+                                />
+
+                                <div>
+                                    <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} />
+                                </div>
+
+                                <PlayerHand
+                                    cards={playerHandCards}
+                                    onClick={(card) => {
+                                        if (!card) return;
+                                        abortPlay();
+                                        setSelectedCard(card);
+                                        if (card.type === "spell") getTargets(0, card);
+                                    }}
+                                    onConfirm={handleConfirmSpell}
+                                />
+
+                            </div>
+
+                            {/* Colonne droite — 1/4 */}
+                            <div className="flex flex-col gap-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
+
+                                <div className="flex items-center justify-center gap-5">
+                                    
+                                    {/* End Turn centré */}
+                                    <div>
+                                        <button
+                                            disabled={waitingEndTurn}
+                                            onClick={handleEndTurn}
+                                            className="border rounded-xl border-blue-300 py-1.5 px-2 text-sm hover:bg-blue-300 hover:text-black transition"
+                                            >
+                                                {waitingEndTurn ? "..." : "End Turn"}
+                                        </button>
+                                    </div>
+                                    
+                                    {/* Tour */}
+                                    <div className="text-center text-sm text-blue-300/60 py-1">
+                                        Turn {turnNumber}/8
+                                    </div>
+
+                                    <button
+                                            onClick={handleConcede}
+                                            className="border border-red-400/40 py-2 px-2 text-xs text-red-400 hover:bg-red-400/20 transition rounded-sm"
+                                            >
+                                                Concede
+                                    </button>
+                                </div>
+
+                                {/* Chat */}
+                                <div className="flex-1 min-h-0">
+                                    <ChatPanel />
+                                </div>
+
+                                {/* LargeCard + Confirm */}
+                                <div className="flex flex-col gap-2">
+                                    <CardDetails
+                                        card={selectedCard}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── MOBILE ── */}
+                        <div className="flex flex-col md:hidden pt-14 h-[calc(100vh-3.5rem)] overflow-hidden">
+                            <OpponentBoard
+                                cards={opponentSlots}
+                                onPlay={() => {}}
+                                potentialTargets={potentialTargets}
+                                selectedTargets={selectedTargets.map(st => st.target)}
+                                onClick={pushSelectedTarget}
+                            />
+                            <PlayerBoard
+                                cards={displaySlots}
+                                onPlay={handlePlayToSlot}
+                                potentialTargets={potentialTargets}
+                                selectedTargets={selectedTargets.map(st => st.target)}
+                                onClick={pushSelectedTarget}
+                            />
+                            <PlayerHand
+                                cards={playerHandCards}
+                                onConfirm={handleConfirmSpell}
+                                onClick={(card) => {
+                                if (!card) return;
+                                abortPlay();
+                                setSelectedCard(card);
+                                if (card.type === "spell") getTargets(0, card);
+                                }}
+                            />
+
+                            {/* Bandeau bas mobile — pas de carte sélectionnée */}
+                                {
+                                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 border-t border-blue-400/40 px-4 py-2 flex items-center justify-between">
+                                    <span className="text-yellow-400 font-semibold text-sm">⬡ {runes} runes</span>
+                                    
+                                    <button
+                                        disabled={waitingEndTurn}
+                                        onClick={handleEndTurn}
+                                        className="border border-blue-300 px-4 py-1 text-sm text-blue-200 hover:bg-blue-300 hover:text-black transition"
+                                        >
+                                        {waitingEndTurn ? "..." : "End Turn"}
+                                    </button>
+
+                                    <button
+                                        onClick={() => setShowStats(true)}
+                                        className="border border-blue-400/40 px-3 py-1 text-sm text-blue-300"
+                                        >
+                                        ⚔️
+                                    </button>
+                                </div>
+                            }
+
+                            {/* LargeCardView en overlay si une carte est sélectionnée */}
+                            {selectedCard && (
+                                <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2">
+                                    <LargeCardView
+                                        card={selectedCard}
+                                        onClick={getTargets}
+                                        onConfirm={handleConfirmSpell}
+                                        hasTargets={
+                                        selectedCard.type === "spell"
+                                            ? selectedTargets.length >= getRequiredTargetCount(selectedCard)
+                                            : pendingSlotIndex !== null
+                                        }
+                                    />
+                                    {/* <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} /> */}
+                                </div>
+                            )}
+
+                            {/* Stats drawer */}
+                            {showStats && (
+                                <div className="fixed inset-0 bg-black/80 z-50 flex items-end">
+                                    <div className="w-full bg-slate-900 border-t border-blue-400 p-4 rounded-t-xl flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
+                                        <button
+                                            onClick={() => setShowStats(false)}
+                                            className="self-end text-blue-300 text-lg"
+                                            >
+                                            ✕
+                                        </button>
+
+                                        <GameStats
+                                            turnNumber={turnNumber}
+                                            me={meStats}
+                                            opponent={opponentStats}
+                                            highlightOpponentHero={potentialTargets.some(t => t.kind === "hero" && t !== game?.players[myPlayerIndexRef.current!])}
+                                            highlightPlayerHero={potentialTargets.some(t => t.kind === "hero" && t === game?.players[myPlayerIndexRef.current!])}
+                                            isOpponentHeroSelected={selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[1 - myPlayerIndexRef.current!]?.idInGame)}
+                                            isPlayerHeroSelected={selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[myPlayerIndexRef.current!]?.idInGame)}
+                                            onHeroClick={(type: "self" | "opponent") => {
+                                                const index = type === "opponent" ? 1 - myPlayerIndexRef.current! : myPlayerIndexRef.current!;
+                                                const hero = game?.players[index];
+                                                if (hero)
+                                                    pushSelectedTarget(hero);
+                                                setShowStats(false);
+                                            }}
+                                            onConcede={handleConcede}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </>
                 )}
-                </div>
             </>
-            )}
-        </>
         )}
 
         {gameOverMessage && (

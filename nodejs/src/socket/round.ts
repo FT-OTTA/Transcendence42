@@ -66,7 +66,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
     session.game.turnNumber += 1
 
-    if (session.game.turnNumber > 1) {
+    if (session.game.turnNumber > 8) {
         const winner = checkVictory(session.game)
         session.game.winner = winner ?? undefined
         await emitGameOver(session)

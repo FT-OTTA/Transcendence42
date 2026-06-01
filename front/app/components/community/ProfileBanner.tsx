@@ -30,7 +30,6 @@ const moodText = clsx
 type ProfileBannerProps = {
 	username: string;
 	mood: string;
-	isOnline: boolean;
 	avatarUrl?: string | null;
 };
 
@@ -40,14 +39,15 @@ const onlineStatus = clsx
 	" opacity-80 font-bold md:px-5"
 )
 
-export default function ProfileBanner({username, mood, isOnline, avatarUrl}: ProfileBannerProps)
+export default function ProfileBanner({username, mood, avatarUrl}: ProfileBannerProps)
 {
 	const [isOwner, setIsOwner] = useState(false);
 
 	useEffect(() => {
 		const storedUsername = localStorage.getItem("username");
+		const ownerCheck = storedUsername?.toLowerCase() === username.toLocaleLowerCase();
+		setIsOwner(ownerCheck);
 
-		setIsOwner(storedUsername?.toLowerCase() === username.toLowerCase());
 	}, [username]);
 
 	async function uploadAvatar(file: File)
@@ -83,10 +83,6 @@ export default function ProfileBanner({username, mood, isOnline, avatarUrl}: Pro
 						initialMood={ mood }
 					/>
 				</div>
-			</div>
-
-			<div className={clsx(onlineStatus, isOnline ? "text-green-100" : "text-red-400")}>
-				● { isOnline ? l("online") : l("offline") }
 			</div>
 
 		</section>

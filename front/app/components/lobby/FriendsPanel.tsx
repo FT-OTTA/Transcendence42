@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { requireAuth } from "../login/RequireAuth";
 import { customScrollBar } from "../scrollBar";
 import { useTranslations } from "next-intl";
+import { socket } from "@/lib/socket";
 
 type FriendStatus = "online" | "offline" | "in room" | "playing";
 
@@ -32,6 +33,7 @@ export default function FriendsPanel() {
     const [adding, setAdding] = useState(false);
 
     const l = useTranslations("Lobby");
+    const p = useTranslations("Profile");
     const e = useTranslations("Error");
 
     async function fetchFriends() {
@@ -54,7 +56,7 @@ export default function FriendsPanel() {
 
             const formatted: Friend[] = data.map((f: any) => ({
                 name: f.friend.username,
-                status: "online",
+                status: (f.friend.isOnline ?? false) ? "online" : "offline",
                 message: ""
             }));
 
@@ -120,7 +122,41 @@ export default function FriendsPanel() {
     }
 
     useEffect(() => {
-        fetchFriends();
+        fetchFriends().then(() => {
+            return requireAuth();
+        })
+        .then((username) => {
+            if (username)
+            {
+                socket.emit("user_logged_in", { username });
+                socket.emit("get_online_users");
+            }
+        })
+        .catch((err) => console.error("ERROR: initializing friends sockets:", err));
+
+        socket.on("online_users_list", (onlineUsernames: string[]) => {
+            setFriends((prevFriends) =>
+                prevFriends.map((friend) => ({
+                    ...friend,
+                    status: onlineUsernames.some(name => name.toLowerCase() === friend.name.toLowerCase()) ? "online" : "offline"}))
+            );
+        });
+
+        const handleStatusChange = (data: { username: string; isOnline: boolean }) => {
+            setFriends((prevFriends) =>
+                prevFriends.map((friend) =>
+                    friend.name === data.username
+                        ? { ...friend, status: data.isOnline ? "online" : "offline" }
+                        : friend
+                )
+            );
+        };
+
+        socket.on("status_changed", handleStatusChange);
+        return () => {
+            socket.off("online_users_list");
+            socket.off("status_changed", handleStatusChange);
+        };
     }, []);
 
     if (loading) {
@@ -166,7 +202,7 @@ export default function FriendsPanel() {
                             <div
                                 className={`text-xs px-2 py-1 border rounded-sm w-fit ${statusStyles[friend.status]}`}
                             >
-                                {friend.status}
+                                {p(friend.status)}
                             </div>
 
                             <div className="flex gap-2 justify-end">

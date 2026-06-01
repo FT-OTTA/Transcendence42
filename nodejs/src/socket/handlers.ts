@@ -12,6 +12,15 @@ import { prisma } from '../../prisma/prisma.ts'
 import jwt from 'jsonwebtoken'
 const JWT_SECRET = process.env.JWT_SECRET ?? 'changeme'
 
+
+declare module 'socket.io' {
+    interface Socket {
+        username?: string;
+    }
+}
+
+const activeUsers = new Map<string, string>();
+
 export function onConnection(io: Server, socket: Socket): void {
 
     socket.on('join_game', async (data) => {
@@ -277,4 +286,25 @@ export function onConnection(io: Server, socket: Socket): void {
         }
     });
 
+    socket.on("user_logged_in", ({ username }) => {
+        if (!username)
+            return;
+        socket.username = username;
+        activeUsers.set(username, socket.id);
+
+        io.emit("status_changed", { username, isOnline: true });
+    });
+
+    socket.on("get_online_users", () => {
+        socket.emit("online_users_list", Array.from(activeUsers.keys()));
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconeccted :', socket.id);
+        
+        if (socket.username) {
+            activeUsers.delete(socket.username);
+            io.emit("status_changed", { username: socket.username, isOnline: false });
+        }
+    });
 }

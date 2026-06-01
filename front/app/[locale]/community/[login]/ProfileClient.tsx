@@ -1,5 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { socket } from "@/lib/socket";
 import Navbar from "../../../components/navigation/Navbar";
 import ProfileBanner from "../../../components/community/ProfileBanner";
 import ProfileStats from "../../../components/community/ProfileStats";
@@ -7,16 +8,18 @@ import MatchHistory from "../../../components/community/MatchHistory";
 import ProfileSearchBar from "../../../components/community/ProfileSearchBar";
 import LoggedInBadge from "../../../components/login/LoggedInBadge";
 
-export default function ProfileClient({ login }: { login: string })
-{
-  const router = useRouter();
+export default function ProfileClient({ login }: { login: string }) {
+
+  useEffect(() => {
+    if (!login)
+      return;
+
+  }, []);
 
   return (
     <main className="overflow-x-hidden md:overflow-y-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
-
       <Navbar />
       <div className="md:py-5" />
-
       <LoggedInBadge />
 
       <div className="max-w-6xl mx-auto px-4 py-4">
@@ -24,7 +27,6 @@ export default function ProfileClient({ login }: { login: string })
         <ProfileBanner
           username={login}
           mood="J'arrive ratale sur le beat..."
-          isOnline={false}
         />
       </div>
 
@@ -32,7 +34,6 @@ export default function ProfileClient({ login }: { login: string })
         <ProfileStats />
         <MatchHistory />
       </section>
-
     </main>
   );
 }

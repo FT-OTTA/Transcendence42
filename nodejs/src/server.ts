@@ -5,7 +5,6 @@ import { initSocket } from './socket/index.ts'
 import { prisma } from '../prisma/prisma.ts'
 import cors from 'cors'
 import fileUpload from 'express-fileupload'
-
 import cardsRouter from './routes/cards.ts'
 import heroesRouter from './routes/heroes.ts'
 import authRouter from './routes/auth.ts'
@@ -14,6 +13,7 @@ import friendRouter from './routes/friends.ts'
 import roomRouter from './routes/rooms.ts'
 import messageRouter from './routes/messages.ts'
 import avatarRouter from './routes/avatar.ts'
+import historyRouter from './routes/history.ts'
 
 const app = express()
 // app.use(cors({ origin: '*' }))
@@ -41,6 +41,9 @@ app.use('/avatars', express.static('/app/databases/users/avatars'));
 app.use('/cards', cardsRouter);
 app.use('/heroes', heroesRouter);
 app.use('/auth', authRouter);
+app.use('/users', historyRouter);
+console.log('historyRouter registered');
+
 app.use('/users', usersRouter);
 app.use('/friends', friendRouter);
 app.use('/rooms', roomRouter);

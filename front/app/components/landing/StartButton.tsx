@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { cinzel } from "../../fonts"
 import { useRouter } from "next/navigation";
 import { requireAuth } from "../login/RequireAuth";
-import { useTranslations } from "next-intl"; 
+import { useTranslations, useLocale } from "next-intl"; 
 
 const startButton = clsx
 (
@@ -23,11 +23,12 @@ export default function StartButton({setIsLogin}: StartButtonProps)
 
   const router = useRouter();
   const l = useTranslations("Homepage");
+	const locale = useLocale();
 
   async function HandleClick() {
     const user = await requireAuth();
     if (user) {
-      router.push("/lobby");
+      router.push(`/${locale}/lobby`);
     }
     else {
       setIsLogin(true);

@@ -26,15 +26,13 @@ export default async function LocaleLayout({
 
 const messages = await getMessages(); // apres
   // const messages = (await import(`../../messages/${locale}.json`)).default; //avant
+ console.log("locale reçue:", locale);
+console.log("messages reçus:", Object.keys(messages));
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body>
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
         </NextIntlClientProvider>
-      </body>
-    </html>
   );
 }
 

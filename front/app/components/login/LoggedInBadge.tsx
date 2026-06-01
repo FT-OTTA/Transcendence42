@@ -3,24 +3,36 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import LoginCard from "./LoginCard";
+import { socket } from "@/lib/socket";
+import { requireAuth } from "./RequireAuth";
 
 export default function LoggedInBadge() {
+    
     const l = useTranslations("Homepage");
     const [showLogin, setShowLogin] = useState(false);
     
-    const [username, setUsername] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
 
-    function logout() {
+    const [username, setUsername] = useState<string | null>(() => {
+        if (typeof window !== "undefined")
+        {
+            return localStorage.getItem("username");
+        }
+        return null;
+    });
+
+    function logout()
+    {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         window.location.reload();
     }
 
     async function uservalidation() {
-        const storedUsername = localStorage.getItem("username");
+        const storedUsername = await requireAuth();
 
-        if (!storedUsername) return;
+        if (!storedUsername)
+            return;
 
         try {
             const res = await fetch(
@@ -30,8 +42,10 @@ export default function LoggedInBadge() {
             if (!res.ok) {
                 localStorage.removeItem("token");
                 localStorage.removeItem("username");
-            } else {
+            }
+            else {
                 setUsername(storedUsername);
+                socket.emit("user_logged_in", { username: storedUsername });
             }
         } catch (err) {
             console.error(err);

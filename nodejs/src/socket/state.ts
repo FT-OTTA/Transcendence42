@@ -4,7 +4,15 @@ import type { Socket } from 'socket.io'
 export let waitingPlayers: WaitingPlayer[] = []
 export let sessions: GameSession[] = []
 
-export function clearWaitingPlayers() { waitingPlayers = [] }
+export function filterWaitingPlayers(roomId: number) {
+    waitingPlayers = waitingPlayers.filter(p => Number(p.playerData.roomId) !== roomId)
+}
+
+export function removePlayersFromRoom(roomId: number) {
+    waitingPlayers = waitingPlayers.filter(
+        p => Number(p.playerData.roomId) !== roomId
+    )
+}
 export function addSession(s: GameSession) { sessions.push(s) }
 export function findSession(socketId: string): GameSession | undefined {
     return sessions.find(s => s.sockets.some(sock => sock.id === socketId))

@@ -6,6 +6,7 @@ import type { Hero } from "otta-shared-types/hero";
 import CardSlot from "./CardSlot";
 import LargeCardView from "./LargeCardView";
 import type { Card } from 'otta-shared-types/card';
+import CardDetails from "./CardDetails";
 
 interface OpponentBoardProps {
   cards: (Card | null)[];
@@ -22,8 +23,7 @@ export default function OpponentBoard({ cards, label="Opponent", onPlay, potenti
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
   return (
-    <div className="border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4">
-      <h3 className="text-sm text-blue-300/60 mb-3 uppercase tracking-wider">{label}</h3>
+    <div className="bg-black/30 backdrop-blur-sm rounded-sm p-4">
 
       <div className="grid grid-cols-8 gap-2">
         {opponentSlots.map((slot, index) => (
@@ -51,15 +51,10 @@ export default function OpponentBoard({ cards, label="Opponent", onPlay, potenti
 
       {hoveredCard && createPortal(
         <div
-          className="fixed z-[999] pointer-events-none"
-          style={{ top: tooltipPos.y, left: tooltipPos.x }}
+          className="fixed z-[999] pointer-events-none w-56"
+          style={{ top: tooltipPos.y, left: tooltipPos.x, transform: 'translateY(-100%)' }}
         >
-          <LargeCardView
-            card={hoveredCard}
-            onClick={() => {}}
-            onConfirm={() => {}}
-            hasTargets={false}
-          />
+          <CardDetails card={hoveredCard} />
         </div>,
         document.body
       )}

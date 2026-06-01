@@ -33,7 +33,8 @@ export default function CardSlot({
   );
 
   const emptySlotClass = clsx(
-    "aspect-square rounded bg-white/10 transition-all cursor-pointer",
+    "aspect-square rounded lg:w-30",
+    "bg-sky-300/10 transition-all cursor-pointer",
     "flex items-center justify-center text-xs opacity-60",
   );
 

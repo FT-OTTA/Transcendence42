@@ -50,19 +50,18 @@ app.use((req, res, next) => {
 })
 // ─────────────────────────────────────────────────────────────────
 app.use('/illustrations', express.static('/app/databases/illustrations'));
-app.use('/avatars', express.static('/app/databases/users/avatars'))
-app.use('/cards', cardsRouter)
-app.use('/heroes', heroesRouter)
-app.use('/auth', authRouter)
-app.use('/users', historyRouter)
-console.log('historyRouter registered')
-app.use('/users', usersRouter)
-app.use('/friends', friendRouter)
-app.use('/rooms', roomRouter)
-app.use('/messages', messageRouter)
-app.use('/users', avatarRouter)
+app.use('/avatars', express.static('/app/databases/users/avatars'));
+app.use('/api/cards', cardsRouter);
+app.use('/api/heroes', heroesRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/users', historyRouter);
+console.log('historyRouter registered');
 
-// ─── Endpoint Prometheus ──────────────────────────────────────────
+app.use('/users', usersRouter);
+app.use('/friends', friendRouter);
+app.use('/rooms', roomRouter);
+app.use('/messages', messageRouter);
+app.use('/users', avatarRouter);
 
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', register.contentType)

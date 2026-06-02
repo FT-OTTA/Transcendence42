@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface PlayerStats {
   class: "Druid" | "Warrior";
   armor: number;
@@ -38,10 +40,13 @@ export default function GameStats({
   onConcede
 
 }: GameStatsProps) {
+  
+  const p = useTranslations("Playground");
+
   return (
     <div className="border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col gap-4">
-      <h3 className="text-lg font-semibold text-blue-300 text-center">Game Stats</h3>
-      <h4 className="text-md font-medium text-blue-300 text-center">Turn: {turnNumber}/8</h4>
+      <h3 className="text-lg font-semibold text-blue-300 text-center">{p("game_stats")}</h3>
+      <h4 className="text-md font-medium text-blue-300 text-center">{p("turn")}: {turnNumber}/8</h4>
 
       {/* Opponent Stats */}
       <div 
@@ -50,19 +55,19 @@ export default function GameStats({
 className={`border-b border-blue-300/30 pb-4 
   ${isOpponentHeroSelected ? "ring-4 ring-orange-500 bg-orange-500/20" : highlightOpponentHero ? "ring-2 ring-yellow-400/80 cursor-pointer" : ""}`}      >
         <h4 className="text-sm text-blue-300/60 uppercase tracking-wider mb-2">
-          {formatHeroLabel("Opponent", opponent?.class)}
+          {formatHeroLabel(p("opponent"), opponent?.class)}
         </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Armor:</span>
+            <span className="text-blue-200/70">p("armor"):</span>
             <span className="text-blue-400 font-semibold">{opponent?.armor ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Score:</span>
+            <span className="text-blue-200/70">p("score"):</span>
             <span className="text-red-400 font-semibold">{opponent?.dmgDealt ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Deck:</span>
+            <span className="text-blue-200/70">p("deck"):</span>
             <span className="text-blue-400 font-semibold">{opponent?.library.length ?? 0}</span>
           </div>
         </div>
@@ -78,23 +83,23 @@ className={`border-b border-blue-300/30 pb-4
         </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Hand Cards:</span>
+            <span className="text-blue-200/70">p("hand_cards"):</span>
             <span className="text-green-300 font-semibold">{me?.hand.length ?? 0}/8</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Armor:</span>
+            <span className="text-blue-200/70">p("armor"):</span>
             <span className="text-blue-400 font-semibold">{me?.armor ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Score:</span>
+            <span className="text-blue-200/70">p("score"):</span>
             <span className="text-red-400 font-semibold">{me?.dmgDealt ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Runes:</span>
+            <span className="text-blue-200/70">p("runes"):</span>
             <span className="text-yellow-400 font-semibold">{me?.curRunes ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">Deck:</span>
+            <span className="text-blue-200/70">p("deck"):</span>
             <span className="text-green-300 font-semibold">{me?.library.length ?? 0}</span>
           </div>
         </div>
@@ -103,7 +108,7 @@ className={`border-b border-blue-300/30 pb-4
       <button 
         onClick={onConcede}
         className="border border-red-400/40 py-2 px-3 text-sm text-red-400 hover:bg-red-400/20 transition mt-1">
-        Concede
+        p("concede")
       </button>
 
     </div>

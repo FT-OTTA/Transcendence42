@@ -78,6 +78,25 @@
     "fail_friend_fetch": "Failed to fetch friends.",
     "no_username": "Please enter a username.",
     "fail_add": "Failed to add friend."
+  },
+
+  "Playground": {
+    "loading": "Loading Game...",
+    "concede": "Concede",
+    "end_turn": "End Turn",
+    "turn": "Turn",
+    "runes": "runes",
+    "return_to_lobby": "Return to lobby",
+    "hand": "Hand",
+    "game_stats": "Game Stats",
+    "armor": "Armor",
+    "score": "Score",
+    "deck": "Deck",
+    "confirm_play": "Confirm Play",
+    "choose_your_heros": "Choose your Heros",
+    "hover_a_card": "Hover a Card to preview it",
+    "opponent": "Opponent",
+    "you": "You"
   }
 
 }

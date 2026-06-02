@@ -1,7 +1,11 @@
 "use client";
 import clsx from "clsx";
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { Card } from 'otta-shared-types/card';
 import GameCard from "./GameCard";
+import CardDetails from "./CardDetails";
+import { useLongPress } from "../../utils/useLongPress";
 
 interface CardSlotProps {
   id: string;
@@ -23,6 +27,11 @@ export default function CardSlot({
   isHighlighted = false,
   isSelected = false,
 }: CardSlotProps) {
+  const [showPreview, setShowPreview] = useState(false);
+
+  const longPress = useLongPress(() => {
+    if (card) setShowPreview(true);
+  });
 
   const wrapperClass = clsx(
     "aspect-square rounded transition-all cursor-pointer",
@@ -39,24 +48,40 @@ export default function CardSlot({
   );
 
   return (
-    <div
-      id={id}
-      onClick={() => onClick?.(card ?? null)}
-      className={card ? wrapperClass : emptySlotClass}
-    >
-      {card ? (
-        <GameCard
-          name={card.cardName}
-          cardType={card.type}
-          cost={card.runeCost}
-          runeUrl={"/default_avatar.png"}
-          attack={card.currForce}
-          defense={card.currEndurance}
-          ability={card.effects.length > 0}
-        />
-      ) : (
-        <></>
+    <>
+      <div
+        id={id}
+        onClick={() => onClick?.(card ?? null)}
+        className={card ? wrapperClass : emptySlotClass}
+        {...longPress}
+      >
+        {card ? (
+          <GameCard
+            name={card.cardName}
+            cardType={card.type}
+            cost={card.runeCost}
+            runeUrl="/default_avatar.png"
+            attack={card.currForce}
+            defense={card.currEndurance}
+            ability={card.effects.length > 0}
+          />
+        ) : (
+          <></>
+        )}
+      </div>
+
+      {/* Popup mobile onLongPress */}
+      {showPreview && card && createPortal(
+        <div
+          className="md:hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
+          onClick={() => setShowPreview(false)}
+        >
+          <div className="w-64" onClick={e => e.stopPropagation()}>
+            <CardDetails card={card} />
+          </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   );
 }

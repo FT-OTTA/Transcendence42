@@ -1,43 +1,39 @@
 import clsx from "clsx";
 import CardFooter from "./CardFooter";
 
-const CardFrame = clsx (
-	"relative",
-	"aspect-square w-30",
-	"select-none",
-	"transition duration-100",
-	"opacity-70 hover:opacity-90",
-	"bg-black/20 backdrop-blur-sm",
-	"hover:-translate-y-1",
-)
+const CardFrame = clsx(
+  "relative select-none transition duration-100",
+
+  //desktop
+  "aspect-square w-20 h-20 lg:w-30 lg:h-30",
+  "block p-0",
+  "bg-black/20 backdrop-blur-sm rounded-none border-none",
+  "opacity-70 hover:opacity-90 hover:-translate-y-1",
+);
 
 const titleClass = clsx(
-	"absolute top-0.5 left-1/2 -translate-x-1/2",
-	"text-sky-300",
-	"text-[10px] tracking-tight",
-	"z-10",
-	"w-[75%]",
-	"text-center",
-	"truncate whitespace-nowrap overflow-hidden"
+	"block",
+	"absolute top-0 left-1/2 -translate-x-1/2",
+	"text-sky-300 text-[10px] lg:text-[12px] font-semibold",
+	"z-10 w-[75%] text-center truncate whitespace-nowrap overflow-hidden"
 );
 
 const costClass = clsx(
-	"absolute top-5 left-1",
-	"text-sky-200",
-	"text-md font-bold",
-	"drop-shadow-md",
-	"z-10"
+	"block",
+	"absolute top-3 lg:top-5 left-1 lg:left-1.5",
+	"text-sky-200 text-sm lg:text-md lg:font-bold",
+	"drop-shadow-md z-10"
 );
 
 
 const runeClass = clsx(
-	"absolute inset-0",
-	"flex items-center justify-center",
-	"z-0"
+	"flex",
+	"absolute inset-0 items-center justify-center z-0"
 );
 
 const frameClass = clsx(
-	"absolute inset-0 w-full h-full z-20 pointer-events-none"
+	"block",
+	"absolute inset-0 w-full h-full border z-20 pointer-events-none"
 );
 
 type Props = {

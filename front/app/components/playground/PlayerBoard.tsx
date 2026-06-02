@@ -22,8 +22,8 @@ export default function PlayerBoard({ cards, potentialTargets, selectedTargets, 
   const [mobilePreview, setMobilePreview] = useState<Card | null>(null);
 
   return (
-    <div className="bg-black/30 backdrop-blur-sm rounded-sm p-4">
-      <div className="grid grid-cols-8 gap-2">
+    <div className="bg-black/30 backdrop-blur-sm rounded-sm p-2">
+      <div className="grid grid-cols-4 grid-lines-2 md:grid-cols-8 md:grid-lines-1 gap-2">
         {cards.map((card, index) => (
           <div
             key={index}

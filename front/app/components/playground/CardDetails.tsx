@@ -17,7 +17,7 @@ export default function CardDetails({card} : Props)
 	if (!card)
 		return (
 			<div className={clsx(container, "text-sky-200/30 italic text-xs")}>
-				Hover a card to see details
+				Select a card to see details
 			</div>
 		);
 

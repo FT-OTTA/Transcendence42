@@ -23,9 +23,9 @@ export default function OpponentBoard({ cards, label="Opponent", onPlay, potenti
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
   return (
-    <div className="bg-black/30 backdrop-blur-sm rounded-sm p-4">
+    <div className="bg-black/40 backdrop-blur-sm rounded-sm p-2">
 
-      <div className="grid grid-cols-8 gap-2">
+      <div className="grid grid-cols-4 grid-lines-2 md:grid-cols-8 md:grid-lines-1 gap-2">
         {opponentSlots.map((slot, index) => (
           <div
             key={slot}

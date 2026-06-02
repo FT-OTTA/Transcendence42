@@ -9,13 +9,23 @@ generator client {
 
 model Card {
   id String @id
-  name String
-  type String
+
+  name_en String
+  name_fr String
+  name_sv String
+
+  type_en String
+  type_fr String
+  type_sv String
+
+  effect_text_en String
+  effect_text_fr String
+  effect_text_sv String
+
   class String
   force Int?
   endurance Int?
   rune_cost Int
-  effect_text String
   effect String @db.Text
   illustration String
   target_number Int?
@@ -26,9 +36,16 @@ model Card {
 
 model Hero {
   id String @id
-  name String
+
+  name_en String
+  name_fr String
+  name_sv String
+
+  passive_text_en String
+  passive_text_fr String
+  passive_text_sv String
+
   base_armor Int
-  passive_text String
   passive_json_path String
   illustration String
   deck String @db.Text

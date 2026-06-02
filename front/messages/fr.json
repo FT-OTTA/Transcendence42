@@ -96,6 +96,8 @@
         "choose_your_heros": "Choisissez vos héros",
         "hover_a_card": "Survolez une carte pour en voir un aperçu",
         "opponent": "Adversaire",
-        "you": "Vous"
+        "you": "Vous",
+        "draw": "Égalité"
+
     }
 }

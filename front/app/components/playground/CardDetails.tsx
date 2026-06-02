@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { Card } from "otta-shared-types/card";
 import { useTranslations } from "next-intl";
+import { useLocale } from 'next-intl';
 
 const container = clsx(
 	"flex flex-col gap-2 p-3",
@@ -13,9 +14,22 @@ type Props = {
 	card: Card | null;
 };
 
+function cardLocalizer(card: Card, locale: string)
+{
+	return {
+        id: card.idInGame,
+        name: (card[`name_${locale}`] || card.name_en) as string, 
+        type: (card[`type_${locale}`] || card.type_en) as string,
+        effectText: (card[`effect_text_${locale}`] || card.effect_text_en) as string,
+        cost: card.rune_cost,
+        illustration: card.illustration,
+    };
+}
+
 export default function CardDetails({card} : Props)
 {
 	const p = useTranslations("Playground");
+	const l = useLocale();
 
 	if (!card)
 		return (
@@ -24,22 +38,24 @@ export default function CardDetails({card} : Props)
 			</div>
 		);
 
+	const localizedCard = cardLocalizer(card, l);
+
 	return (
 		<div className={container}>
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-blue-100">
-					{card?.cardName}
+					{localizedCard.name}
 				</span>
 				<span className="text-yellow-400 font-bold text-xs">
-					{card.runeCost}R
+					{localizedCard.cost}R
 				</span>
 			</div>
 				<span className="text-[9px] text-blue-200/40 uppercase tracking-wider">
-					{card.type}
+					{localizedCard.type}
 				</span>
-				{card.effectText && (
+				{localizedCard?.effectText && (
 					<p className="text-xs text-slate-300 leading-5 border-t border-blue-300/20 pt-2">
-						{card.effectText}
+						{localizedCard.effectText}
 					</p>
 				)}
 		</div>

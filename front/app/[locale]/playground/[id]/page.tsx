@@ -610,21 +610,24 @@ const locale = useLocale();
 
                         {/* Chat popup */}
                         {showChat && createPortal(
-                            <div className="fixed inset-0 bg-black/80 z-50 flex items-end">
-                                <div className="w-full bg-slate-900 border-t border-blue-400 rounded-t-xl flex flex-col gap-3 p-4 h-[70vh]">
+                            <div className="fixed inset-0 bg-black/80 z-50">
+                                <div
+                                className="absolute bottom-0 left-0 right-0 bg-slate-900 border-t border-blue-400 rounded-t-xl flex flex-col p-4"
+                                style={{ height: '70dvh' }}
+                                >
                                     <button
                                         onClick={() => setShowChat(false)}
-                                        className="self-end text-blue-300 text-lg"
+                                        className="self-end text-blue-300 text-lg shrink-0 mb-2"
                                     >
-                                         ✕
+                                        ✕
                                     </button>
-                                    <div className="absolute h-full">
+                                    <div className="flex-1 min-h-0">
                                         <ChatPanel />
                                     </div>
                                 </div>
                             </div>,
                             document.body
-                        )}
+                            )}
 
                         </div>
                     </>

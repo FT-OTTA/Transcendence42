@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 interface ConfirmPlayProps {
   onClick: () => void;
   disabled?: boolean;
@@ -5,7 +7,10 @@ interface ConfirmPlayProps {
 
 
 export default function ConfirmPlay({ onClick, disabled }: ConfirmPlayProps) {
-  return (
+  
+    const p = useTranslations("Playground");
+
+    return (
 	<div className="rounded-lg text-center">
 	     <button
   			onClick={onClick}
@@ -20,7 +25,7 @@ export default function ConfirmPlay({ onClick, disabled }: ConfirmPlayProps) {
     		uppercase text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)]
   			"
 			>
-  			Confirm Play
+  			{p("confirm_play")}
 		</button>
 	 </div>
   );

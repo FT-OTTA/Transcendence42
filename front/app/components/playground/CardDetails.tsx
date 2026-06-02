@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { Card } from "otta-shared-types/card";
+import { useTranslations } from "next-intl";
 
 const container = clsx(
 	"flex flex-col gap-2 p-3",
@@ -14,10 +15,12 @@ type Props = {
 
 export default function CardDetails({card} : Props)
 {
+	const p = useTranslations("Playground");
+
 	if (!card)
 		return (
 			<div className={clsx(container, "text-sky-200/30 italic text-xs")}>
-				Select a card to see details
+				{p("hover_a_card")}
 			</div>
 		);
 

@@ -78,5 +78,24 @@
       "fail_friend_fetch": "Det gick inte att hämta vänner.",
       "no_username": "Ange ett användarnamn.",
       "fail_add": "Det gick inte att lägga till vän."
+    },
+
+    "Playground": {
+      "loading": "Laddar spel...",
+      "concede": "Ge upp",
+      "end_turn": "Avsluta tur",
+      "turn": "Tur",
+      "runes": "runor",
+      "return_to_lobby": "Återvänd till lobbyn",
+      "hand": "Hand",
+      "game_stats": "Spelstatistik",
+      "armor": "Rustning",
+      "score": "Poäng",
+      "deck": "Kortlek",
+      "confirm_play": "Bekräfta drag",
+      "choose_your_heros": "Välj dina hjältar",
+      "hover_a_card": "Hovra över ett kort för att förhandsgranska",
+      "opponent": "Motståndare",
+      "you": "Du"
     }
 }

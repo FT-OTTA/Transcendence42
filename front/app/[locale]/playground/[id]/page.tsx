@@ -16,6 +16,7 @@ import LargeCardView from '@/app/components/playground/LargeCardView';
 import { Hero } from 'otta-shared-types/hero';
 import { usePathname } from 'next/navigation'
 import { useLocale } from 'next-intl';
+import { useTranslations } from "next-intl";
 import HeroStrip from '@/app/components/playground/HeroStripProps';
 import ChatPanel from '@/app/components/lobby/ChatPanel';
 import CardDetails from '@/app/components/playground/CardDetails';
@@ -24,6 +25,8 @@ import { createPortal } from 'react-dom';
 export default function PlaygroundPage() {
   const { id } = useParams();
   const pathname = usePathname()
+
+  const p = useTranslations("Playground");
 
   // permet de restaurer la sélection du héros si la page est rechargée accidentellement (F5, crash, etc.) pendant une partie
   const [selectedHero, setSelectedHero] = useState<string | null>(() => {
@@ -387,7 +390,7 @@ const onHeroClick = (type: "self" | "opponent") => {
 
 const locale = useLocale();
     if (!hydrated) return (
-        <div className="pt-20 text-center text-blue-200/70">Loading game...</div>
+        <div className="pt-20 text-center text-blue-200/70">{p("loading")}</div>
     )
     return (
     <main className="overflow-x-hidden h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80 overflow-y-hidden">
@@ -399,7 +402,7 @@ const locale = useLocale();
             <>
                 {isLoading ? (
                     <div className="pt-20 text-center text-blue-200/70">
-                        Loading game...
+                        {p("loading")}
                     </div>
 
                     ) : isSpectator ? (
@@ -414,7 +417,7 @@ const locale = useLocale();
                             <div className="col-span-3 lg:col-span-2 flex flex-col gap-2 min-h-0">
 
                                 <HeroStrip
-                                    label="Opponent"
+                                    label={p("opponent")}
                                     playerClass={opponentStats?.class}
                                     armor={opponentStats?.armor ?? 0}
                                     dmgDealt={opponentStats?.dmgDealt ?? 0}
@@ -442,7 +445,7 @@ const locale = useLocale();
                                 />
 
                                 <HeroStrip
-                                    label="You"
+                                    label={p("you")}
                                     playerClass={meStats?.class}
                                     armor={meStats?.armor ?? 0}
                                     dmgDealt={meStats?.dmgDealt ?? 0}
@@ -483,20 +486,20 @@ const locale = useLocale();
                                             onClick={handleEndTurn}
                                             className="border rounded-xl border-blue-300 py-1.5 px-2 text-sm hover:bg-blue-300 hover:text-black transition"
                                             >
-                                                {waitingEndTurn ? "..." : "End Turn"}
+                                                {waitingEndTurn ? "..." : p("end_turn")}
                                         </button>
                                     </div>
                                     
                                     {/* Tour */}
                                     <div className="text-center text-sm text-blue-300/60 py-1">
-                                        Turn {turnNumber}/8
+                                        {p("turn")} {turnNumber}/8
                                     </div>
 
                                     <button
                                             onClick={handleConcede}
                                             className="border border-red-400/40 py-2 px-2 text-xs text-red-400 hover:bg-red-400/20 transition rounded-sm"
                                             >
-                                                Concede
+                                                {p("concede")}
                                     </button>
                                 </div>
 
@@ -643,7 +646,7 @@ const locale = useLocale();
                 onClick={() => window.location.href = `/${locale}/lobby`}
                 className="border border-blue-300 px-6 py-2 hover:bg-blue-300 hover:text-black transition"
             >
-                Retour au lobby
+                {p("return_to_lobby")}
             </button>
             </div>
         </div>

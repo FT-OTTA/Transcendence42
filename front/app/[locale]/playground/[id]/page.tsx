@@ -138,7 +138,7 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
 
     newSocket.on('game_over', (data) => {
         const msg = data.message ?? (
-            data.winner === -1 ? "Match nul !" :
+            data.winner === -1 ? p("draw") :
             data.winner === myPlayerIndexRef.current ? "Vous avez gagné !" : "Vous avez perdu !"
         )
         setGameOverMessage(msg)

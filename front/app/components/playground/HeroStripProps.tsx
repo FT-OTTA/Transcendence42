@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 
 interface HeroStripProps {
   label: string;
@@ -39,6 +40,8 @@ export default function HeroStrip({
   isOpponent = false,
 }: HeroStripProps) {
   const isClickable = isHighlighted || isSelected;
+  
+  const p = useTranslations("Playground");
 
   const stripClass = clsx(
     strip,
@@ -66,27 +69,27 @@ export default function HeroStrip({
 
       <div className="flex items-center gap-4 flex-1 justify-end">
         <div className={stat}>
-          <span className={statLabel}>Armor</span>
+          <span className={statLabel}>{p("armor")}</span>
           <span className={statValue}>{armor}</span>
         </div>
         <div className={stat}>
-          <span className={statLabel}>Score</span>
+          <span className={statLabel}>{p("score")}</span>
           <span className={clsx(statValue, "text-red-400")}>{dmgDealt}</span>
         </div>
         {curRunes !== undefined && (
           <div className={stat}>
-            <span className={statLabel}>Runes</span>
+            <span className={statLabel}>{p("runes")}</span>
             <span className={clsx(statValue, "text-yellow-400")}>{curRunes}</span>
           </div>
         )}
         {handCount !== undefined && (
           <div className={stat}>
-            <span className={statLabel}>Hand</span>
+            <span className={statLabel}>{p("hand")}</span>
             <span className={clsx(statValue, "text-green-300")}>{handCount}/8</span>
           </div>
         )}
         <div className={stat}>
-          <span className={statLabel}>Deck</span>
+          <span className={statLabel}>{p("deck")}</span>
           <span className={statValue}>{deckCount}</span>
         </div>
       </div>

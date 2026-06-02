@@ -78,5 +78,24 @@
       "fail_friend_fetch": "Échec du chargement des amis.",
       "no_username": "Veuillez entrer un nom d'utilisateur.",
       "fail_add": "Échec de l'ajout d'un ami."
+    },
+
+    "Playground": {
+        "loading": "Chargement du jeu...",
+        "concede": "Abandonner",
+        "end_turn": "Fin de tour",
+        "turn": "Tour",
+        "runes": "runes",
+        "return_to_lobby": "Retour au salon",
+        "hand": "Main",
+        "game_stats": "Stats de la partie",
+        "armor": "Armure",
+        "score": "Points",
+        "deck": "Deck",
+        "confirm_play": "Confirmer le coup",
+        "choose_your_heros": "Choisissez vos héros",
+        "hover_a_card": "Survolez une carte pour en voir un aperçu",
+        "opponent": "Adversaire",
+        "you": "Vous"
     }
 }

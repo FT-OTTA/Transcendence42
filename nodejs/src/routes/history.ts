@@ -5,8 +5,6 @@ import { prisma } from '../../prisma/prisma.ts';
 const router = Router();
 
 router.get('/history/:username', async (req, res) => {
-    console.log('HISTORY ROUTE HIT', req.params.username);
-
     const { username } = req.params;
     const user = await prisma.user.findUnique({ where: { username } });
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -31,10 +29,12 @@ router.get('/history/:username', async (req, res) => {
         const opponent = isDraw
             ? (r.player1Id === user.id ? r.player2?.username : r.player1?.username)
             : (isWin ? r.loser?.username : r.winner?.username);
+        const heroClass = r.player1Id === user.id ? r.player1Class : r.player2Class;
         return {
             opponent,
             result: isDraw ? 'draw' : (isWin ? 'win' : 'loss'),
             turns: r.turns,
+            heroClass
         };
     });
     res.json(formatted);

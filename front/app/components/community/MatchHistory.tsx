@@ -32,6 +32,7 @@ export default function MatchHistory({ username }: { username: string }) {
 					opponent={match.opponent}
 					score={match.score}
 					result={match.result}
+					heroClass={match.heroClass}
 					/>
 				))}
 			</section>

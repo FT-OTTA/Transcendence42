@@ -83,7 +83,9 @@ model GameResult {
     loserId   Int?
     player1Id Int
     player2Id Int
-
+    player1Class String
+    player2Class String
+    
     turns     Int
 
     winner    User? @relation("GameWinner", fields: [winnerId], references: [id])

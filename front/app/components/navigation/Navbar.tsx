@@ -4,6 +4,7 @@ import clsx from "clsx";
 import MobileNavbar from "./MobileNavbar"
 import {useTranslations} from 'next-intl';
 import LanguageSwitcher from "../Language/LanguageSwitcher";
+import LoggedInBadge from "../login/LoggedInBadge";
 
 
 const NavbarClassDesktop = clsx
@@ -36,6 +37,10 @@ export default function Navbar()
 					<NavItem text={t("community")} href="/community" />
 					<NavItem text={t("lobby")} href="/lobby" />
 				</nav>
+				<div className="right-0">
+					<LoggedInBadge/>
+				</div>
+
 				{/* <div className={ NavLine }/> */}
 			</div>
 

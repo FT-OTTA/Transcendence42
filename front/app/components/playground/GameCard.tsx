@@ -62,7 +62,7 @@ export default function GameCard({
 		spell: "/cardframes/spellFrame.svg",
 		building: "/cardframes/buildingFrame.svg",
 	}[cardType];
-
+	console.log(runeUrl);
 	return (
 		<div className = { CardFrame }>
 

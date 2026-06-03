@@ -1,6 +1,11 @@
+'use client'
+
 import MobileNavItem from "./MobileNavItem"
 import { useState } from "react";
 import clsx from "clsx";
+import LoggedInBadge from "../login/LoggedInBadge";
+import LanguageSwitcher from "../Language/LanguageSwitcher";
+import {useTranslations} from 'next-intl';
 
 const BurgerButton = clsx
 (
@@ -25,6 +30,7 @@ const MenuBurger = clsx
 export default function MobileNavbar()
 {
 	const [isOpen, setIsOpen] = useState(false);
+	const t = useTranslations('Navbar');
 
 	return (
 		<div className="flex md:hidden">
@@ -39,13 +45,17 @@ export default function MobileNavbar()
 						className="absolute top-2 right-4 text-4xl text-blue-200">
 						✕
 					</button>
-					
+					<div 
+						onClick={(e) => e.stopPropagation()}
+						className="absolute top-2 left-4 text-4xl text-blue-200">
+						<LanguageSwitcher />
+					</div>
 					<div onClick={(e) => e.stopPropagation()}
 						className="fixed z-50 overflow-hidden flex flex-col justify-center items-end gap-8"
 					>
-						<MobileNavItem text="Home" href="/" />
-						<MobileNavItem text="Community" href="/community" />
-						<MobileNavItem text="Rooms" href="/lobby" />
+						<MobileNavItem text={t("home")} href="/" />
+						<MobileNavItem text={t("community")} href="/community" />
+						<MobileNavItem text={t("lobby")} href="/lobby" />
 					</div>
 				</div>
 			)}

@@ -8,17 +8,24 @@ export default function ProfilePanel() {
 
     const [username, setUsername] = useState("Placeholder");
     const [matches, setMatches] = useState<any[]>([]);
+    const [moodPhrase, setMoodPhrase] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
     const l = useTranslations("Lobby");
 
     useEffect(() => {
         async function init() {
             const user = await requireAuth();
             setUsername(user ?? "Placeholder");
-            
             if (!user) return;
             const res = await fetch(`http://localhost:3000/users/history/${user}`);
             const data = await res.json();
             setMatches(Array.isArray(data) ? data : []);
+            
+            const res2 = await fetch(`http://localhost:3000/users/${user}`);
+            const data2 = await res2.json();
+            setMoodPhrase(data2.moodphrase ?? "no mood yet");
+            setAvatarUrl(data2.avatarUrl ?? null);
         }
         init();
     }, []);
@@ -34,7 +41,7 @@ export default function ProfilePanel() {
         
             <div className="flex gap-4 items-start">
                 
-                <AvatarFrame/>
+                <AvatarFrame avatarUrl={avatarUrl} />
 
                 <div className="flex-1 flex flex-col gap-1">
 
@@ -43,21 +50,16 @@ export default function ProfilePanel() {
                         <h3 className="text-2xl font-semibold text-blue-100">
                             {username}
                         </h3>
-                        
-                        <button className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition">
-                            ⚙
-                        </button>
-
                     </div>
         
-                    <p className="text-base text-blue-200/70">
+                    {/* <p className="text-base text-blue-200/70">
                         Favorite class: Mage
-                    </p>
+                    </p> */}
                     <p className="text-sm text-blue-200/60">
                         {winsNumber}W - {lossesNumber}L - {drawsNumber}D
                     </p>
                     <p className="text-xs italic text-blue-200/40 mt-1">
-                        Deep message cuz cool guy
+                        {moodPhrase || ""}
                     </p>
 
                 </div>

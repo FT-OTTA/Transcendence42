@@ -27,6 +27,17 @@ function parseCSV(filePath: string): Record<string, string>[] {
 
 // methode .upsert = mix de update et insert, insert l'entree
 // update en cas de duplicate.
+function getIllustrationPath(collectionId: string): string {
+    const prefix = collectionId[0]; // 'c', 'b', 's'
+    const num = parseInt(collectionId.slice(1)); // 001 → 1
+
+    const offset = prefix === 'c' ? 0 : prefix === 'b' ? 100 : 200;
+    const index = num + offset;
+
+    const decimal = index.toString().padStart(3, '0');
+    const binary = index.toString(2).padStart(8, '0');
+    return `/illustrations/otta_256_runes/${decimal}_${binary}.png`;
+}
 
 async function importCreatures() {
     const rows = parseCSV('/app/databases/creatures/CREATURE_DB.csv')
@@ -47,7 +58,7 @@ async function importCreatures() {
                 force: parseInt(row['Force']),
                 endurance: parseInt(row['Endurance']),
                 effect: parseJSON("/app/databases/creatures/effects/" + row['Effect (json path)']),
-                illustration: row['Illustration'],
+                illustration: getIllustrationPath(row['CollectionID']),
                 target_number: parseInt(row['Target Number']),
                 target_type: row['Target Type']
             }
@@ -78,7 +89,7 @@ async function importBuildings() {
                 rune_cost: parseInt(row['Rune Cost']),
                 endurance: parseInt(row['Life']), // On mappe "Life" vers endurance
                 effect: parseJSON("/app/databases/buildings/effects/" + row['Effect (json path)']),
-                illustration: row['Illustration'],
+                illustration: getIllustrationPath(row['CollectionID']),
             }
         await prisma.card.upsert({
             where: { id: row['CollectionID'] },
@@ -106,7 +117,7 @@ async function importSpells() {
                 class: row['Class'],
                 rune_cost: parseInt(row['Rune Cost']),
                 effect: parseJSON("/app/databases/spells/effects/" + row['Effect (json path)']),
-                illustration: row['Illustration (.png)'],
+                illustration: getIllustrationPath(row['CollectionID']),
                 target_number: parseInt(row['Target Number']),
                 target_type: row['Target Type'],
                 timing: row['Timing'] === 'immediate' ? 'immediate' : 'end_of_turn'

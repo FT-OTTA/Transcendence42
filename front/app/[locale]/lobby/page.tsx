@@ -7,6 +7,7 @@ import RoomsPanel from "../../components/lobby/RoomsPanel";
 import Navbar from "../../components/navigation/Navbar";
 import LoggedInBadge from "../../components/login/LoggedInBadge";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 type ActivePanel = "friends" | "chat" | null;
 
@@ -15,6 +16,7 @@ export default function LobbyPage() {
 
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [mounted, setMounted] = useState(false);
+  const l = useTranslations();
 
   useEffect(() => {
     setMounted(true);
@@ -26,9 +28,9 @@ export default function LobbyPage() {
         
         {mounted && <Navbar />}
         
-        {mounted && <LoggedInBadge/>}
-
           <div className="hidden md:grid flex flex-col flex-1 overflow-hidden min-h-0 overflow-hidden grid-cols-1 md:grid-cols-4 gap-4 pt-4">
+            
+            {mounted && <LoggedInBadge/>}
 
             <div className="flex flex-col gap-4 h-full min-h-0">
                 {mounted && <ProfilePanel />}
@@ -39,7 +41,7 @@ export default function LobbyPage() {
               {mounted && <RoomsPanel />}
             </div>
 
-            {mounted && <ChatPanel />}          
+            {mounted && <ChatPanel />}
         
           </div>
 
@@ -50,37 +52,42 @@ export default function LobbyPage() {
               {mounted && <RoomsPanel />}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex justify-center items-center gap-20">
               <button onClick={() => setActivePanel("friends")}>
-                Friends
+                  👥
               </button>
 
               <button onClick={() => setActivePanel("chat")}>
-                Chat
+                💬
               </button>
             </div>
 
           </div>
 
-          {activePanel && (
-            <div
-              className="fixed overflow-y-auto top-0 inset-0 flex bg-black/40 backdrop-blur-sm z-50"
-              onClick={() => setActivePanel(null)}
-            >
-              {activePanel == "friends" && (
-                <div onClick={(e) => e.stopPropagation()}>
-                  {mounted && <FriendsPanel />}
-                </div>
-              )}
-
-              {activePanel == "chat" && (
-                <div onClick={(e) => e.stopPropagation()}>
-                  {mounted && <ChatPanel />}
-                </div>
-              )}
-
-            </div>
-          )}
+        {activePanel && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 p-4"
+            onClick={() => setActivePanel(null)}
+          >
+            {activePanel === "friends" && (
+              <div 
+                className="w-full max-w-md h-[80vh] min-h-0 flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {mounted && <FriendsPanel />}
+              </div>
+            )}
+        
+            {activePanel === "chat" && (
+              <div 
+                className="w-full max-w-md h-[80vh] min-h-0 flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {mounted && <ChatPanel />}
+              </div>
+            )}
+          </div>
+        )}
     </main>
     );
 }

@@ -221,34 +221,35 @@ export default function FriendsPanel() {
         );
     }
 
-    return (
-        <>
-            <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm">
+return (
+    <>
+        <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm">
 
-                <h2 className="text-xl mb-2 text-center py-2">
-                    {l("friends")}
-                </h2>
+            <h2 className="text-xl mb-2 text-center py-2">
+                {l("friends")}
+            </h2>
 
-                <button
-                    onClick={() => setShowAddPopup(true)}
-                    className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
-                >
-                    + {l("add_friend")}
-                </button>
+            <button
+                onClick={() => setShowAddPopup(true)}
+                className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
+            >
+                + {l("add_friend")}
+            </button>
 
-                <div className={`${customScrollBar} flex flex-col gap-2 flex-1 py-4 overflow-y-auto pr-1`}>
+            <div className={`${customScrollBar} flex flex-col gap-2 flex-1 py-4 overflow-y-auto pr-1`}>
 
-                    {friends.length === 0 && (
-                        <p className="text-center text-blue-200/50 text-sm mt-4">
-                            {l("no_friends")}
-                        </p>
-                    )}
+                {friends.length === 0 && (
+                    <p className="text-center text-blue-200/50 text-sm mt-4">
+                        {l("no_friends")}
+                    </p>
+                )}
 
-                    {friends.map((friend) => (
-                        <div
-                            key={friend.name}
-                            className="grid grid-cols-3 gap-2 items-center border border-blue-300/40 p-2"
-                        >
+                {friends.map((friend) => (
+                    <div
+                        key={friend.name}
+                        className="flex flex-col gap-3 sm:grid sm:grid-cols-3 sm:gap-2 items-start sm:items-center border border-blue-300/40 p-3 sm:p-2"
+                    >
+                        <div className="flex items-center justify-between w-full sm:contents">
                             <div className="font-semibold text-blue-100">
                                 {friend.name}
                             </div>
@@ -258,95 +259,96 @@ export default function FriendsPanel() {
                             >
                                 {p(friend.status)}
                             </div>
-
-                            <div className="flex gap-2 justify-end">
-
-                                {friend.status === "in room" && (
-                                    <button className="text-xs border border-green-300 px-2 py-1 text-green-300 hover:bg-green-300 hover:text-black">
-                                        {l("join")}
-                                    </button>
-                                )}
-
-                                {friend.status === "playing" && (
-                                    <button className="text-xs border border-blue-400 px-2 py-1 text-blue-300 hover:bg-blue-300 hover:text-black">
-                                        {l("spectate")}
-                                    </button>
-                                )}
-
-                                <button 
-                                    onClick={ () => handleRemoveFriend(friend.name)}
-                                    className="text-xs border border-red-300 px-2 py-1 hover:bg-red-300 hover:text-black">
-                                    {l("remove")}
-                                </button>
-
-                            </div>
                         </div>
-                    ))}
-                </div>
-            </div>
 
-            {showAddPopup && (
-                <div
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-                    onClick={() => setShowAddPopup(false)}
-                >
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-full max-w-sm border border-blue-300 bg-black/80 backdrop-blur-sm p-6 rounded-sm flex flex-col gap-4"
-                    >
-                        <h3 className="text-xl text-center text-blue-100">
-                            {l("add_friend")}
-                        </h3>
+                        <div className="flex gap-2 w-full justify-end sm:col-start-3">
 
-                        <input
-                            type="text"
-                            value={friendUsername}
-                            onChange={(e) =>
-                                setFriendUsername(e.target.value)
-                            }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    handleAddFriend();
-                                }
-                            }}
-                            placeholder= {l("username")}
-                            className="w-full px-3 py-2 bg-transparent border border-blue-300 text-blue-200 outline-none"
-                        />
+                            {friend.status === "in room" && (
+                                <button className="flex-1 sm:flex-none text-center text-xs border border-green-300 px-2 py-1 text-green-300 hover:bg-green-300 hover:text-black">
+                                    {l("join")}
+                                </button>
+                            )}
 
+                            {friend.status === "playing" && (
+                                <button className="flex-1 sm:flex-none text-center text-xs border border-blue-400 px-2 py-1 text-blue-300 hover:bg-blue-300 hover:text-black">
+                                    {l("spectate")}
+                                </button>
+                            )}
 
-                        {error && (
-                            <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
-                                {e(error)}
-                            </p>
-                        )}
-
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() =>
-                                    {
-                                        setShowAddPopup(false);
-                                        setError("");
-                                        setFriendUsername("");
-                                    }
-                                }
-                                className="flex-1 border border-gray-500 py-2 hover:bg-gray-700 transition"
-                            >
-                                {l("cancel")}
+                            <button 
+                                onClick={ () => handleRemoveFriend(friend.name)}
+                                className="flex-1 sm:flex-none text-center text-xs border border-red-300 px-2 py-1 hover:bg-red-300 hover:text-black">
+                                {l("remove")}
                             </button>
 
-                            <button
-                                onClick={handleAddFriend}
-                                disabled={adding}
-                                className="flex-1 border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
-                            >
-                                {adding
-                                    ? l("adding")
-                                    : l("add_friend")}
-                            </button>
                         </div>
                     </div>
+                ))}
+            </div>
+        </div>
+
+        {showAddPopup && (
+            <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                onClick={() => setShowAddPopup(false)}
+            >
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full max-w-sm border border-blue-300 bg-black/80 backdrop-blur-sm p-6 rounded-sm flex flex-col gap-4"
+                >
+                    <h3 className="text-xl text-center text-blue-100">
+                        {l("add_friend")}
+                    </h3>
+
+                    <input
+                        type="text"
+                        value={friendUsername}
+                        onChange={(e) =>
+                            setFriendUsername(e.target.value)
+                        }
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleAddFriend();
+                            }
+                        }}
+                        placeholder= {l("username")}
+                        className="w-full px-3 py-2 bg-transparent border border-blue-300 text-blue-200 outline-none"
+                    />
+
+
+                    {error && (
+                        <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
+                            {e(error)}
+                        </p>
+                    )}
+
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() =>
+                                {
+                                    setShowAddPopup(false);
+                                    setError("");
+                                    setFriendUsername("");
+                                }
+                            }
+                            className="flex-1 border border-gray-500 py-2 hover:bg-gray-700 transition"
+                        >
+                            {l("cancel")}
+                        </button>
+
+                        <button
+                            onClick={handleAddFriend}
+                            disabled={adding}
+                            className="flex-1 border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
+                        >
+                            {adding
+                                ? l("adding")
+                                : l("add_friend")}
+                        </button>
+                    </div>
                 </div>
-            )}
-        </>
-    );
+            </div>
+        )}
+    </>
+);
 }

@@ -13,7 +13,11 @@ type Message = {
     isSelf: boolean;
 };
 
-export default function ChatPanel() {
+interface ChatPanelProps {
+    roomId?: number | null;
+}
+
+export default function ChatPanel({ roomId = null }: ChatPanelProps) {
     const [chatMessages, setChatMessages] = useState<Message[]>([]);
     const [messageInput, setMessageInput] = useState("");
     const [error, setError] = useState("");
@@ -46,7 +50,11 @@ export default function ChatPanel() {
 
     async function fetchMessages() {
         const username = localStorage.getItem("username");
-        const res = await fetch("http://localhost:3000/messages/global");
+        const url = roomId 
+            ? `http://localhost:3000/messages/room/${roomId}`
+            : "http://localhost:3000/messages/global";
+
+        const res = await fetch(url);
 
         if (!res.ok) {
             const err = await res.json();
@@ -83,7 +91,7 @@ export default function ChatPanel() {
         socket.emit('send_message', {
             username,
             content: messageInput,
-            roomId: null,
+            roomId: roomId,
         });
 
         setMessageInput("");
@@ -93,8 +101,13 @@ export default function ChatPanel() {
         fetchMessages();
         const username = localStorage.getItem("username");
 
-        // Named handler for accurate synchronization tear-down
+        if (roomId) {
+            socket.emit('join_room', { roomId });
+        }
+
         const handleNewMessage = (msg: any) => {
+            if (msg.roomId !== roomId) return;
+
             const formatted: Message = {
                 id: msg.id,
                 name: msg.sender.username,
@@ -109,8 +122,11 @@ export default function ChatPanel() {
 
         return () => {
             socket.off('new_message', handleNewMessage);
+            if (roomId) {
+                socket.emit('leave_room', { roomId });
+            }
         };
-    }, []);
+    }, [roomId]);
 
     return (
         <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm ">

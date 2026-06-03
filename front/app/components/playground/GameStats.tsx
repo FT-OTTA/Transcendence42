@@ -59,15 +59,15 @@ className={`border-b border-blue-300/30 pb-4
         </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("armor"):</span>
+            <span className="text-blue-200/70">{p("armor")}:</span>
             <span className="text-blue-400 font-semibold">{opponent?.armor ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("score"):</span>
+            <span className="text-blue-200/70">{p("score")}:</span>
             <span className="text-red-400 font-semibold">{opponent?.dmgDealt ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("deck"):</span>
+            <span className="text-blue-200/70">{p("deck")}:</span>
             <span className="text-blue-400 font-semibold">{opponent?.library.length ?? 0}</span>
           </div>
         </div>
@@ -83,23 +83,23 @@ className={`border-b border-blue-300/30 pb-4
         </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("hand_cards"):</span>
+            <span className="text-blue-200/70">{p("hand_cards")}:</span>
             <span className="text-green-300 font-semibold">{me?.hand.length ?? 0}/8</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("armor"):</span>
+            <span className="text-blue-200/70">{p("armor")}:</span>
             <span className="text-blue-400 font-semibold">{me?.armor ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("score"):</span>
+            <span className="text-blue-200/70">{p("score")}:</span>
             <span className="text-red-400 font-semibold">{me?.dmgDealt ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("runes"):</span>
+            <span className="text-blue-200/70">{p("runes")}:</span>
             <span className="text-yellow-400 font-semibold">{me?.curRunes ?? 0}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-blue-200/70">p("deck"):</span>
+            <span className="text-blue-200/70">{p("deck")}:</span>
             <span className="text-green-300 font-semibold">{me?.library.length ?? 0}</span>
           </div>
         </div>
@@ -108,7 +108,7 @@ className={`border-b border-blue-300/30 pb-4
       <button 
         onClick={onConcede}
         className="border border-red-400/40 py-2 px-3 text-sm text-red-400 hover:bg-red-400/20 transition mt-1">
-        p("concede")
+        {p("concede")}
       </button>
 
     </div>

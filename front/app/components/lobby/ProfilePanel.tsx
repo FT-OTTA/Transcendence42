@@ -20,22 +20,9 @@ export default function ProfilePanel() {
             if (!user) return;
             const res = await fetch(`/users/history/${user}`);
             const data = await res.json();
-            
-            const res2 = await fetch(`/api/users/${user}`);
-            const data2 = await res2.json();
-            setMoodPhrase(data2.moodphrase ?? "no mood yet");
-            setAvatarUrl(data2.avatarUrl ?? null);
-
             setMatches(Array.isArray(data) ? data : []);
             
             const res2 = await fetch(`/api/users/${user}`);
-            const data2 = await res2.json();
-            setMoodPhrase(data2.moodphrase ?? "no mood yet");
-            setAvatarUrl(data2.avatarUrl ?? null);
-
-            setMatches(Array.isArray(data) ? data : []);
-            
-            const res2 = await fetch(`/users/${user}`);
             const data2 = await res2.json();
             setMoodPhrase(data2.moodphrase ?? "no mood yet");
             setAvatarUrl(data2.avatarUrl ?? null);
@@ -81,7 +68,7 @@ export default function ProfilePanel() {
                         {winsNumber}W - {lossesNumber}L - {drawsNumber}D
                     </p>
                     <p className="text-xs italic text-blue-200/40 mt-1">
-                        {moodPhrase || l("no_mood")}
+                        {moodPhrase}
                     </p>
 
                 </div>

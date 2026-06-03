@@ -67,8 +67,7 @@ async function buildHero(heroId: string): Promise<Hero> {
         owner: null as any,
         timing: c.timing ?? 'end_of_turn' as EffectTime,
         state: 'alive' as CreatureState,
-        fullPicPath: c.illustration ?? '',
-        smallPicPath: c.illustration ?? '',
+        illustration: c.illustration ?? '',
         cardBackPath: ''
     }))
 

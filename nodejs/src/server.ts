@@ -46,7 +46,7 @@ app.use((req, res, next) => {
     next()
 })
 // ─────────────────────────────────────────────────────────────────
-
+app.use('/illustrations', express.static('/app/databases/illustrations'));
 app.use('/avatars', express.static('/app/databases/users/avatars'))
 app.use('/cards', cardsRouter)
 app.use('/heroes', heroesRouter)

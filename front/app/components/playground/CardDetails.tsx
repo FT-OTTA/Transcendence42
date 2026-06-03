@@ -14,22 +14,11 @@ type Props = {
 	card: Card | null;
 };
 
-function cardLocalizer(card: Card, locale: string)
-{
-	return {
-        id: card.idInGame,
-        name: (card[`name_${locale}`] || card.name_en) as string, 
-        type: (card[`type_${locale}`] || card.type_en) as string,
-        effectText: (card[`effect_text_${locale}`] || card.effect_text_en) as string,
-        cost: card.rune_cost,
-        illustration: card.illustration,
-    };
-}
 
 export default function CardDetails({card} : Props)
 {
 	const p = useTranslations("Playground");
-	const l = useLocale();
+	const locale = useLocale();
 
 	if (!card)
 		return (
@@ -38,24 +27,22 @@ export default function CardDetails({card} : Props)
 			</div>
 		);
 
-	const localizedCard = cardLocalizer(card, l);
-
 	return (
 		<div className={container}>
 			<div className="flex items-center justify-between">
 				<span className="font-semibold text-blue-100">
-					{localizedCard.name}
+					{card[`cardName_${locale}`]}
 				</span>
 				<span className="text-yellow-400 font-bold text-xs">
-					{localizedCard.cost}R
+					{card.runeCost}R
 				</span>
 			</div>
 				<span className="text-[9px] text-blue-200/40 uppercase tracking-wider">
-					{localizedCard.type}
+					{card.type}
 				</span>
-				{localizedCard?.effectText && (
+				{card[`effectText_${locale}`] && (
 					<p className="text-xs text-slate-300 leading-5 border-t border-blue-300/20 pt-2">
-						{localizedCard.effectText}
+						{card[`effectText_${locale}`]}
 					</p>
 				)}
 		</div>

@@ -2,6 +2,7 @@
 import clsx from "clsx";
 import type { Card } from 'otta-shared-types/card';
 import GameCard from "./GameCard";
+import { useLocale } from "next-intl";
 
 interface CardSlotProps {
   id: string;
@@ -38,6 +39,7 @@ export default function CardSlot({
     "flex items-center justify-center text-xs opacity-60",
   );
 
+  const locale = useLocale();
   return (
     <div
       id={id}
@@ -46,7 +48,7 @@ export default function CardSlot({
     >
       {card ? (
         <GameCard
-          name={card.cardName}
+          name={(card[`cardName_${locale}`] || card.name_en)}
           cardType={card.type}
           cost={card.runeCost}
           runeUrl={"/default_avatar.png"}

@@ -7,7 +7,7 @@ import sharp from "sharp";
 
 const router = Router()
 
-router.post('/api/:login/avatar', async (req, res) => {
+router.post('/:login/avatar', async (req, res) => {
 	try 
 	{
 		const { login } = req.params;
@@ -21,8 +21,8 @@ router.post('/api/:login/avatar', async (req, res) => {
 			return res.status(400).json({error : "No file uploaded" });
 		}
 
-		const filename = `${login}.png`;
-		const folder = path.join(process.cwd(), "/api/databases/users/avatars");
+		const filename = `${login.toLowerCase()}.png`;
+		const folder = path.join(process.cwd(), "databases/users/avatars");
 
 		fs.mkdirSync( folder, { recursive: true });
 
@@ -35,7 +35,7 @@ router.post('/api/:login/avatar', async (req, res) => {
 
 		await prisma.user.update({
 			where: {username: login },
-			data: {avatarUrl: `/api/avatars/${filename}`},
+			data: {avatarUrl: `/avatars/${filename}`},
 		});
 	} 
 	catch (err)

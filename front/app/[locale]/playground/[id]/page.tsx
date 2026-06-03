@@ -25,8 +25,8 @@ import { createPortal } from 'react-dom';
 export default function PlaygroundPage() {
   const { id } = useParams();
   const pathname = usePathname()
-
   const p = useTranslations("Playground");
+  const CurrentRoomId = id ? Number(id) : null;
 
   // permet de restaurer la sélection du héros si la page est rechargée accidentellement (F5, crash, etc.) pendant une partie
   const [selectedHero, setSelectedHero] = useState<string | null>(() => {
@@ -505,7 +505,7 @@ const locale = useLocale();
 
                                 {/* Chat */}
                                 <div className="flex-1 min-h-0">
-                                    <ChatPanel />
+                                    <ChatPanel roomId={CurrentRoomId} />
                                 </div>
 
                                 {/* LargeCard + Confirm */}
@@ -625,7 +625,7 @@ const locale = useLocale();
                                         ✕
                                     </button>
                                     <div className="flex-1 min-h-0">
-                                        <ChatPanel />
+                                        <ChatPanel roomId={CurrentRoomId}/>
                                     </div>
                                 </div>
                             </div>,

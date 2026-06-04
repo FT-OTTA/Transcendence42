@@ -105,36 +105,6 @@ export function resolveBuildings(game:Game) {
         }
     }
 }
-// function resolveValue(
-//     valueFrom: string | undefined,
-//     value: number | undefined,
-//     payload: PlayCardPayload,
-//     target?: Card | Hero,
-//     target2?: Card | Hero
-// ): number
-// {
-//     if (valueFrom)
-//     {
-//         const [source, field] = valueFrom.split('.');
-
-//         const obj =
-//             source === 'target' ? target :
-//             source === 'target2' ? target2 :
-//             undefined;
-
-//         if (!obj)
-//             return value ?? 0;
-
-//         const resolved = (obj as any)[field];
-
-//         return typeof resolved === 'number'
-//             ? resolved
-//             : value ?? 0;
-//     }
-
-//     return value ?? 0;
-// }
-// resolveValue
 function resolveValue(
     valueFrom: string | undefined,
     value: number | undefined,
@@ -234,125 +204,79 @@ export function resolveEffect(
     const noTargetNeeded = !!eff.target && (["all_enemies", "all_allies", "all_board"] as string[]).includes(eff.target)
     
     if (!target && !noTargetNeeded) return false;
-    target = target!;
 
-    
     let value = resolveValue(eff.valueFrom, eff.value, payload, target, target2, context);
     console.log("Resolved value:", value, "from", eff.valueFrom);
     console.log("target avant switch:", target?.kind, "noTargetNeeded:", noTargetNeeded)
+
+    // Gestion des cibles multiples
+    if (eff.target === "all_enemies" || eff.target === "all_allies" || eff.target === "all_board") {
+        const opponent = game.players.find(p => p !== player);
+        let targets: Card[] = [];
+
+        if (eff.target === "all_enemies" && opponent)
+            targets = Object.values(opponent.battlefield).filter(Boolean) as Card[];
+        else if (eff.target === "all_allies")
+            targets = Object.values(player.battlefield).filter(Boolean) as Card[];
+        else if (eff.target === "all_board")
+            for (const p of game.players)
+                targets.push(...Object.values(p.battlefield).filter(Boolean) as Card[]);
+
+        // Filtre par targetType si défini
+        if (eff.targetType) {
+            targets = targets.filter(c => {
+                if (c.type === "creature" && eff.targetType?.creature) return true;
+                if (c.type === "building" && eff.targetType?.building) return true;
+                return false;
+            });
+        }
+
+        for (const t of targets)
+            resolveEffect(player, { ...eff, target: undefined }, payload, game, fromTiming, t, target2, context);
+
+        return true;
+    }
+
+    target = target!;
+
+    // Filtre targetType pour cible unique
+    if (target.kind === "card" && eff.targetType) {
+        const tt = eff.targetType;
+        if (target.type === "creature" && !tt.creature) return false;
+        if (target.type === "building" && !tt.building) return false;
+    }
+    if (target.kind === "hero" && eff.targetType && !eff.targetType.hero) return false;
+
     switch (eff.effect) {
         case "ad_mod":
-            if (eff.target === "all_enemies" && game) {
-                const opponent = game.players.find(p => p !== player);
-                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currForce += value });
-                return true;
-            }
-            else if (eff.target === "all_allies" && game) {
-                Object.values(player.battlefield).forEach(c => { if (c) c.currForce += value });
-                return true;
-            }
-            else if (eff.target === "all_board" && game) {
-                for (const p of game.players){
-                    for (const c of Object.values(p.battlefield))
-                        if (c) c.currForce += value;
-                }
-                return true;
-            }
-            else if (target.kind === "hero")
-                return false;
-            else
-                target.currForce += value;
+            if (target.kind === "hero") return false;
+            target.currForce += value;
             break;
         case "def_mod":
-            if (eff.target === "all_enemies" && game) {
-                const opponent = game.players.find(p => p !== player);
-                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currEndurance += value });
-            }
-            else if (eff.target === "all_allies" && game) {
-                Object.values(player.battlefield).forEach(c => { if (c) c.currEndurance += value });
-            }
-            else if (eff.target === "all_board" && game) {
-                for (const p of game.players){
-                    for (const c of Object.values(p.battlefield))
-                        if (c) c.currEndurance += value;
-                }
-            }
-            else if (target.kind === "hero")
-                return false;
-            else
-                target.currEndurance += value;
+            if (target.kind === "hero") return false;
+            target.currEndurance += value;
             break;
         case "addef_mod":
-            if (eff.target === "all_enemies" && game) {
-                const opponent = game.players.find(p => p !== player);
-                if (opponent)
-                    Object.values(opponent.battlefield).forEach(c => {
-                    if (c) {
-                        c.currForce += value;
-                        c.currEndurance += value;
-                    }
-                    });
-            }
-            else if (eff.target === "all_allies" && game) {
-                Object.values(player.battlefield).forEach(c => {
-                    if (c) {
-                        c.currForce += value;
-                        c.currEndurance += value }
-                });
-            }
-            else if (eff.target === "all_board" && game) {
-                for (const p of game.players){
-                    for (const c of Object.values(p.battlefield))
-                        if (c){
-                            c.currForce += value;
-                            c.currEndurance += value
-                        }
-                }
-            }
-            else if (target.kind === "hero")
-                return false;
-            else {
-                target.currForce += value;
-                target.currEndurance += value;
-            }
+            if (target.kind === "hero") return false;
+            target.currForce += value;
+            target.currEndurance += value;
             break;
         case "draw":
-            if (target.kind === "card")
-                return false;
+            if (target.kind === "card") return false;
             playerDraw(target, value);
             break;
         case "dmg":
-            if (eff.target === "all_enemies" && game) {
-                const opponent = game.players.find(p => p !== player);
-                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currEndurance -= value });
-            }
-            else if (eff.target === "all_allies" && game) {
-                Object.values(player.battlefield).forEach(c => { if (c) c.currEndurance -= value });
-            }
-            else if (eff.target === "all_board" && game) {
-                for (const p of game.players){
-                    for (const c of Object.values(p.battlefield))
-                        if (c) c.currEndurance -= value;
-                }
-                return true;
-            }
-            else if (target.kind === "hero") {
-                console.log("💥 dealsDmg", { player: player.idInGame, target: target.idInGame, value });
-
+            if (target.kind === "hero")
                 dealsDmg(player, target, value);
-            }
-            else if (target.kind === "card")
+            else
                 target.currEndurance -= value;
-
             break;
         case "armor":
-            if (target.kind === "card")
-                return false;
+            if (target.kind === "card") return false;
             target.armor += value;
             break;
         case "runes":
-            if (target.kind === "card")
-                return false;
+            if (target.kind === "card") return false;
             target.curRunes += value;
             break;
         case "swap": {
@@ -366,57 +290,19 @@ export function resolveEffect(
             target2.owner = tmpOwner;
             target.zone = zone2;
             target2.zone = zone1;
-
-            // 👇 Sync board depuis battlefield
-            for (const player of (game as any).players) {
-                player.board = Object.values(player.battlefield).filter(Boolean);
-            }
+            for (const p of (game as any).players)
+                p.board = Object.values(p.battlefield).filter(Boolean);
             break;
         }
         case "destroy":
-            if (eff.target === "all_enemies" && game) {
-                const opponent = game.players.find(p => p !== player);
-                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.currEndurance = 0 });
-                return true;
-            }
-            else if (eff.target === "all_allies" && game) {
-                Object.values(player.battlefield).forEach(c => { if (c) c.currEndurance = 0 });
-                return true;
-            }
-            else if (eff.target === "all_board" && game) {
-                for (const p of game.players){
-                    for (const c of Object.values(p.battlefield))
-                        if (c) c.currEndurance = 0;
-                }
-            }
-            else if (target.kind === "hero")
-                return false;
-            else
-                target.currEndurance = 0;
+            if (target.kind === "hero") return false;
+            target.currEndurance = 0;
             break;
         case "freeze":
-            if (eff.target === "all_enemies" && game) {
-                const opponent = game.players.find(p => p !== player);
-                if (opponent) Object.values(opponent.battlefield).forEach(c => { if (c) c.state = "sick" });
-                return true;
-            }
-            else if (eff.target === "all_allies" && game) {
-                Object.values(player.battlefield).forEach(c => { if (c) c.state = "sick" });
-                return true;
-            }
-            else if (eff.target === "all_board" && game) {
-                for (const p of game.players){
-                    for (const c of Object.values(p.battlefield))
-                        if (c) c.state = "sick";
-                }
-            }
-            else if (target.kind === "hero")
-                return false;
-            else
-                target.state = "sick";
+            if (target.kind === "hero") return false;
+            target.state = "sick";
             break;
         case "win":
-            console.log("target dans win:", target);
             if (!target || target.kind !== "hero") return false;
             game.status = "game_over";
             game.winner = target as Hero;

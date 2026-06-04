@@ -18,11 +18,11 @@ export default function ProfilePanel() {
             const user = await requireAuth();
             setUsername(user ?? "Placeholder");
             if (!user) return;
-            const res = await fetch(`http://localhost:3000/users/history/${user}`);
+            const res = await fetch(`/api/users/history/${user}`);
             const data = await res.json();
             setMatches(Array.isArray(data) ? data : []);
             
-            const res2 = await fetch(`http://localhost:3000/users/${user}`);
+            const res2 = await fetch(`/api/users/${user}`);
             const data2 = await res2.json();
             setMoodPhrase(data2.moodphrase ?? "no mood yet");
             setAvatarUrl(data2.avatarUrl ?? null);
@@ -33,6 +33,15 @@ export default function ProfilePanel() {
     const winsNumber = matches.filter(m => m.result === 'win').length;
     const lossesNumber = matches.filter(m => m.result === 'loss').length;
     const drawsNumber = matches.filter(m => m.result === 'draw').length;
+
+    const favoriteClass = matches.length === 0 ? "None" :
+        Object.entries(
+            matches.reduce((acc, m) => {
+                const cls = m.heroClass ?? "Unknown";
+                acc[cls] = (acc[cls] || 0) + 1;
+                return acc;
+            }, {} as Record<string, number>)
+        ).sort((a, b) => (b[1] as number) - (a[1] as number))[0][0];
 
     return (
         <div className="h-auto shrink-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm md:h-1/3 flex flex-col p-4">
@@ -52,14 +61,14 @@ export default function ProfilePanel() {
                         </h3>
                     </div>
         
-                    {/* <p className="text-base text-blue-200/70">
-                        Favorite class: Mage
-                    </p> */}
+                    <p className="text-base text-blue-200/70">
+                        Favorite class: {favoriteClass}
+                    </p>
                     <p className="text-sm text-blue-200/60">
                         {winsNumber}W - {lossesNumber}L - {drawsNumber}D
                     </p>
                     <p className="text-xs italic text-blue-200/40 mt-1">
-                        {moodPhrase || ""}
+                        {moodPhrase}
                     </p>
 
                 </div>

@@ -16,9 +16,10 @@ type MatchProps = {
 	opponent: string;
 	score: string;
 	result: string;
+	heroClass: string;
 };
 
-export default function MatchCard({opponent, score, result}:MatchProps)
+export default function MatchCard({opponent, score, result, heroClass}:MatchProps)
 {
 
 	const resultColor =
@@ -40,6 +41,10 @@ export default function MatchCard({opponent, score, result}:MatchProps)
 
 			<div className={clsx("text-center", resultColor)}>
 				{ score }
+			</div>
+
+			<div className={clsx("text-center", resultColor)}>
+				as { heroClass }
 			</div>
 		</div>
 	);

@@ -21,6 +21,8 @@ export async function emitGameOver(session: GameSession) {
             loserId: winnerIndex !== -1 ? session.game.players[1 - winnerIndex].userId : null,
             player1Id: session.game.players[0].userId,
             player2Id: session.game.players[1].userId,
+            player1Class: session.game.players[0].class,
+            player2Class: session.game.players[1].class,
             turns: session.game.turnNumber
             }
         })

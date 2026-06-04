@@ -89,7 +89,7 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
   useEffect(() => {
     if (!isSpectator && !selectedHero) return;
 
-    const newSocket = io('http://localhost:3000');
+    const newSocket = io();
     socketRef.current = newSocket;
     setSocket(newSocket);
 
@@ -411,10 +411,10 @@ const locale = useLocale();
                     <>
 
                         {/* ── DESKTOP ── */}
-                        <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-3 gap-4 pt-16 h-[calc(100vh-6rem)]">
+                        <div className="hidden md:grid md:grid-cols-4 gap-4 pt-16 h-[calc(100vh-6rem)]">
 
                             {/* Colonne principale — 3/4 */}
-                            <div className="col-span-3 lg:col-span-2 flex flex-col gap-2 min-h-0">
+                            <div className="col-span-3 flex flex-col gap-2 min-h-0">
 
                                 <HeroStrip
                                     label={p("opponent")}

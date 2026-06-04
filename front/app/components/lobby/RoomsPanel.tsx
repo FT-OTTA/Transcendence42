@@ -28,7 +28,7 @@ export default function RoomPanel() {
         requireAuth().then(setMe);
 
         async function fetchRooms() {
-            const res = await fetch("http://localhost:3000/rooms");
+            const res = await fetch("/api/rooms");
             if (!res.ok) {
                 const err = await res.json();
                 alert(err.error);

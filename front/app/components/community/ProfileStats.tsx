@@ -11,7 +11,7 @@ export default function ProfileStats({ username }: { username: string })
 	const [matches, setMatches] = useState<any[]>([]);
 	
 	useEffect(() => {
-        fetch(`http://localhost:3000/users/history/${username}`)
+        fetch(`/api/users/history/${username}`)
             .then(r => r.json())
             .then(setMatches);
     }, [username]);

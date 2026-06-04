@@ -44,7 +44,7 @@ export default function AvatarFrame({
 			<img 
 				src={
 					avatarUrl
-					? `http://localhost:3000${avatarUrl}`
+					? avatarUrl
 					: "/default_avatar.png"
 				}
 				className="w-full h-full object-cover"

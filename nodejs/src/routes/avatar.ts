@@ -21,7 +21,7 @@ router.post('/:login/avatar', async (req, res) => {
 			return res.status(400).json({error : "No file uploaded" });
 		}
 
-		const filename = `${login}.png`;
+		const filename = `${login.toLowerCase()}.png`;
 		const folder = path.join(process.cwd(), "databases/users/avatars");
 
 		fs.mkdirSync( folder, { recursive: true });

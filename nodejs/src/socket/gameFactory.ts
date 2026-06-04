@@ -106,7 +106,7 @@ async function buildHero(heroId: string): Promise<Hero> {
     return {
         kind: 'hero',
         idInGame: Math.floor(Math.random() * 100000),
-        class: hero.name as CardClass,
+        class: hero.name_en as CardClass,
         passive: passiveEffect,
         armor: hero.base_armor,
         dmgDealt: 0,

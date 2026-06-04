@@ -15,7 +15,7 @@ export default function MatchHistory({ username }: { username: string }) {
 	const [matches, setMatches] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch(`http://localhost:3000/users/history/${username}`)
+        fetch(`/api/users/history/${username}`)
             .then(r => r.json())
             .then(setMatches);
     }, [username]);
@@ -32,6 +32,7 @@ export default function MatchHistory({ username }: { username: string }) {
 					opponent={match.opponent}
 					score={match.score}
 					result={match.result}
+					heroClass={match.heroClass}
 					/>
 				))}
 			</section>

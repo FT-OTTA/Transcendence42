@@ -99,6 +99,40 @@
     "you": "You",
     "draw": "Draw",
     "debug_mode": "Enable debug mode (all cards available + infinite runes)"
+  },
+
+  "Privacy": {
+    "policy": "Privacy Policy",
+    "last_update": "Last Updated: June 2026",
+    "collected_title": "1. Data We Collect",
+    "collected_usage": "We collect your username and email address solely for account creation, authentication, and saving your game progress.",
+    "usage_title": "2. How We Use Data",
+    "usage_usage": "Your data is used strictly to provide game services. We do not sell, rent, or share your personal information with third parties for marketing purposes."
+  },
+
+  "TOS": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: June 2026",
+    "welcome": "Welcome to our Card Game application. By registering an account or using our platform, you agree to be bound by these Terms of Service.",
+    "section1Title": "1. Account Creation & Security",
+    "section1Content": "To play the game, you must create an account. You are entirely responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.",
+    "section2Title": "2. User Conduct & Fair Play",
+    "section2Content": "You agree to use this application fairly and respectfully. The following behaviors are strictly prohibited and will lead to immediate account suspension or termination:",
+    "section2List": {
+      "cheating": "Cheating, exploiting bugs, or using unauthorized third-party software/bots.",
+      "harassment": "Harassing, abusing, or using offensive language against other players.",
+      "disruption": "Attempting to disrupt or reverse-engineer the application's infrastructure."
+    },
+    "section3Title": "3. Intellectual Property",
+    "section3Content": "All game designs, graphics, mechanics, and code are the intellectual property of this project. You may not copy, distribute, or modify any part of the game without explicit permission.",
+    "section4Title": "4. Limitation of Liability",
+    "section4Content": "This application is provided \"as is\" for evaluation and entertainment purposes. We make no guarantees regarding server uptime, data persistence, or the absolute security of your account."
+  },
+
+  "Footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved."
   }
 
 }

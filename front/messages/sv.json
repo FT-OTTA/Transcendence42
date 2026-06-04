@@ -99,5 +99,39 @@
       "you": "Du",
       "draw": "Dra",
       "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)"
-    }
+    },
+
+  "Privacy": {
+    "policy": "Integritetspolicy",
+    "last_update": "Senast uppdaterad: Juni 2026",
+    "collected_title": "1. Data vi samlar in",
+    "collected_usage": "Vi samlar in ditt användarnamn och din e-postadress enbart för att skapa konto, autentisera dig och spara dina framsteg i spelet.",
+    "usage_title": "2. Hur vi använder data",
+    "usage_usage": "Dina data används strikt för att tillhandahålla speltjänsterna. Vi säljer, hyr inte ut eller delar dina personuppgifter med tredje part för marknadsföringsändamål."
+  },
+
+  "TOS": {
+    "title": "Användarvillkor",
+    "lastUpdated": "Senast uppdaterad: Juni 2026",
+    "welcome": "Välkommen till vår kortspelsapplikation. Genom att registrera ett konto eller använda vår plattform godkänner du att du binds av dessa användarvillkor.",
+    "section1Title": "1. Skapande av konto & säkerhet",
+    "section1Content": "För somliga funktioner eller för att spela spelet måste du skapa ett konto. Du är helt ansvarig för att hålla dina inloggningsuppgifter konfidentiella och för alla aktiviteter som sker under ditt konto.",
+    "section2Title": "2. Användarbeteende & rent spel",
+    "section2Content": "Du samtycker till att använda denna applikation på ett rättvist och respektfullt sätt. Följande beteenden är strängt förbjudna och kommer att leda till omedelbar avstängning eller uppsägning av kontot:",
+    "section2List": {
+      "cheating": "Fusk, utnyttjande av buggar eller användning av obehörig programvara/botar från tredje part.",
+      "harassment": "Trakassera, missbruka eller använda kränkande språk mot andra spelare.",
+      "disruption": "Försök att störa eller dekompilera applikationens infrastruktur."
+    },
+    "section3Title": "3. Immateriella rättigheter",
+    "section3Content": "Alla speldesigner, grafik, mekanik och kod är detta projekts immateriella egendom. Du får inte kopiera, distribuera eller modifiera någon del av spelet utan uttryckligt tillstånd.",
+    "section4Title": "4. Ansvarsbegränsning",
+    "section4Content": "Denna applikation tillhandahålls i \"befintligt skick\" för utvärdering och underhållningsändamål. Vi ger inga garantier gällande serverdrifttid, datapersistens eller ditt kontos absoluta säkerhet."
+  },
+
+  "Footer": {
+    "privacy": "Integritetspolicy",
+    "terms": "Användarvillkor",
+    "rights": "Med ensamrätt."
+  }
 }

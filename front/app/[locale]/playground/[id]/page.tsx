@@ -21,6 +21,7 @@ import HeroStrip from '@/app/components/playground/HeroStripProps';
 import ChatPanel from '@/app/components/lobby/ChatPanel';
 import CardDetails from '@/app/components/playground/CardDetails';
 import { createPortal } from 'react-dom';
+import Footer from '@/app/components/footer/footer';
 
 export default function PlaygroundPage() {
   const { id } = useParams();
@@ -659,6 +660,7 @@ const locale = useLocale();
             {runeError}
         </div>
         )}
+        <Footer/>
     </main>
     );
 }

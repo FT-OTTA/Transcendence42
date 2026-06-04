@@ -10,9 +10,9 @@ type HeroProps = {
 export default function Hero({setIsLogin}: HeroProps)
 {
 	return (
-		<section className=" h-screen flex flex-col">
+		<section className="flex-1 flex flex-col">
 			
-			<div className=" flex-1 flex flex-col items-center justify-around ">
+			<div className="flex-1 flex flex-col items-center justify-around ">
 				<HeroTitle />
 				<StartButton setIsLogin={setIsLogin}/>
 			</div>

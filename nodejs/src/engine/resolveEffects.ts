@@ -105,36 +105,6 @@ export function resolveBuildings(game:Game) {
         }
     }
 }
-// function resolveValue(
-//     valueFrom: string | undefined,
-//     value: number | undefined,
-//     payload: PlayCardPayload,
-//     target?: Card | Hero,
-//     target2?: Card | Hero
-// ): number
-// {
-//     if (valueFrom)
-//     {
-//         const [source, field] = valueFrom.split('.');
-
-//         const obj =
-//             source === 'target' ? target :
-//             source === 'target2' ? target2 :
-//             undefined;
-
-//         if (!obj)
-//             return value ?? 0;
-
-//         const resolved = (obj as any)[field];
-
-//         return typeof resolved === 'number'
-//             ? resolved
-//             : value ?? 0;
-//     }
-
-//     return value ?? 0;
-// }
-// resolveValue
 function resolveValue(
     valueFrom: string | undefined,
     value: number | undefined,

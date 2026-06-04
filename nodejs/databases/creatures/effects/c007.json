@@ -1,7 +1,9 @@
 {
     "effects": [
         {
-            "effect": "destroy"
+            "effect": "destroy",
+            "target": "opponent",
+            "targetType": { "creature": true }
         }
     ]
 }

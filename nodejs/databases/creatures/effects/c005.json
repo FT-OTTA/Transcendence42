@@ -1,8 +1,10 @@
 {
     "effects": [
         {
-            "effect": "mana",
-            "value": 1
+            "effect": "runes",
+            "value": 1,
+            "target": "self_hero",
+            "targetType": { "hero": true }
         }
     ]
 }

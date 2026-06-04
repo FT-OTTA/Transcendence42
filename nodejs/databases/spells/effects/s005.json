@@ -2,11 +2,8 @@
     "effects": [
         {
             "effect": "destroy",
-            "target": "all_allies"
-        },
-        {
-            "effect": "destroy",
-            "target": "all_enemies"
+            "target": "all_board",
+            "targetType": { "creature": true }
         }
     ]
 }

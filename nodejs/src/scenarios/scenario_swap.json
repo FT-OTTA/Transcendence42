@@ -1,0 +1,35 @@
+{
+  "description": "Swap au tour 2 après 2 end turns",
+  "players": [
+    {
+      "id": "P1",
+      "board": [
+        { "id": 1, "name": "P1 Creature A", "force": 2, "endurance": 2, "zone": "bf1" }
+      ]
+    },
+    {
+      "id": "P2",
+      "board": [
+        { "id": 2, "name": "P2 Creature B", "force": 3, "endurance": 3, "zone": "bf1" }
+      ]
+    }
+  ],
+  "turn": 1,
+  "stack": [],
+  "actions": [
+    { "type": "end_turn", "player": "P1" },
+    { "type": "end_turn", "player": "P2" },
+    { "type": "start_turn_2" },
+    {
+      "type": "play_card",
+      "player": "P1",
+      "card": {
+        "effect": "swap",
+        "target": "self",
+        "targetType": { "creature": true }
+      },
+      "target": 1,
+      "target2": 2
+    }
+  ]
+}

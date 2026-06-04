@@ -1,0 +1,104 @@
+{
+  "Homepage": {
+    "start": "Get Started",
+    "whats_otta": "What is Otta?",
+    "log_status": "Log in to enjoy our incredible features",
+    "login_as": "Logged in as:",
+    "log_out": "Log Out",
+    "log_in": "Log In"
+  },
+
+  "Navbar": {
+    "home": "Home",
+    "lobby": "Lobby",
+    "community": "Community"
+  },
+
+  "Auth": {
+    "username": "Username",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "create_account": "Create Account",
+    "welcome_back": "Welcome Back",
+    "hide": "Hide",
+    "show": "Show",
+    "register": "Register",
+    "login": "Login",
+    "already_have": "Already have an account?",
+    "dont_have": "Don't have an account?",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "loading": "Loading..."
+  },
+
+  "Profile": {
+    "online": "Online",
+    "offline": "Offline",
+    "set_mood": "Click to set your mood",
+    "loading": "Loading",
+    "search_placeholder": "Search player..."
+  },
+
+  "Stats": {
+    "num_played": "Played",
+    "wins": "Wins",
+    "losses": "Losses",
+    "draws": "Draws",
+    "best_friend": "Most Played with",
+    "worst_enemy": "Worst Enemy"
+  },
+
+  "Lobby": {
+    "friends": "Friends",
+    "add_a_friend": "Add a friend",
+    "no_friends": "No friends yet",
+    "loading_friends": "Loading friends...",
+    "create_room": "Create Room",
+    "type_message": "Type a message...",
+    "add_friend": "Add Friend",
+    "send": "Send",
+    "adding": "Adding...",
+    "cancel": "Cancel",
+    "username": "Username",
+    "join": "Join",
+    "spectate": "Spectate",
+    "dm": "DM",
+    "chat": "Chat",
+    "profile": "Profile",
+    "rooms": "Rooms",
+    "rejoin": "Rejoin",
+    "remove": "Remove"
+  },
+
+  "Error": {
+    "server_error": "A server error has been encountered.",
+    "need_login": "You need to be logged in for this feature.",
+    "room_full": "This room is already full.",
+    "game_server_error": "Unable to connect to the game server.",
+    "fail_friend_fetch": "Failed to fetch friends.",
+    "no_username": "Please enter a username.",
+    "fail_add": "Failed to add friend."
+  },
+
+  "Playground": {
+    "loading": "Loading Game...",
+    "concede": "Concede",
+    "end_turn": "End Turn",
+    "turn": "Turn",
+    "runes": "runes",
+    "return_to_lobby": "Return to lobby",
+    "hand": "Hand",
+    "game_stats": "Game Stats",
+    "armor": "Armor",
+    "score": "Score",
+    "deck": "Deck",
+    "confirm_play": "Confirm Play",
+    "choose_your_heros": "Choose your Heros",
+    "hover_a_card": "Hover a Card to preview it",
+    "opponent": "Opponent",
+    "you": "You",
+    "draw": "Draw",
+    "debug_mode": "Enable debug mode (all cards available + infinite runes)"
+  }
+
+}

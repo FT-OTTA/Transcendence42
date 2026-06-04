@@ -1,15 +1,69 @@
 services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+    ports:
+      - "9090:9090"
+    networks:
+      - otta
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION=false
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - otta
+    restart: unless-stopped
+
+#   elasticsearch:
+#     image: elasticsearch:8.11.0
+#     environment:
+#       - discovery.type=single-node
+#       - xpack.security.enabled=false
+#     ports:
+#       - "9200:9200"
+
+  # logstash:
+  #   image: logstash:8.11.0
+  #   volumes:
+  #     - ./logstash/pipeline:/usr/share/logstash/pipeline
+  #   ports:
+  #     - "5044:5044"
+  #   depends_on:
+  #     - elasticsearch
+
+  # kibana:
+  #   image: kibana:8.11.0
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     - elasticsearch
+
   nginx:
     image: nginx:alpine
     container_name: nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - nodejs
+      - front
     networks:
       - otta
     restart: unless-stopped
@@ -20,8 +74,8 @@ services:
     env_file:
       - ./.env
     depends_on:
-        mysql:
-            condition: service_healthy
+      mysql:
+        condition: service_healthy
     networks:
       - otta
     restart: unless-stopped
@@ -37,14 +91,30 @@ services:
       - otta
     restart: unless-stopped
     healthcheck:
-        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-        interval: 5s
-        timeout: 5s
-        retries: 10
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  front:
+    build: ./front
+    container_name: front
+    env_file:
+      - ./.env
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    networks:
+      - otta
+    restart: unless-stopped
 
 volumes:
   db_data:
     name: db_data
+  grafana_data:
+  prometheus_data:
 
 networks:
   otta:

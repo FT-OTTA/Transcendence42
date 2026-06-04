@@ -1,8 +1,9 @@
 {
     "effects": [
         {
-            "effect": "destroy?",
-            "targetType": "building"
+            "effect": "destroy",
+            "target": "all",
+            "targetType": { "building": true }
         }
     ]
 }

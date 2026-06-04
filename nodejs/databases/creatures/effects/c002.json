@@ -1,7 +1,9 @@
 {
     "effects": [
         {
-            "effect": "swap"
+            "effect": "swap",
+            "target": "self",
+            "targetType": { "creature": true, "building": true }
         }
-    ]   
+    ]
 }

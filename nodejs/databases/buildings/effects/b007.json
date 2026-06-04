@@ -1,7 +1,10 @@
 {
     "effects": [
         {
-            "effect": "destroy"
+            "effect": "destroy",
+            "target": "random_enemies",
+            "targetType": { "creature": true },
+            "timing": "start_turn"
         }
     ]
 }

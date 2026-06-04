@@ -1,0 +1,8 @@
+Id;Username;PasswordHash;HeroId;MoodPhrase
+1;Alice;$2b$10$fakehash1;HERO_01;This is a test
+2;Bob;$2b$10$fakehash2;HERO_02;
+3;Poman;$2b$10$fakehash3;HERO_03;
+4;ElTeddy;$2b$10$fakehash4;HERO_01;
+5;Tonyo;$2b$10$fakehash5;HERO_02;
+6;BigRat27;$2b$10$fakehash6;HERO_03;
+7;Guest;$2b$10$fakehash7;HERO_01;

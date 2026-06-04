@@ -2,16 +2,21 @@
     "effects": [
         {
             "effect": "dmg",
-            "value": 5
+            "value": 5,
+            "target": "opponent",
+            "targetType": { "hero": true, "creature": true, "building": true }
         },
         {
             "effect": "dmg",
-            "value": 4
+            "value": 4,
+            "target": "opponent",
+            "targetType": { "hero": true, "creature": true, "building": true }
         },
         {
             "effect": "dmg",
-            "value": 3
-
+            "value": 3,
+            "target": "opponent",
+            "targetType": { "hero": true, "creature": true, "building": true }
         }
     ]
 }

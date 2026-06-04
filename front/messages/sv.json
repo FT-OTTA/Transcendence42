@@ -1,0 +1,103 @@
+{
+    "Homepage": {
+      "start": "Kom igång",
+      "whats_otta": "Vad är Otta?",
+      "log_status": "Logga in för att ta del av våra fantastiska funktioner",
+      "login_as": "Inloggad som:",
+      "log_out": "Logga ut",
+      "log_in": "Logga in"
+    },
+
+    "Navbar": {
+      "home": "Hem",
+      "lobby": "Lobby",
+      "community": "Gemenskap"
+    },
+
+    "Auth": {
+      "username": "Användarnamn",
+      "password": "Lösenord",
+      "confirm_password": "Bekräfta lösenord",
+      "create_account": "Skapa konto",
+      "welcome_back": "Välkommen tillbaka",
+      "hide": "Dölj",
+      "show": "Visa",
+      "register": "Registrera",
+      "login": "Logga in",
+      "already_have": "Har du redan ett konto?",
+      "dont_have": "Har du inget konto?",
+      "sign_in": "Logga in",
+      "sign_up": "Skapa konto",
+      "loading": "Laddar..."
+    },
+
+    "Profile": {
+      "online": "Online",
+      "offline": "Offline",
+      "set_mood": "Klicka för att ange ditt humör",
+      "loading": "Laddar",
+      "search_placeholder": "Sök spelare..."
+    },
+
+    "Stats": {
+      "num_played": "Spelade",
+      "wins": "Vinster",
+      "losses": "Förluster",
+      "draws": "Oavgjorda",
+      "best_friend": "Spelat mest med",
+      "worst_enemy": "Värsta fiende"
+    },
+
+    "Lobby": {
+      "friends": "Vänner",
+      "add_a_friend": "Lägg till en vän",
+      "no_friends": "Inga vänner ännu",
+      "loading_friends": "Laddar vänner...",
+      "create_room": "Skapa rum",
+      "type_message": "Skriv ett meddelande...",
+      "add_friend": "Lägg till vän",
+      "send": "Skicka",
+      "adding": "Lägger till...",
+      "cancel": "Avbryt",
+      "username": "Användarnamn",
+      "join": "Gå med",
+      "spectate": "Titta på",
+      "dm": "DM",
+      "chat": "Chatt",
+      "profile": "Profil",
+      "rooms": "Rum",
+      "rejoin": "Återanslut",
+      "remove": "Ta bort"
+    },
+
+    "Error": {
+      "server_error": "Ett serverfel har inträffat.",
+      "need_login": "Du måste vara inloggad för att använda den här funktionen.",
+      "room_full": "Det här rummet är redan fullt.",
+      "game_server_error": "Det gick inte att ansluta till spelservern.",
+      "fail_friend_fetch": "Det gick inte att hämta vänner.",
+      "no_username": "Ange ett användarnamn.",
+      "fail_add": "Det gick inte att lägga till vän."
+    },
+
+    "Playground": {
+      "loading": "Laddar spel...",
+      "concede": "Ge upp",
+      "end_turn": "Avsluta tur",
+      "turn": "Tur",
+      "runes": "runor",
+      "return_to_lobby": "Återvänd till lobbyn",
+      "hand": "Hand",
+      "game_stats": "Spelstatistik",
+      "armor": "Rustning",
+      "score": "Poäng",
+      "deck": "Kortlek",
+      "confirm_play": "Bekräfta drag",
+      "choose_your_heros": "Välj dina hjältar",
+      "hover_a_card": "Hovra över ett kort för att förhandsgranska",
+      "opponent": "Motståndare",
+      "you": "Du",
+      "draw": "Dra",
+      "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)"
+    }
+}

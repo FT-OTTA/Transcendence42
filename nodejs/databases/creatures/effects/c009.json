@@ -1,0 +1,9 @@
+{
+    "effects": [
+        {
+            "effect": "destroy",
+            "target": "random_enemies",
+            "targetType": { "creature": true }
+        }
+    ]
+}

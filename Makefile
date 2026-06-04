@@ -1,10 +1,10 @@
 # TCG Dev Edition — Makefile
 
-.PHONY: up down build logs clean certs fclean re
+.PHONY: up down build logs clean certs fclean re backend front
 
 ## Lance tous les services
 up:
-	docker compose up -d
+	docker compose up -d --remove-orphans
 
 ## Stoppe tous les services
 down:
@@ -12,12 +12,22 @@ down:
 
 ## Rebuild et relance
 build:
-	docker compose up -d --build
+	docker compose up -d --remove-orphans --build
 
+backend:
+	docker restart nodejs
+front:
+	docker restart front
 ## Affiche les logs en live
 logs:
 	docker compose logs -f
 
+logstash-logs:
+	docker logs transcendence42-logstash-1
+kibana-logs:
+	docker logs transcendence42-kibana-1
+elastic-logs:
+	docker logs transcendence42-elasticsearch-1
 ## Stoppe et supprime les volumes (reset complet)
 clean:
 	docker compose down -v
@@ -25,7 +35,7 @@ clean:
 fclean: clean
 	docker system prune -af
 
-re: fclean build
+re: down build
 
 ## Génère des certificats SSL auto-signés pour le dev local
 certs:

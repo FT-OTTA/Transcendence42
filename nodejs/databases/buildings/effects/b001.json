@@ -2,8 +2,10 @@
     "effects": [
         {
             "effect": "armor",
-            "value": 5,
-            "target": "self_hero"
+            "value": 3,
+            "target": "self_hero",
+            "targetType": { "hero": true },
+            "timing": "start_turn"
         }
     ]
 }

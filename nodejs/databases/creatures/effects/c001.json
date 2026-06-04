@@ -2,17 +2,21 @@
     "effects": [
         {
             "effect": "dmg",
-            "value": 1
+            "value": 1,
+            "target": "all",
+            "targetType": { "creature": true, "hero": true }
         },
         {
             "effect": "draw",
             "value": 1,
-            "target": "self_hero"
+            "target": "self_hero",
+            "targetType": { "hero": true }
         },
         {
             "effect": "armor",
             "value": 1,
-            "target": "self_hero"
+            "target": "self_hero",
+            "targetType": { "hero": true }
         }
     ]
 }

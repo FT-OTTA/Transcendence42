@@ -159,19 +159,20 @@ async function importHeroes() {
 
 async function importUsers() {
     const rows = parseCSV('/app/databases/users/USERS.csv')
+    const SALT_ROUNDS = 10
 
     for (const row of rows) {
         await prisma.user.upsert({
             where: { id: parseInt(row['Id']) },
             update: {
                 username: row['Username'],
-                passwordHash: await bcrypt.hash("prout", 10),
+                passwordHash: await bcrypt.hash("prout", SALT_ROUNDS),
                 moodphrase: row['MoodPhrase'],
             },
             create: {
                 id: parseInt(row['Id']),
                 username: row['Username'],
-                passwordHash: await bcrypt.hash("prout", 10),
+                passwordHash: await bcrypt.hash("prout", SALT_ROUNDS),
                 moodphrase: row['MoodPhrase'],
             }
         })

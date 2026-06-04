@@ -20,6 +20,7 @@ import { useTranslations } from "next-intl";
 import HeroStrip from '@/app/components/playground/HeroStripProps';
 import ChatPanel from '@/app/components/lobby/ChatPanel';
 import CardDetails from '@/app/components/playground/CardDetails';
+import FeedbackLog, { type FeedbackEntry } from '@/app/components/playground/FeedbackLog';
 import { createPortal } from 'react-dom';
 
 export default function PlaygroundPage() {
@@ -76,6 +77,9 @@ export default function PlaygroundPage() {
   const [isDebug, setIsDebug] = useState(false);
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const gameRef = useRef<any>(null);
+  const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
+  const feedbackIdRef = useRef(0);
 
 const highlightOpponentHero = potentialTargets.some(t => t.kind === "hero" && t !== game?.players[myPlayerIndexRef.current!]);
 const highlightPlayerHero = potentialTargets.some(t => t.kind === "hero" && t === game?.players[myPlayerIndexRef.current!]);

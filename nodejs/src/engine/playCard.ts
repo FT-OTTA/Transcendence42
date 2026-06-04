@@ -7,12 +7,13 @@ import { resolveEffect } from "./resolveEffects.ts";
 import { findById } from './utils.ts'
 
 
-export function playCard(card: Card, payload: PlayCardPayload, game: Game): void {
+export function playCard(card: Card, payload: PlayCardPayload, game: Game, emit: (event: string, data: any) => void): void {
     // console.log("Playing card", { card, payload });
     // console.log("zone reçue:", payload.zone)
     // console.log("starts with bf:", payload.zone?.startsWith("bf"))
 
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
+    emit?.('card_played', { cardId: card.idInGame, zone: payload.zone, cardName: card.cardName_en, cardType: card.type, player: card.owner.username });
 
 
     if (card.type === "building" || card.type === "creature")
@@ -53,7 +54,7 @@ export function playCard(card: Card, payload: PlayCardPayload, game: Game): void
 
             
             console.log("Resolving effect", { effect, target, target2 ,context });
-            resolveEffect(card.owner, effect, payload, game, undefined, target, target2, context);
+            resolveEffect(card.owner, effect, payload, game, undefined, target, target2, context, emit);
         }
     }
 }

@@ -77,7 +77,8 @@
       "game_server_error": "Det gick inte att ansluta till spelservern.",
       "fail_friend_fetch": "Det gick inte att hämta vänner.",
       "no_username": "Ange ett användarnamn.",
-      "fail_add": "Det gick inte att lägga till vän."
+      "fail_add": "Det gick inte att lägga till vän.",
+      "already_in_room": "Du är redan i ett rum."
     },
 
     "Playground": {

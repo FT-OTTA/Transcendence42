@@ -77,7 +77,8 @@
       "game_server_error": "Impossible de se connecter au serveur de jeu.",
       "fail_friend_fetch": "Échec du chargement des amis.",
       "no_username": "Veuillez entrer un nom d'utilisateur.",
-      "fail_add": "Échec de l'ajout d'un ami."
+      "fail_add": "Échec de l'ajout d'un ami.",
+      "already_in_room": "Vous êtes déjà dans une salle."
     },
 
     "Playground": {

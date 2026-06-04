@@ -8,6 +8,7 @@ import Navbar from "../../components/navigation/Navbar";
 import LoggedInBadge from "../../components/login/LoggedInBadge";
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import Footer from "@/app/components/footer/footer";
 
 type ActivePanel = "friends" | "chat" | null;
 
@@ -88,6 +89,7 @@ export default function LobbyPage() {
             )}
           </div>
         )}
+        <Footer/>
     </main>
     );
 }

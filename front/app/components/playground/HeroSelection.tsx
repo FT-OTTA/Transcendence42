@@ -36,7 +36,7 @@ export default function HeroSelection({ onSelect, onSetDebug }: HeroSelectionPro
         onClick={() => onSetDebug(true)}
         className="mt-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
       >
-        Enable debug mode (all cards available + infinite runes)
+        {p("debug_mode")}
       </button>
     </div>
   );

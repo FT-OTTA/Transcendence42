@@ -97,7 +97,8 @@
         "hover_a_card": "Survolez une carte pour en voir un aperçu",
         "opponent": "Adversaire",
         "you": "Vous",
-        "draw": "Égalité"
+        "draw": "Égalité",
+        "debug_mode": "Activer le mode debug (toutes les cartes sont disponibles + runes infinies)"
 
     }
 }

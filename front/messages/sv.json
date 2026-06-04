@@ -97,6 +97,7 @@
       "hover_a_card": "Hovra över ett kort för att förhandsgranska",
       "opponent": "Motståndare",
       "you": "Du",
-      "draw": "Dra"
+      "draw": "Dra",
+      "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)"
     }
 }

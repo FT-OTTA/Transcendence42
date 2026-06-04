@@ -97,7 +97,8 @@
     "hover_a_card": "Hover a Card to preview it",
     "opponent": "Opponent",
     "you": "You",
-    "draw": "Draw"
+    "draw": "Draw",
+    "debug_mode": "Enable debug mode (all cards available + infinite runes)"
   }
 
 }

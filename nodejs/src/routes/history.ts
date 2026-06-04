@@ -30,11 +30,14 @@ router.get('/history/:username', async (req, res) => {
             ? (r.player1Id === user.id ? r.player2?.username : r.player1?.username)
             : (isWin ? r.loser?.username : r.winner?.username);
         const heroClass = r.player1Id === user.id ? r.player1Class : r.player2Class;
+        const oppoClass = r.player1Id === user.id ? r.player2Class : r.player1Class;
         return {
             opponent,
             result: isDraw ? 'draw' : (isWin ? 'win' : 'loss'),
             turns: r.turns,
-            heroClass
+            heroClass,
+            oppoClass,
+            score: `${r.scorep1} - ${r.scorep2}`
         };
     });
     res.json(formatted);

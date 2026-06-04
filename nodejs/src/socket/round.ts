@@ -23,7 +23,9 @@ export async function emitGameOver(session: GameSession) {
             player2Id: session.game.players[1].userId,
             player1Class: session.game.players[0].class,
             player2Class: session.game.players[1].class,
-            turns: session.game.turnNumber
+            turns: session.game.turnNumber,
+            scorep1: session.game.players[0].dmgDealt,
+            scorep2: session.game.players[1].dmgDealt,
             }
         })
     } catch (error) {

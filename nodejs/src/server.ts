@@ -53,13 +53,11 @@ app.use('/api/cards', cardsRouter);
 app.use('/api/heroes', heroesRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', historyRouter);
-console.log('historyRouter registered');
-
-app.use('/users', usersRouter);
-app.use('/friends', friendRouter);
-app.use('/rooms', roomRouter);
-app.use('/messages', messageRouter);
-app.use('/users', avatarRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/friends', friendRouter);
+app.use('/api/rooms', roomRouter);
+app.use('/api/messages', messageRouter);
+app.use('/api/users', avatarRouter);
 
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', register.contentType)

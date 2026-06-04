@@ -51,8 +51,8 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
     async function fetchMessages() {
         const username = localStorage.getItem("username");
         const url = roomId 
-            ? `/messages/room/${roomId}`
-            : "/messages/global";
+            ? `/api/messages/room/${roomId}`
+            : "/api/messages/global";
 
         const res = await fetch(url);
 

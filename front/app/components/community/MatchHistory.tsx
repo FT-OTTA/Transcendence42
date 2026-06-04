@@ -15,7 +15,7 @@ export default function MatchHistory({ username }: { username: string }) {
 	const [matches, setMatches] = useState<any[]>([]);
 
     useEffect(() => {
-        fetch(`/users/history/${username}`)
+        fetch(`/api/users/history/${username}`)
             .then(r => r.json())
             .then(setMatches);
     }, [username]);

@@ -36,7 +36,7 @@ export default function LoggedInBadge() {
 
         try {
             const res = await fetch(
-                `/users/${storedUsername}`
+                `/api/users/${storedUsername}`
             );
 
             if (!res.ok) {

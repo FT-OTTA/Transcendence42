@@ -52,7 +52,6 @@ services:
   #   depends_on:
   #     - elasticsearch
 
-services:
   nginx:
     image: nginx:alpine
     container_name: nginx

@@ -62,7 +62,7 @@ export default function CardSlot({
             name={(card[`cardName_${locale}`] || card.name_en)}
             cardType={card.type}
             cost={card.runeCost}
-            runeUrl={`http://localhost:3000${card.illustration}`}
+            runeUrl={card.illustration}
             attack={card.currForce}
             defense={card.currEndurance}
             ability={card.effects.length > 0}

@@ -45,7 +45,7 @@ export default function ProfileSearchBar()
 		setError("");
 
 		const res = await fetch(
-			`/users/${search}`
+			`/api/users/${search}`
 		);
 
 		if (!res.ok)

@@ -131,7 +131,41 @@ export function onConnection(io: Server, socket: Socket): void {
             })
         }
     })
+    socket.on('delete_room', async (data) => {
+        try {
+            const roomId = data.roomId
+            const username = data.username;
+            console.log('Request delete room', { roomId, username })
+            if (!roomId || !username)
+                return;
 
+            const room = await prisma.room.findUnique({
+                where: { id: roomId }
+            });
+            if (!room)
+                return;
+            console.log('Room found:', { room })
+            const user = await prisma.user.findUnique({
+                where: { id: room.player1Id }
+            });
+            if (user.username !== username) {
+                socket.emit('room_error', {
+                    message: 'Only the room creator can delete the room'
+                });
+                return;
+            }
+
+            await prisma.room.delete({
+                where: { id: roomId }
+            });
+        } catch (error) {
+            console.error(error);
+            socket.emit('room_error', {
+                message: 'Failed to delete room'
+            });
+        }
+        socket.emit('room_deleted', data.roomId);
+    })
     socket.on('spectate', (roomId: number) => {
         console.log('Spectate roomId:', roomId, typeof roomId)
         console.log('Sessions:', sessions.map(s => ({ roomId: s.roomId, type: typeof s.roomId })))

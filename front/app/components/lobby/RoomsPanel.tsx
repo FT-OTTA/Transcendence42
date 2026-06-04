@@ -57,10 +57,14 @@ export default function RoomPanel() {
                 return prev.map((r) => r.id === room.id ? formatted : r);
             });
         };
+        const handleRoomDeleted = (roomId: number) => {
+            setRoomDetails((prev) => prev.filter((r) => r.id !== roomId));
+        };
 
         const handleRoomError = (err: any) => showError(err.message);
 
         socket.on("room_updated", handleRoomUpdated);
+        socket.on("room_deleted", handleRoomDeleted);
         socket.on("room_error", handleRoomError);
 
         return () => {
@@ -81,10 +85,21 @@ export default function RoomPanel() {
             router.push(`/${locale}/playground/${room.id}`);
         });
     }
+    async function deleteRoom(roomId: number) {
+        const username = await requireAuth();
+        if (!username) { showError("need_login"); return; }
+        console.log("deleting room", roomId, username);
+        socket.emit("delete_room", { roomId, username }, (response: any) => {
+            if (!response.success) {
+                showError(response.message);
+            }
+        });
+    }
 
     async function joinRoom(roomId: number) {
         const username = await requireAuth();
         if (!username) { showError("need_login"); return; }
+        if (myRoom) { showError("already_in_room"); return; }
         const room = roomDetails.find(r => r.id === roomId);
         if (room?.p1 === username) { showError("cant_join_own_room"); return; }
         socket.emit("join_room", { roomId, username }, (room: any) => {
@@ -155,7 +170,16 @@ export default function RoomPanel() {
                                     👁 {l("spectate")}
                                 </button>
                             ) : null}
+                            {isMyRoom(room) && ( room.p1 === me) ? (
+                                <button
+                                    onClick={() => deleteRoom(room.id, me)}
+                                    className="text-red-400 hover:text-red-200 transition ml-2"
+                                >
+                                    ✖
+                                </button>
+                            ) : null}
                         </div>
+
                     </div>
                 ))}
             </div>

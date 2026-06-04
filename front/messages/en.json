@@ -77,7 +77,8 @@
     "game_server_error": "Unable to connect to the game server.",
     "fail_friend_fetch": "Failed to fetch friends.",
     "no_username": "Please enter a username.",
-    "fail_add": "Failed to add friend."
+    "fail_add": "Failed to add friend.",
+    "already_in_room": "You are already in a room."
   },
 
   "Playground": {

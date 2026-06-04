@@ -286,6 +286,7 @@ function getNextEffectIndex(card: Card, targets: Array<{ target: Card | Hero; ef
 }
 
 function handleEndTurn() {
+    abortPlay();
     if (!socketRef.current) return;
     setWaitingEndTurn(true);
     socketRef.current.emit('end_turn');

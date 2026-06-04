@@ -7,6 +7,7 @@ import { Card as PrismaCard } from '@prisma/client'
 import { prisma } from '../../prisma/prisma.ts'
 import fs from 'fs'
 import path from 'path'
+import { waitingPlayers } from './state.ts'
 
 function shuffle<T>(array: T[]): T[] {
     for (let i = array.length - 1; i > 0; i--) {
@@ -16,7 +17,7 @@ function shuffle<T>(array: T[]): T[] {
     return array
 }
 
-async function buildHero(heroId: string): Promise<Hero> {
+async function buildHero(heroId: string, debugMode: boolean): Promise<Hero> {
     const hero = await prisma.hero.findUnique({ where: { id: heroId } })
     if (!hero) throw new Error('Héros introuvable')
 
@@ -39,9 +40,12 @@ async function buildHero(heroId: string): Promise<Hero> {
             console.error(`Erreur passif ${heroId}:`, err)
         }
     }
+    let library: Card[] = []
+    if (debugMode) {
+    console.log("Debug mode: loading all cards for hero", hero.name)
     // DEV MODE — remplacer par le vrai deck plus tard
     const allCards = await prisma.card.findMany()
-    const library: Card[] = allCards.map((c: PrismaCard): Card => ({
+    library = allCards.map((c: PrismaCard): Card => ({
         kind: 'card',
         idInGame: Math.floor(Math.random() * 100000),
         idInCollection: parseInt(c.id),
@@ -70,39 +74,43 @@ async function buildHero(heroId: string): Promise<Hero> {
         illustration: c.illustration ?? '',
         cardBackPath: ''
     }))
-
+    } else {
+    console.log("Normal mode: loading deck for hero", hero.name)
     // PROD ONLY
-// const cardIds: string[] = JSON.parse(hero.deck)
-// const cards = (await Promise.all(
-//     cardIds.map(id => prisma.card.findUnique({ where: { id } }))
-// )).filter((c : PrismaCard | null): c is NonNullable<typeof c> => !!c)
+ const cardIds: string[] = JSON.parse(hero.deck)
+ const cards = (await Promise.all(
+     cardIds.map(id => prisma.card.findUnique({ where: { id } }))
+ )).filter((c : PrismaCard | null): c is NonNullable<typeof c> => !!c)
 
-// const library: Card[] = cards.map((c : PrismaCard): Card => ({
-//     kind: 'card',
-//     idInGame: Math.floor(Math.random() * 100000),
-//     idInCollection: parseInt(c.id),
-//     cardName: c.name,
-//     effectText: c.effect_text ?? '',
-//     type: c.type as CardType,
-//     class: c.class as CardClass,
-//     runeCost: c.rune_cost,
-//     baseForce: c.force ?? 0,
-//     currForce: c.force ?? 0,
-//     baseEndurance: c.endurance ?? 0,
-//     currEndurance: c.endurance ?? 0,
-//     effect: c.effect,
-//     effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[],
-//     zone: null as any,
-//     owner: null as any,
-//     timing: c.timing ?? 'end_of_turn' as EffectTime,
-//     state: 'alive' as CreatureState,
-//     fullPicPath: c.illustration ?? '',
-//     smallPicPath: c.illustration ?? '',
-//     cardBackPath: ''
-// }))
-
-//     shuffle(library);
-
+    library = cards.map((c : PrismaCard): Card => ({
+     kind: 'card',
+     idInGame: Math.floor(Math.random() * 100000),
+     idInCollection: parseInt(c.id),
+     cardName_en: c.name_en,
+     cardName_fr: c.name_fr,
+     cardName_sv: c.name_sv,
+     effectText_en: c.effect_text_en ?? '',
+     effectText_fr: c.effect_text_fr ?? '',
+     effectText_sv: c.effect_text_sv ?? '',
+     type: c.type_en as CardType,
+     class: c.class as CardClass,
+     runeCost: c.rune_cost,
+     baseForce: c.force ?? 0,
+     currForce: c.force ?? 0,
+     baseEndurance: c.endurance ?? 0,
+     currEndurance: c.endurance ?? 0,
+     effect: c.effect,
+     effects: (c.effect ? JSON.parse(c.effect).effects : []) as Effect[],
+     zone: null as any,
+     owner: null as any,
+     timing: c.timing ?? 'end_of_turn' as EffectTime,
+     state: 'alive' as CreatureState,
+     fullPicPath: c.illustration ?? '',
+     smallPicPath: c.illustration ?? '',
+     cardBackPath: ''
+    }))
+    shuffle(library);
+    }
     return {
         kind: 'hero',
         idInGame: Math.floor(Math.random() * 100000),
@@ -120,14 +128,21 @@ async function buildHero(heroId: string): Promise<Hero> {
 }
 
 export async function instantiateGame(players: WaitingPlayer[]): Promise<Game> {
-    const heroes = await Promise.all(players.map(p => buildHero(p.playerData.heroId)))
+    let debugMode = false;
+    if (players.some(p => p.playerData.debug)) {
+        console.log("Debug mode activated for this game")
+        debugMode = true;
+    } else {
+        console.log("Normal mode activated for this game")
+    }
+    const heroes = await Promise.all(players.map(p => buildHero(p.playerData.heroId, debugMode)))
 
     heroes.forEach((hero, i) => {
         hero.username = players[i].playerData.username
         hero.userId = players[i].playerData.userId
     })
 
-    
+
     for (const hero of heroes)
         for (const card of hero.library)
             card.owner = hero
@@ -140,6 +155,7 @@ export async function instantiateGame(players: WaitingPlayer[]): Promise<Game> {
         players: heroes,
         status: 'playing',
         winner: undefined,
+        debug: debugMode,
         backgroundPath: 'default.png'
     }
 }

@@ -5,9 +5,10 @@ import { useTranslations } from "next-intl";
 
 interface HeroSelectionProps {
   onSelect: (heroId: string) => void;
+  onSetDebug: (debug: boolean) => void;
 }
 
-export default function HeroSelection({ onSelect }: HeroSelectionProps) {
+export default function HeroSelection({ onSelect, onSetDebug }: HeroSelectionProps) {
   const heroes = [
     { id: 'h001', name: 'Guerrier', description: 'Force brute et armure.' },
     { id: 'h002', name: 'Druide', description: 'Contrôle et magie naturelle.' },
@@ -18,7 +19,7 @@ export default function HeroSelection({ onSelect }: HeroSelectionProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black/80 text-white p-6">
       <h2 className="text-3xl font-bold mb-8">{p("choose_your_heros")}</h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {heroes.map((hero) => (
           <button
@@ -31,6 +32,12 @@ export default function HeroSelection({ onSelect }: HeroSelectionProps) {
           </button>
         ))}
       </div>
+      <button
+        onClick={() => onSetDebug(true)}
+        className="mt-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+      >
+        Enable debug mode (all cards available + infinite runes)
+      </button>
     </div>
   );
 }

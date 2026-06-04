@@ -5,7 +5,7 @@ import type { Hero } from './hero.ts'
 export type WaitingPlayer = {
     socket: Socket;
     playerData: any;
-    debugMode?: boolean;
+    debug: boolean;
 }
 
 export type GameSession = {
@@ -16,7 +16,6 @@ export type GameSession = {
     timer: ReturnType<typeof setTimeout> | null;
     readyPlayers: Set<string>;  // les socketIds des joueurs qui ont cliqué fin de tour
     spectators: Socket[];
-
 }
 
 export type GamePhase = "beginning" | "main" | "resolve";
@@ -30,6 +29,7 @@ export type Game = {
     backgroundPath: string;
     status: "playing" | "game_over";
     winner?: Hero;
-    
+    debug: boolean;
+
 };
 

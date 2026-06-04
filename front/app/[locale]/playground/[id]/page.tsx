@@ -73,6 +73,7 @@ export default function PlaygroundPage() {
   const [currentEffectIndex, setCurrentEffectIndex] = useState<number>(0);
   const [gameOverMessage, setGameOverMessage] = useState<string | null>(null)
   const [showChat, setShowChat] = useState(false);
+  const [isDebug, setIsDebug] = useState(false);
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -114,9 +115,9 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
               heroId: selectedHero,
               roomId: Number(roomId),
               username: localStorage.getItem('username'),
-              token: localStorage.getItem('token')
-
-          });
+              token: localStorage.getItem('token'),
+              debug: isDebug
+            });
         }
     });
 
@@ -186,7 +187,7 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         setRunes(me.curRunes);
         setPlayerSlots(battlefieldToSlots(me.battlefield));
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
-        setIsLoading(false)  
+        setIsLoading(false)
         setWaitingEndTurn(false);
     });
 
@@ -397,7 +398,7 @@ const locale = useLocale();
         <Navbar />
 
         {!isSpectator && !selectedHero ? (
-            <HeroSelection onSelect={(id) => setSelectedHero(id)} />
+            <HeroSelection onSelect={(id) => setSelectedHero(id)} onSetDebug={(debug) => setIsDebug(debug)} />
         ) : (
             <>
                 {isLoading ? (
@@ -427,7 +428,7 @@ const locale = useLocale();
                                     onClick={() => onHeroClick?.("opponent")}
                                     isOpponent
                                 />
-                                
+
                                 <OpponentBoard
                                     cards={opponentSlots}
                                     onPlay={() => {}}
@@ -478,7 +479,7 @@ const locale = useLocale();
                             <div className="flex flex-col gap-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
 
                                 <div className="flex items-center justify-center gap-5">
-                                    
+
                                     {/* End Turn centré */}
                                     <div>
                                         <button
@@ -489,7 +490,7 @@ const locale = useLocale();
                                                 {waitingEndTurn ? "..." : p("end_turn")}
                                         </button>
                                     </div>
-                                    
+
                                     {/* Tour */}
                                     <div className="text-center text-sm text-blue-300/60 py-1">
                                         {p("turn")} {turnNumber}/8

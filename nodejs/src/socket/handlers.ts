@@ -56,16 +56,13 @@ export function onConnection(io: Server, socket: Socket): void {
             p => p.playerData.username === data.username && Number(p.playerData.roomId) === roomId
         )
         if (!alreadyWaiting) {
-            waitingPlayers.push({ socket, playerData: { ...data, userId } })
+            waitingPlayers.push({ socket, playerData: { ...data, userId }, debug: data.debug})
         }
 
         // ✅ Cherche un autre joueur dans la MÊME room, pas n'importe qui
         const playersInRoom = waitingPlayers.filter(
             p => Number(p.playerData.roomId) === roomId
         )
-        if (playersInRoom.length === 1) {
-            socket.emit('ask_debug');
-        }
         if (playersInRoom.length === 2) {
             filterWaitingPlayers(Number(data.roomId))
             try {
@@ -77,8 +74,7 @@ export function onConnection(io: Server, socket: Socket): void {
                     submittedCards: new Map(),
                     readyPlayers: new Set(),
                     timer: null,
-                    spectators: []
-                    debug
+                    spectators: [],
                 }
 
                 addSession(newSession)
@@ -88,12 +84,6 @@ export function onConnection(io: Server, socket: Socket): void {
                 socket.emit('error', { message: 'Impossible de charger les données du héros' })
             }
         }
-    })
-    socket.on('reply_debug', (data) => {
-        console.log("recu", {data});
-        const session = findSession(socket.id);
-        if (!session) return
-        session.debugMode = data.debugMode;
     })
     socket.on('play_card', (data) => {
         console.log('Reçu play_card', { data })
@@ -184,7 +174,7 @@ export function onConnection(io: Server, socket: Socket): void {
             });
             if (!user)
                 return;
-            
+
             const message = await prisma.message.create({
                 data: {
                     senderId: user.id,
@@ -211,7 +201,7 @@ export function onConnection(io: Server, socket: Socket): void {
             const { username } = data;
             if ( !username )
                 return;
-            const user = 
+            const user =
                 await prisma.user.findUnique({
                     where: {
                         username
@@ -247,13 +237,13 @@ export function onConnection(io: Server, socket: Socket): void {
             const { roomId, username } = data;
             if (!roomId || !username)
                 return;
-            
+
             const user = await prisma.user.findUnique({
                 where: {username}
             });
             if (!user)
                 return;
-            
+
             const room = await prisma.room.findUnique({
                 where: {id: roomId}
             });
@@ -270,8 +260,8 @@ export function onConnection(io: Server, socket: Socket): void {
                 });
                 return;
             }
-        
-            const updateRoom = 
+
+            const updateRoom =
                 await prisma.room.update({
                     where: { id: roomId },
                     data: {
@@ -310,7 +300,7 @@ export function onConnection(io: Server, socket: Socket): void {
 
     socket.on('disconnect', () => {
         console.log('User disconeccted :', socket.id);
-        
+
         if (socket.username) {
             activeUsers.delete(socket.username);
             io.emit("status_changed", { username: socket.username, isOnline: false });

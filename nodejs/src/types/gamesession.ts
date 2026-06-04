@@ -5,6 +5,7 @@ import type { Hero } from './hero.ts'
 export type WaitingPlayer = {
     socket: Socket;
     playerData: any;
+    debugMode?: boolean;
 }
 
 export type GameSession = {

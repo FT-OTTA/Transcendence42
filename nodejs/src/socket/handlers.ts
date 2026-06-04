@@ -63,7 +63,9 @@ export function onConnection(io: Server, socket: Socket): void {
         const playersInRoom = waitingPlayers.filter(
             p => Number(p.playerData.roomId) === roomId
         )
-
+        if (playersInRoom.length === 1) {
+            socket.emit('ask_debug');
+        }
         if (playersInRoom.length === 2) {
             filterWaitingPlayers(Number(data.roomId))
             try {
@@ -76,6 +78,7 @@ export function onConnection(io: Server, socket: Socket): void {
                     readyPlayers: new Set(),
                     timer: null,
                     spectators: []
+                    debug
                 }
 
                 addSession(newSession)
@@ -85,6 +88,12 @@ export function onConnection(io: Server, socket: Socket): void {
                 socket.emit('error', { message: 'Impossible de charger les données du héros' })
             }
         }
+    })
+    socket.on('reply_debug', (data) => {
+        console.log("recu", {data});
+        const session = findSession(socket.id);
+        if (!session) return
+        session.debugMode = data.debugMode;
     })
     socket.on('play_card', (data) => {
         console.log('Reçu play_card', { data })

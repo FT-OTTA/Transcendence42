@@ -1,0 +1,4 @@
+- swap
+- traitrise selon Loki
+
+

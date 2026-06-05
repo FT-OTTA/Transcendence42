@@ -68,7 +68,7 @@ export default function GameCard({
 
 			<div className={ runeClass }>
 				<img
-					className="w-20 h-20 object-contain opacity-95"
+					className="w-16 h-16 object-contain opacity-95"
 					src={runeUrl}
 					alt={name}
 					draggable={false}

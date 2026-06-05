@@ -31,13 +31,20 @@ export function onConnection(io: Server, socket: Socket): void {
                 const decoded = jwt.verify(data.token, JWT_SECRET) as any
                 userId = decoded.userId
             } catch {}
+        } else {
+            console.log('No token provided for join_game')
+            socket.emit('error', { message: 'Authentication required' })
+            return
         }
 
         // Reconnexion à une session existante
         const existingSession = findSessionByRoomId(Number(data.roomId))
         if (existingSession) {
+            let user =  await prisma.user.findUnique({
+                where: { id: userId }
+            });
             const playerIndex = existingSession.game.players.findIndex(
-                (p: any) => p.username === data.username
+                (p: any) => p.username === user.username // Don't trust user
             )
             if (playerIndex !== -1) {
                 existingSession.sockets[playerIndex] = socket
@@ -121,7 +128,6 @@ export function onConnection(io: Server, socket: Socket): void {
             session.readyPlayers.add(socket.id)
             if (session.readyPlayers.size === session.sockets.length) {
                 session.readyPlayers.clear()
-
                 resolveRound(session)
                 session.sockets.forEach((s, id) => {
                     s.emit('game_update', { game: getPlayerPerspective(session.game, id) })
@@ -164,7 +170,7 @@ export function onConnection(io: Server, socket: Socket): void {
                 message: 'Failed to delete room'
             });
         }
-        socket.emit('room_deleted', data.roomId);
+        io.emit('room_deleted', data.roomId);
     })
     socket.on('spectate', (roomId: number) => {
         console.log('Spectate roomId:', roomId, typeof roomId)

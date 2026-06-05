@@ -67,7 +67,8 @@
       "profile": "Profil",
       "rooms": "Rum",
       "rejoin": "Återanslut",
-      "remove": "Ta bort"
+      "remove": "Ta bort",
+      "login_to_play": "Logga in för att spela"
     },
 
     "Error": {
@@ -78,7 +79,8 @@
       "fail_friend_fetch": "Det gick inte att hämta vänner.",
       "no_username": "Ange ett användarnamn.",
       "fail_add": "Det gick inte att lägga till vän.",
-      "already_in_room": "Du är redan i ett rum."
+      "already_in_room": "Du är redan i ett rum.",
+      "error_playground": "Ett fel inträffade vid anslutning till spelservern."
     },
 
     "Playground": {

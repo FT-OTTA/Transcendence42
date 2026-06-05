@@ -67,7 +67,8 @@
     "profile": "Profile",
     "rooms": "Rooms",
     "rejoin": "Rejoin",
-    "remove": "Remove"
+    "remove": "Remove",
+    "login_to_play": "Login to Play"
   },
 
   "Error": {
@@ -78,7 +79,8 @@
     "fail_friend_fetch": "Failed to fetch friends.",
     "no_username": "Please enter a username.",
     "fail_add": "Failed to add friend.",
-    "already_in_room": "You are already in a room."
+    "already_in_room": "You are already in a room.",
+    "error_playground": "An error occurred while connecting to the game server."
   },
 
   "Playground": {

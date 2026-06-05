@@ -67,7 +67,8 @@
       "profile": "Profil",
       "rooms": "Salles",
       "rejoin": "Reprendre",
-      "remove": "Supprimer"
+      "remove": "Supprimer",
+      "login_to_play": "Connectez-vous pour jouer"
     },
 
     "Error": {
@@ -78,7 +79,8 @@
       "fail_friend_fetch": "Échec du chargement des amis.",
       "no_username": "Veuillez entrer un nom d'utilisateur.",
       "fail_add": "Échec de l'ajout d'un ami.",
-      "already_in_room": "Vous êtes déjà dans une salle."
+      "already_in_room": "Vous êtes déjà dans une salle.",
+      "error_playground": "Une erreur est survenue lors de la connexion au serveur de jeu."
     },
 
     "Playground": {

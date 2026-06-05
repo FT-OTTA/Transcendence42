@@ -32,6 +32,7 @@ export default function RoomPanel() {
 
     useEffect(() => {
         requireAuth().then(setMe);
+        console.log(me);
 
         async function fetchRooms() {
             const res = await fetch("/api/rooms");
@@ -134,12 +135,12 @@ export default function RoomPanel() {
                         key={room.id}
                         className={clsx(
                             "grid grid-cols-4 gap-2 items-center border p-2 transition",
-                            isMyRoom(room)
+                            (isMyRoom(room) && me)
                                 ? "border-amber-300/60 bg-amber-500/5"
                                 : "border-blue-300/40"
                         )}
                     >
-                        <div className={clsx("text-sm", isMyRoom(room) && "text-amber-300")}>
+                        <div className={clsx("text-sm", (isMyRoom(room) && me) && "text-amber-300")}>
                             #{room.id}
                         </div>
 
@@ -164,9 +165,10 @@ export default function RoomPanel() {
                             {isMyRoom(room) ? (
                                 <button
                                     onClick={() => router.push(`/${locale}/playground/${room.id}`)}
-                                    className="text-amber-300 hover:text-amber-100 transition"
+                                    disabled={!me}
+                                    className={me ? "text-amber-300 hover:text-amber-100 transition" : "text-gray-500 cursor-not-allowed"}
                                 >
-                                    ▶ {l("rejoin")}
+                                    ▶ {me? l("rejoin") : l("login_to_play")}
                                 </button>
                             ) : isFull(room) ? (
                                 <button
@@ -178,7 +180,7 @@ export default function RoomPanel() {
                             ) : null}
                             {isMyRoom(room) && ( room.p1 === me) ? (
                                 <button
-                                    onClick={() => deleteRoom(room.id, me)}
+                                    onClick={() => deleteRoom(room.id)}
                                     className="text-red-400 hover:text-red-200 transition ml-2"
                                 >
                                     ✖
@@ -193,16 +195,17 @@ export default function RoomPanel() {
             <button
                 className={clsx(
                     "border py-2 transition",
-                    myRoom
-                        ? "border-amber-300/30 rounded-md hover:bg-amber-300 hover:text-black"
-                        : "border-blue-300/30 rounded-md hover:bg-blue-300 hover:text-black"
+                    (myRoom && me)
+                        ? "border-amber-300 hover:bg-amber-300 hover:text-black"
+                        : "border-blue-300 hover:bg-blue-300 hover:text-black"
                 )}
+                disabled={!me}
                 onClick={myRoom
                     ? () => router.push(`/${locale}/playground/${myRoom.id}`)
                     : createRoom
                 }
             >
-                {myRoom ? `▶ ${l("rejoin")}` : `+ ${l("create_room")}`}
+                {me? (myRoom ? `▶ ${l("rejoin")}` : `+ ${l("create_room")}`) : l("login_to_play")}
             </button>
         </div>
     );

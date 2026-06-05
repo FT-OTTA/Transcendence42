@@ -67,7 +67,8 @@
       "profile": "Profil",
       "rooms": "Salles",
       "rejoin": "Reprendre",
-      "remove": "Supprimer"
+      "remove": "Supprimer",
+      "login_to_play": "Connectez-vous pour jouer"
     },
 
     "Error": {
@@ -77,7 +78,9 @@
       "game_server_error": "Impossible de se connecter au serveur de jeu.",
       "fail_friend_fetch": "Échec du chargement des amis.",
       "no_username": "Veuillez entrer un nom d'utilisateur.",
-      "fail_add": "Échec de l'ajout d'un ami."
+      "fail_add": "Échec de l'ajout d'un ami.",
+      "already_in_room": "Vous êtes déjà dans une salle.",
+      "error_playground": "Une erreur est survenue lors de la connexion au serveur de jeu."
     },
 
     "Playground": {
@@ -123,4 +126,39 @@
             "swap": "{a} ↔ {b}"
         }
     }
+        "debug_mode": "Activer le mode debug (toutes les cartes sont disponibles + runes infinies)"
+    },
+  "Privacy": {
+    "policy": "Politique de confidentialité",
+    "last_update": "Dernière mise à jour : Juin 2026",
+    "collected_title": "1. Données collectées",
+    "collected_usage": "Nous collectons votre nom d'utilisateur et votre adresse e-mail uniquement pour la création de compte, l'authentification et la sauvegarde de votre progression dans le jeu.",
+    "usage_title": "2. Utilisation des données",
+    "usage_usage": "Vos données sont strictement utilisées pour fournir les services du jeu. Nous ne vendons, ne louons ni ne partageons vos informations personnelles avec des tiers à des fins de marketing."
+  },
+
+  "TOS": {
+    "title": "Conditions générales d'utilisation",
+    "lastUpdated": "Dernière mise à jour : Juin 2026",
+    "welcome": "Bienvenue sur notre application de jeu de cartes. En créant un compte ou en utilisant notre plateforme, vous acceptez d'être lié par ces Conditions générales d'utilisation.",
+    "section1Title": "1. Création de compte et sécurité",
+    "section1Content": "Pour jouer, vous devez créer un compte. Vous êtes entièrement responsable du maintien de la confidentialité de vos identifiants de connexion et de toutes les activités qui se déroulent sous votre compte.",
+    "section2Title": "2. Conduite de l'utilisateur et fair-play",
+    "section2Content": "Vous acceptez d'utiliser cette application de manière équitable et respectueuse. Les comportements suivants sont strictement interdits et entraîneront la suspension ou la suppression immédiate du compte :",
+    "section2List": {
+      "cheating": "Tricher, exploiter des bugs ou utiliser des logiciels/bots tiers non autorisés.",
+      "harassment": "Harceler, insulter ou utiliser un langage offensant envers d'autres joueurs.",
+      "disruption": "Tenter de perturber ou d'inverser la conception de l'infrastructure de l'application."
+    },
+    "section3Title": "3. Propriété intellectuelle",
+    "section3Content": "Tous les concepts de jeu, graphismes, mécaniques et codes sont la propriété intellectuelle de ce projet. Vous ne pouvez copier, distribuer ou modifier aucune partie du jeu sans autorisation explicite.",
+    "section4Title": "4. Limitation de responsabilité",
+    "section4Content": "Cette application est fournie « en l'état » à des fins d'évaluation et de divertissement. Nous ne garantissons pas la disponibilité des serveurs, la persistance des données ni la sécurité absolue de votre compte."
+  },
+
+  "Footer": {
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions générales d'utilisation",
+    "rights": "Tous droits réservés."
+  }
 }

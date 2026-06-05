@@ -2,6 +2,7 @@
 import LoginCard from "../components/login/LoginCard"
 import Navbar from "../components/navigation/Navbar";
 import Hero from "../components/landing/Hero";
+import Footer from "../components/footer/footer";
 import { useEffect, useState } from "react";
 
 
@@ -11,7 +12,7 @@ export default function Home() {
 
   return (
     <main 
-      className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
+      className=" flex flex-col overflow-x-hidden h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
       <Navbar />
 
       <Hero setIsLogin={setIsLogin}/>
@@ -26,6 +27,7 @@ export default function Home() {
           </div>
         </div>
       )}
+      <Footer/>
     </main>
   );
 }

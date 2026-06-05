@@ -21,6 +21,7 @@ import HeroStrip from '@/app/components/playground/HeroStripProps';
 import ChatPanel from '@/app/components/lobby/ChatPanel';
 import CardDetails from '@/app/components/playground/CardDetails';
 import { createPortal } from 'react-dom';
+import Footer from '@/app/components/footer/footer';
 
 function findCardName(idInGame: string, game: any, locale?: string): string {
     if (!game) return '?';
@@ -101,6 +102,7 @@ export default function PlaygroundPage() {
   const { id } = useParams();
   const pathname = usePathname()
   const p = useTranslations("Playground");
+  const e = useTranslations("Error");
   const CurrentRoomId = id ? Number(id) : null;
 
   // permet de restaurer la sélection du héros si la page est rechargée accidentellement (F5, crash, etc.) pendant une partie
@@ -135,6 +137,7 @@ export default function PlaygroundPage() {
   const [potentialTargets, setPotentialTargets] = useState<(Card | Hero)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
   const [runeError, setRuneError] = useState<string | null>(null);
   const [hand, setHand] = useState<(Card | null)[]>(Array(8).fill(null));
   const [playerSlots, setPlayerSlots] = useState<(Card | null)[]>(Array(8).fill(null));
@@ -427,7 +430,10 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         setGameOverMessage(msg)
         localStorage.removeItem('currentGame')
     });
-
+    newSocket.on('error', (data) => {
+        setIsLoading(false);
+        setIsError(true);
+    });
     newSocket.on('game_start', (data) => {
         if (isSpectator) return;
         myPlayerIndexRef.current = data.playerIndex;
@@ -725,8 +731,12 @@ const locale = useLocale();
 
                     ) : isSpectator ? (
                         <SpectatorBoard players={game?.players ?? []} turnNumber={game?.turnNumber ?? 0} />
+                    ) : isError ? (
+                        <div className="pt-20 text-center text-red-500">
+                            {e("error_playground")}
+                        </div>
                     ) : (
-                    <>
+                        <>
 
                         {/* ── DESKTOP ── */}
                         <div className="hidden md:grid md:grid-cols-4 gap-4 pt-16 h-[calc(100vh-6rem)]">
@@ -1011,6 +1021,7 @@ const locale = useLocale();
             {runeError}
         </div>
         )}
+        <Footer/>
     </main>
     );
 }

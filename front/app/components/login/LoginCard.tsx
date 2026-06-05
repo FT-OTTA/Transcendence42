@@ -5,14 +5,13 @@ import { useTranslations } from "next-intl";
 
 const loginCard = clsx
 (
-  cinzel.className,
   "w-full max-w-md",
   "px-6 py-6",
   "rounded-sm",
   "grid gap-4 md:gap-6",
   "text-xl md:text-2xl lg:text-2xl ",
-  "border border-blue-300 bg-transparent text-blue-300",
-  "bg-black/35 backdrop-blur-sm",
+  "text-blue-300",
+  "bg-black/40 backdrop-blur-lg",
   "transition-all duration-300",
 );
 
@@ -97,7 +96,7 @@ export default function LoginCard()
     return (
         <div className={ loginCard }>
 
-            <h2 className="text-2xl md:text-3xl text-center mb-2">
+            <h2 className={clsx(cinzel.className, "text-2xl md:text-3xl text-center mb-2")}>
                 {isRegisterMode ? l("create_account") : l("welcome_back")}
             </h2>
 

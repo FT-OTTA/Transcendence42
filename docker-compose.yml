@@ -97,8 +97,15 @@ services:
       retries: 10
 
   front:
-    build: ./front
+    build:
+      context: .
+      dockerfile: front/Dockerfile
     container_name: front
+    volumes:
+      - ./front:/app/front
+      - /app/front/node_modules
+      - /app/front/.next
+    command: npm run dev -- -H 0.0.0.0
     env_file:
       - ./.env
     networks:

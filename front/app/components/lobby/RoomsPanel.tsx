@@ -7,7 +7,13 @@ import { customScrollBar } from "../scrollBar";
 import { useTranslations } from "next-intl";
 import { socket } from "@/lib/socket";
 import { useLocale } from 'next-intl';
-import clsx from 'clsx';
+import { cinzel } from "../../fonts";
+import clsx from "clsx";
+
+const titleClass = clsx(
+    cinzel.className,
+    "text-blue-400 text-center text-xl py-2"
+)
 
 type Room = {
     id: number;
@@ -26,6 +32,7 @@ export default function RoomPanel() {
 
     useEffect(() => {
         requireAuth().then(setMe);
+        console.log(me);
 
         async function fetchRooms() {
             const res = await fetch("/api/rooms");
@@ -57,10 +64,14 @@ export default function RoomPanel() {
                 return prev.map((r) => r.id === room.id ? formatted : r);
             });
         };
+        const handleRoomDeleted = (roomId: number) => {
+            setRoomDetails((prev) => prev.filter((r) => r.id !== roomId));
+        };
 
         const handleRoomError = (err: any) => showError(err.message);
 
         socket.on("room_updated", handleRoomUpdated);
+        socket.on("room_deleted", handleRoomDeleted);
         socket.on("room_error", handleRoomError);
 
         return () => {
@@ -81,10 +92,21 @@ export default function RoomPanel() {
             router.push(`/${locale}/playground/${room.id}`);
         });
     }
+    async function deleteRoom(roomId: number) {
+        const username = await requireAuth();
+        if (!username) { showError("need_login"); return; }
+        console.log("deleting room", roomId, username);
+        socket.emit("delete_room", { roomId, username }, (response: any) => {
+            if (!response.success) {
+                showError(response.message);
+            }
+        });
+    }
 
     async function joinRoom(roomId: number) {
         const username = await requireAuth();
         if (!username) { showError("need_login"); return; }
+        if (myRoom) { showError("already_in_room"); return; }
         const room = roomDetails.find(r => r.id === roomId);
         if (room?.p1 === username) { showError("cant_join_own_room"); return; }
         socket.emit("join_room", { roomId, username }, (room: any) => {
@@ -97,9 +119,9 @@ export default function RoomPanel() {
     const isFull = (room: Room) => room.p2 !== null;
 
     return (
-        <div className="h-full min-h-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
+        <div className="h-full min-h-0 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
 
-            <h2 className="text-xl mb-2 text-center">{l("rooms")}</h2>
+            <h2 className={titleClass}>{l("rooms")}</h2>
 
             {error && (
                 <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
@@ -113,12 +135,12 @@ export default function RoomPanel() {
                         key={room.id}
                         className={clsx(
                             "grid grid-cols-4 gap-2 items-center border p-2 transition",
-                            isMyRoom(room)
+                            (isMyRoom(room) && me)
                                 ? "border-amber-300/60 bg-amber-500/5"
                                 : "border-blue-300/40"
                         )}
                     >
-                        <div className={clsx("text-sm", isMyRoom(room) && "text-amber-300")}>
+                        <div className={clsx("text-sm", (isMyRoom(room) && me) && "text-amber-300")}>
                             #{room.id}
                         </div>
 
@@ -143,9 +165,10 @@ export default function RoomPanel() {
                             {isMyRoom(room) ? (
                                 <button
                                     onClick={() => router.push(`/${locale}/playground/${room.id}`)}
-                                    className="text-amber-300 hover:text-amber-100 transition"
+                                    disabled={!me}
+                                    className={me ? "text-amber-300 hover:text-amber-100 transition" : "text-gray-500 cursor-not-allowed"}
                                 >
-                                    ▶ {l("rejoin")}
+                                    ▶ {me? l("rejoin") : l("login_to_play")}
                                 </button>
                             ) : isFull(room) ? (
                                 <button
@@ -155,7 +178,16 @@ export default function RoomPanel() {
                                     👁 {l("spectate")}
                                 </button>
                             ) : null}
+                            {isMyRoom(room) && ( room.p1 === me) ? (
+                                <button
+                                    onClick={() => deleteRoom(room.id)}
+                                    className="text-red-400 hover:text-red-200 transition ml-2"
+                                >
+                                    ✖
+                                </button>
+                            ) : null}
                         </div>
+
                     </div>
                 ))}
             </div>
@@ -163,16 +195,17 @@ export default function RoomPanel() {
             <button
                 className={clsx(
                     "border py-2 transition",
-                    myRoom
+                    (myRoom && me)
                         ? "border-amber-300 hover:bg-amber-300 hover:text-black"
                         : "border-blue-300 hover:bg-blue-300 hover:text-black"
                 )}
+                disabled={!me}
                 onClick={myRoom
                     ? () => router.push(`/${locale}/playground/${myRoom.id}`)
                     : createRoom
                 }
             >
-                {myRoom ? `▶ ${l("rejoin")}` : `+ ${l("create_room")}`}
+                {me? (myRoom ? `▶ ${l("rejoin")}` : `+ ${l("create_room")}`) : l("login_to_play")}
             </button>
         </div>
     );

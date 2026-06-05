@@ -4,7 +4,7 @@
             "effect": "dmg",
             "value": 1,
             "target": "all",
-            "targetType": { "creature": true, "hero": true }
+            "targetType": { "creature": true, "building": true,"hero": true }
         },
         {
             "effect": "draw",

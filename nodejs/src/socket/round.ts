@@ -41,6 +41,9 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
     clearTimeout(session.timer!)
     session.timer = null
+    const emit = (event: string, data: any) => {
+        session.sockets.forEach(s => s.emit(event, data));
+    };
 
     for (const [socketId, cards] of session.submittedCards) {
         const playerIndex = session.sockets.findIndex(s => s.id === socketId)
@@ -48,7 +51,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
         for (const { card, payload } of cards) {
             if (!card) continue
-            playCard(card, payload, session.game)
+            playCard(card, payload, session.game, emit)
         }
     }
     session.submittedCards.clear()
@@ -59,7 +62,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
         return;
     }
 
-    resolveCombat(session.game)
+    resolveCombat(session.game, emit)
 
     if (checkBoardState(session.game) === "game_over") {
         await emitGameOver(session)
@@ -73,7 +76,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
         session.game.winner = winner ?? undefined
         await emitGameOver(session)
     } else {
-        startTurn(session.game)
+        startTurn(session.game, emit)
         checkBoardState(session.game);
         session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
         session.sockets.forEach((s, id) => {
@@ -84,7 +87,11 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
 export function launchGame(session: GameSession): void {
     console.log('Lancement de game pour sockets', session.sockets.map(s => s.id))
-    startTurn(session.game)
+    const emit = (event: string, data: any) => {
+        session.sockets.forEach(s => s.emit(event, data));
+    };
+
+    startTurn(session.game, emit)
     session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
     session.sockets.forEach((s, id) => {
         s.emit('game_start', { game: getPlayerPerspective(session.game, id), playerIndex: id })

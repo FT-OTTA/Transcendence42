@@ -10,6 +10,8 @@ export function fibonacci(n: number): number {
 }
 
 export function playerDraw(player: Hero, n: number): boolean {
+    if (n <= 0)
+            return (false);
     while (player.library.length > 0 && n--)
         player.hand.push(player.library.pop()!);
     if (player.library.length === 0)
@@ -17,7 +19,7 @@ export function playerDraw(player: Hero, n: number): boolean {
     return (true);
 }
 
-export function startTurn(game: Game): void {
+export function startTurn(game: Game, emit?: (event: string, data: any) => void): void {
     console.log(`Starting turn ${game.turnNumber}...`)
     for (const player of game.players) {
         for (const card of Object.values(player.battlefield)) {
@@ -32,9 +34,9 @@ export function startTurn(game: Game): void {
         }
         console.log ("RESOLVING PASSIVE")
         for (const eff of player.passive) {
-            resolveEffect(player, eff, { cardId: 0 }, game, 'start_turn', player)
+            resolveEffect(player, eff, { cardId: 0 }, game, 'start_turn', player, undefined, undefined, emit)
         }
     }
-    resolveBuildings(game);
+    resolveBuildings(game, emit);
 }
 

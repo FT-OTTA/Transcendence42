@@ -23,6 +23,81 @@ import CardDetails from '@/app/components/playground/CardDetails';
 import { createPortal } from 'react-dom';
 import Footer from '@/app/components/footer/footer';
 
+function findCardName(idInGame: string, game: any, locale?: string): string {
+    if (!game) return '?';
+    const eq = (a: any) => String(a) === idInGame;
+    const localName = (card: any) =>
+        (locale ? card[`cardName_${locale}`] ?? card[`name_${locale}`] : undefined)
+        ?? card.cardName_en ?? card.name_en ?? '?';
+    for (const p of game.players) {
+        if (eq(p.idInGame)) return p.username ?? p.class ?? '?';
+        for (const card of Object.values<any>(p.battlefield)) {
+            if (card && eq(card.idInGame)) return localName(card);
+        }
+        for (const card of (p.hand ?? [])) {
+            if (card && eq(card.idInGame)) return localName(card);
+        }
+    }
+    return '?';
+}
+
+function fmt(v: number): string { return v >= 0 ? `+${v}` : `${v}`; }
+
+function buildEventMessage(
+    event: { source: 'combat' | 'effect' | 'card_played'; data: any },
+    game: any,
+    myIdx: number,
+    t: (key: string, values?: Record<string, string | number>) => string,
+    sourceNames?: Map<string, string>,
+    locale?: string
+): string {
+    const d = event.data;
+    const n = (id: string | number) => findCardName(String(id), game, locale);
+    const src = (id: string | number) => sourceNames?.get(String(id)) ?? n(id);
+    if (event.source === 'card_played')
+        return t('feedback.card_played_msg', { player: d.player, name: sourceNames?.get(String(d.cardId)) ?? d.name_en });
+    if (event.source === 'combat') {
+        if (d.type === 'zone_fight')   return t('feedback.zone_fight', { a: n(d.card0Id), b: n(d.card1Id) });
+        if (d.type === 'card_damaged') return t('feedback.card_damaged', { name: n(d.cardId), value: d.value });
+        if (d.type === 'card_dies')    return t('feedback.card_dies', { name: n(d.cardId), attacker: n(d.attackerId) });
+        if (d.type === 'hit_hero') {
+            const key = d.targetPlayer === myIdx ? 'feedback.hit_hero_me' : 'feedback.hit_hero_opponent';
+            return t(key, { attacker: n(d.attackerId), value: d.value });
+        }
+    } else {
+        if (d.type === 'dmg_card') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?'
+                ? t('feedback.dmg_card_by', { source: s, name: n(d.targetId), value: d.value })
+                : t('feedback.dmg_card', { name: n(d.targetId), value: d.value });
+        }
+        if (d.type === 'destroy') {
+            const source = d.sourceId ? n(d.sourceId) : null;
+            return source && source !== '?'
+                ? t('feedback.destroy_by', { name: n(d.targetId), source })
+                : t('feedback.destroy', { name: n(d.targetId) });
+        }
+        if (d.type === 'dmg_hero') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?'
+                ? t('feedback.dmg_hero_by', { source: s, value: d.value })
+                : t('feedback.dmg_hero', { name: n(d.targetId), value: d.value });
+        }
+        if (d.type === 'ad_mod')    return t('feedback.ad_mod', { name: n(d.targetId), value: fmt(d.value) });
+        if (d.type === 'def_mod')   return t('feedback.def_mod', { name: n(d.targetId), value: fmt(d.value) });
+        if (d.type === 'addef_mod') return t('feedback.addef_mod', { name: n(d.targetId), value: fmt(d.value) });
+        if (d.type === 'draw')      return t('feedback.draw_card', { name: n(d.targetId), value: d.value });
+        if (d.type === 'armor')     return t('feedback.armor_gain', { name: n(d.targetId), value: fmt(d.value) });
+        if (d.type === 'runes')     return t('feedback.runes_gain', { name: n(d.targetId), value: fmt(d.value) });
+        if (d.type === 'freeze')    return t('feedback.freeze', { name: n(d.targetId) });
+        if (d.type === 'swap')      return t('feedback.swap', { a: n(d.targetId), b: n(d.target2Id) });
+    }
+    return '';
+}
+
+
+let _msgId = 0;
+
 export default function PlaygroundPage() {
   const { id } = useParams();
   const pathname = usePathname()
@@ -79,11 +154,51 @@ export default function PlaygroundPage() {
   const [isDebug, setIsDebug] = useState(false);
   const myPlayerIndexRef = useRef<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const gameRef = useRef<any>(null);
+  const [cardAnimations, setCardAnimations] = useState<Record<string, string>>({});
+  type FloatingNumber = { id: number; text: string; color: string; x: number; y: number };
+  const [floats, setFloats] = useState<FloatingNumber[]>([]);
+  const nextFloatId = useRef(0);
+  const [heroAnimations, setHeroAnimations] = useState<[string, string]>(['', '']);
+  const [resolutionMsg, setResolutionMsg] = useState<{ text: string; id: number } | null>(null);
+  const [resolutionLog, setResolutionLog] = useState<string[]>([]);
+  const turnStartHandledRef = useRef(false);
+  const pendingPlayZonesRef = useRef<Map<string, 'mine' | 'opponent'>>(new Map());
+  const playedCardNamesRef = useRef<Map<string, string>>(new Map());
+  const eventQueueRef = useRef<Array<{ source: 'combat' | 'effect' | 'card_played'; data: any }>>([]);
 
 const highlightOpponentHero = potentialTargets.some(t => t.kind === "hero" && t !== game?.players[myPlayerIndexRef.current!]);
 const highlightPlayerHero = potentialTargets.some(t => t.kind === "hero" && t === game?.players[myPlayerIndexRef.current!]);
 const isOpponentHeroSelected = selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[1 - myPlayerIndexRef.current!]?.idInGame);
 const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" && t.target.idInGame === game?.players[myPlayerIndexRef.current!]?.idInGame);
+
+  function spawnFloatAt(el: Element | null, text: string, color: string) {
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const id = nextFloatId.current++;
+    setFloats(prev => [...prev, { id, text, color, x: rect.left + rect.width / 2, y: rect.top }]);
+    setTimeout(() => setFloats(prev => prev.filter(f => f.id !== id)), 650);
+  }
+
+  function findCardSlotEl(idInGame: string): Element | null {
+    const g = gameRef.current;
+    const myIdx = myPlayerIndexRef.current;
+    if (!g || myIdx === null) return null;
+    const eq = (a: any) => String(a) === idInGame;
+    for (let i = 0; i < 8; i++) {
+        const zone = `bf${i + 1}`;
+        if (eq(g.players[myIdx]?.battlefield?.[zone]?.idInGame))
+            return document.getElementById(`player-slot-${i}`);
+        if (eq(g.players[1 - myIdx]?.battlefield?.[zone]?.idInGame))
+            return document.getElementById(`opponent-${i}`);
+    }
+    return null;
+  }
+
+  function spawnFloatOnHero(playerIdx: number, text: string, color: string) {
+    const isMe = playerIdx === myPlayerIndexRef.current;
+    spawnFloatAt(document.getElementById(isMe ? 'hero-strip-player' : 'hero-strip-opponent'), text, color);
+  }
 
   const searchParams = useSearchParams()
   const isSpectator = searchParams.get('spectate') === 'true'
@@ -105,6 +220,117 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         return slots;
     };
 
+    // Plays queued events one by one with text + animation, then calls onDone.
+    const scheduleAnimQueue = (queue: Array<{ source: 'combat' | 'effect' | 'card_played'; data: any }>, onDone: () => void, applyPartialPlay?: (zone: string, isMe: boolean) => void) => {
+        if (queue.length === 0) { onDone(); return; }
+
+        let t = 0;
+
+        const shakeHero = (idx: 0 | 1, at: number) => {
+            setTimeout(() => setHeroAnimations(prev => { const n = [...prev] as [string, string]; n[idx] = ''; return n; }), at);
+            setTimeout(() => setHeroAnimations(prev => { const n = [...prev] as [string, string]; n[idx] = 'animate-shake'; return n; }), at + 30);
+        };
+
+        for (const event of queue) {
+            const { source, data: d } = event;
+            const at = t;
+
+            const msg = buildEventMessage(event, gameRef.current, myPlayerIndexRef.current ?? 0, p, playedCardNamesRef.current, locale);
+            if (msg) {
+                const id = _msgId++;
+                setTimeout(() => {
+                    setResolutionMsg({ text: msg, id });
+                    setResolutionLog(prev => [...prev, msg]);
+                }, at);
+            }
+
+            if (source === 'card_played') {
+                if (d.zone && applyPartialPlay) {
+                    const myUsername = localStorage.getItem('username');
+                    const isMe = d.player === myUsername;
+                    setTimeout(() => applyPartialPlay(d.zone, isMe), at);
+                }
+                t += 1200;
+            } else if (source === 'combat') {
+                if (d.type === 'zone_fight') {
+                    setTimeout(() => setCardAnimations(prev => ({
+                        ...prev,
+                        [d.card0Id]: 'animate-fb-combat',
+                        [d.card1Id]: 'animate-fb-combat',
+                    })), at);
+                    t += 1800;
+                } else if (d.type === 'card_damaged') {
+                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.cardId), `-${d.value}`, 'text-red-400'), at);
+                    t += 2000;
+                } else if (d.type === 'card_dies') {
+                    setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.cardId]: 'animate-fb-death' })), at);
+                    t += 2500;
+                } else if (d.type === 'hit_hero') {
+                    setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.attackerId]: 'animate-fb-combat' })), at);
+                    shakeHero(d.targetPlayer as 0 | 1, at);
+                    setTimeout(() => spawnFloatOnHero(d.targetPlayer, `-${d.value}`, 'text-red-400'), at);
+                    t += 2000;
+                }
+            } else {
+                if (d.type === 'dmg_card') {
+                    setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.targetId]: 'animate-fb-combat' })), at);
+                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), `-${d.value}`, 'text-red-400'), at);
+                    t += 2000;
+                } else if (d.type === 'destroy') {
+                    setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.targetId]: 'animate-fb-death' })), at);
+                    t += 2500;
+                } else if (d.type === 'dmg_hero') {
+                    const g = gameRef.current;
+                    if (g) {
+                        const idx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
+                        if (idx === 0 || idx === 1) {
+                            shakeHero(idx, at);
+                            setTimeout(() => spawnFloatOnHero(idx, `-${d.value}`, 'text-red-400'), at);
+                        }
+                    }
+                    t += 1800;
+                } else if (d.type === 'ad_mod') {
+                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), `${fmt(d.value)} ATK`, 'text-orange-400'), at);
+                    t += 1200;
+                } else if (d.type === 'def_mod') {
+                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), `${fmt(d.value)} DEF`, 'text-sky-300'), at);
+                    t += 1200;
+                } else if (d.type === 'addef_mod') {
+                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), fmt(d.value), 'text-purple-400'), at);
+                    t += 1200;
+                } else if (d.type === 'armor') {
+                    const g = gameRef.current;
+                    if (g) {
+                        const idx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
+                        if (idx === 0 || idx === 1) setTimeout(() => spawnFloatOnHero(idx, fmt(d.value), 'text-cyan-300'), at);
+                    }
+                    t += 1200;
+                } else if (d.type === 'runes') {
+                    const g = gameRef.current;
+                    if (g) {
+                        const idx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
+                        if (idx === 0 || idx === 1) setTimeout(() => spawnFloatOnHero(idx, fmt(d.value), 'text-yellow-400'), at);
+                    }
+                    t += 1200;
+                } else if (d.type === 'draw') {
+                    const g = gameRef.current;
+                    if (g) {
+                        const idx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
+                        if (idx === 0 || idx === 1) setTimeout(() => spawnFloatOnHero(idx, `+${d.value}`, 'text-green-400'), at);
+                    }
+                    t += 1200;
+                } else if (d.type === 'freeze') {
+                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), '❄', 'text-blue-300'), at);
+                    t += 1200;
+                } else {
+                    t += 1200;
+                }
+            } // end else (source === 'effect')
+        }
+
+        setTimeout(() => { setResolutionMsg(null); onDone(); }, t);
+    };
+
     newSocket.on('connect', () => {
       console.log('isSpectator:', isSpectator, 'selectedHero:', selectedHero)
       if (isSpectator) {
@@ -124,20 +350,76 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         }
     });
 
+    newSocket.on('card_played', (data: { cardId: number; zone: string | null; player: string; name_en: string; name_fr?: string; name_sv?: string; cardType: string }) => {
+        if (data.zone) {
+            const myUsername = localStorage.getItem('username');
+            pendingPlayZonesRef.current.set(data.zone, data.player === myUsername ? 'mine' : 'opponent');
+        }
+        const localeName = (data as any)[`name_${locale}`] ?? data.name_en;
+        playedCardNamesRef.current.set(String(data.cardId), localeName || data.name_en);
+        eventQueueRef.current.push({ source: 'card_played', data });
+    });
+
+    newSocket.on('combat_event', (data: any) => {
+        eventQueueRef.current.push({ source: 'combat', data });
+    });
+
+    newSocket.on('effect_event', (data: any) => {
+        eventQueueRef.current.push({ source: 'effect', data });
+    });
+
     newSocket.on('turn_start', (data) => {
         if (isSpectator) return;
         if (myPlayerIndexRef.current === null) return;
+
+        turnStartHandledRef.current = true;
+        setResolutionLog([]);
+        const queue = [...eventQueueRef.current];
+        eventQueueRef.current = [];
+
         const me = data.game.players[myPlayerIndexRef.current];
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
-        setPendingSlots(Array(8).fill(null));
-        setGame(data.game);
-        setMeStats(me);
-        setOpponentStats(opponent);
-        setTurnNumber(data.game.turnNumber);
-        setHand(me.hand);
-        setRunes(me.curRunes);
-        setPlayerSlots(battlefieldToSlots(me.battlefield));
-        setOpponentSlots(battlefieldToSlots(opponent.battlefield));
+        const newPlayerSlots = battlefieldToSlots(me.battlefield);
+        const newOpponentSlots = battlefieldToSlots(opponent.battlefield);
+
+        const applyFinalState = () => {
+            const playAnims: Record<string, string> = {};
+            for (const [zone, side] of pendingPlayZonesRef.current.entries()) {
+                const zoneIdx = parseInt(zone.replace('bf', '')) - 1;
+                const card = side === 'mine' ? newPlayerSlots[zoneIdx] : newOpponentSlots[zoneIdx];
+                if (card) playAnims[card.idInGame] = side === 'mine' ? 'animate-fb-play-bottom' : 'animate-fb-play-top';
+            }
+            pendingPlayZonesRef.current.clear();
+            setPendingSlots(Array(8).fill(null));
+            setGame(data.game);
+            gameRef.current = data.game;
+            setMeStats(me);
+            setOpponentStats(opponent);
+            setTurnNumber(data.game.turnNumber);
+            setHand(me.hand);
+            setRunes(me.curRunes);
+            setPlayerSlots(newPlayerSlots);
+            setOpponentSlots(newOpponentSlots);
+            setCardAnimations(playAnims);
+            if (Object.keys(playAnims).length > 0)
+                setTimeout(() => setCardAnimations({}), 600);
+            setHeroAnimations(['', '']);
+            turnStartHandledRef.current = false;
+        };
+
+        const applyPartialPlay = (zone: string, isMe: boolean) => {
+            const zoneIdx = parseInt(zone.replace('bf', '')) - 1;
+            const card = isMe ? newPlayerSlots[zoneIdx] : newOpponentSlots[zoneIdx];
+            if (!card) return;
+            pendingPlayZonesRef.current.delete(zone);
+            const animClass = isMe ? 'animate-fb-play-bottom' : 'animate-fb-play-top';
+            if (isMe) setPlayerSlots(prev => { const n = [...prev]; n[zoneIdx] = card; return n; });
+            else setOpponentSlots(prev => { const n = [...prev]; n[zoneIdx] = card; return n; });
+            setCardAnimations(prev => ({ ...prev, [card.idInGame]: animClass }));
+            setTimeout(() => setCardAnimations(prev => { const n = { ...prev }; delete n[card.idInGame]; return n; }), 600);
+        };
+
+        scheduleAnimQueue(queue, applyFinalState, applyPartialPlay);
     });
 
     newSocket.on('game_over', (data) => {
@@ -153,12 +435,13 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         setIsError(true);
     });
     newSocket.on('game_start', (data) => {
-        console.log('game_start reçu', data.playerIndex)
         if (isSpectator) return;
         myPlayerIndexRef.current = data.playerIndex;
         const me = data.game.players[data.playerIndex];
         const opponent = data.game.players[1 - data.playerIndex];
+        // Update board immediately — this is the initial state
         setGame(data.game);
+        gameRef.current = data.game;
         setMeStats(me);
         setOpponentStats(opponent);
         setTurnNumber(data.game.turnNumber);
@@ -167,12 +450,18 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         setPlayerSlots(battlefieldToSlots(me.battlefield));
         setOpponentSlots(battlefieldToSlots(opponent.battlefield));
         setIsLoading(false);
+        // Drain passive events emitted by startTurn inside launchGame
+        setResolutionLog([]);
+        const queue = [...eventQueueRef.current];
+        eventQueueRef.current = [];
+        scheduleAnimQueue(queue, () => {});
     });
 
     newSocket.on('game_update', (data) => {
         if (isSpectator) {
             // vue spectateur — on prend les deux joueurs directement
             setGame(data.game)
+            gameRef.current = data.game;
             setMeStats(data.game.players[0])
             setOpponentStats(data.game.players[1])
             setTurnNumber(data.game.turnNumber)
@@ -183,18 +472,38 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         }
 
         if (myPlayerIndexRef.current === null) return;
+
+        // turn_start already scheduled a sequential animation — don't race it
+        if (turnStartHandledRef.current) {
+            setWaitingEndTurn(false);
+            return;
+        }
+
         const me = data.game.players[myPlayerIndexRef.current];
         const opponent = data.game.players[1 - myPlayerIndexRef.current];
-        setGame(data.game);
-        setMeStats(me);
-        setOpponentStats(opponent);
-        setTurnNumber(data.game.turnNumber);
-        setHand(me.hand);
-        setRunes(me.curRunes);
-        setPlayerSlots(battlefieldToSlots(me.battlefield));
-        setOpponentSlots(battlefieldToSlots(opponent.battlefield));
-        setIsLoading(false)
-        setWaitingEndTurn(false);
+
+        // drain queue (immediate spell effects)
+        setResolutionLog([]);
+        const queue = [...eventQueueRef.current];
+        eventQueueRef.current = [];
+
+        const doUpdate = () => {
+            setGame(data.game);
+            gameRef.current = data.game;
+            setMeStats(me);
+            setOpponentStats(opponent);
+            setTurnNumber(data.game.turnNumber);
+            setHand(me.hand);
+            setRunes(me.curRunes);
+            setPlayerSlots(battlefieldToSlots(me.battlefield));
+            setOpponentSlots(battlefieldToSlots(opponent.battlefield));
+            setIsLoading(false);
+            setWaitingEndTurn(false);
+            setCardAnimations({});
+            setHeroAnimations(['', '']);
+        };
+
+        scheduleAnimQueue(queue, doUpdate);
     });
 
     return () => { newSocket.disconnect(); };
@@ -402,6 +711,13 @@ const locale = useLocale();
     )
     return (
     <main className="overflow-x-hidden h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center p-4 text-white/80 overflow-y-hidden">
+        {floats.map(f => (
+            <div key={f.id}
+                 className={`fixed z-[60] pointer-events-none font-bold text-lg drop-shadow-lg ${f.color} animate-fb-float-up`}
+                 style={{ left: f.x, top: f.y, transform: 'translateX(-50%)' }}>
+                {f.text}
+            </div>
+        ))}
         <Navbar />
 
         {!isSpectator && !selectedHero ? (
@@ -428,6 +744,7 @@ const locale = useLocale();
                             {/* Colonne principale — 3/4 */}
                             <div className="col-span-3 flex flex-col gap-2 min-h-0">
 
+                                <div id="hero-strip-opponent">
                                 <HeroStrip
                                     label={p("opponent")}
                                     playerClass={opponentStats?.class}
@@ -438,7 +755,9 @@ const locale = useLocale();
                                     isSelected={isOpponentHeroSelected}
                                     onClick={() => onHeroClick?.("opponent")}
                                     isOpponent
+                                    animClass={heroAnimations[1 - (myPlayerIndexRef.current ?? 0)]}
                                 />
+                                </div>
 
                                 <OpponentBoard
                                     cards={opponentSlots}
@@ -446,6 +765,7 @@ const locale = useLocale();
                                     potentialTargets={potentialTargets}
                                     selectedTargets={selectedTargets.map(st => st.target)}
                                     onClick={pushSelectedTarget}
+                                    cardAnimations={cardAnimations}
                                 />
 
                                 <PlayerBoard
@@ -454,8 +774,10 @@ const locale = useLocale();
                                     potentialTargets={potentialTargets}
                                     selectedTargets={selectedTargets.map(st => st.target)}
                                     onClick={pushSelectedTarget}
+                                    cardAnimations={cardAnimations}
                                 />
 
+                                <div id="hero-strip-player">
                                 <HeroStrip
                                     label={p("you")}
                                     playerClass={meStats?.class}
@@ -467,7 +789,9 @@ const locale = useLocale();
                                     isHighlighted={highlightPlayerHero}
                                     isSelected={isPlayerHeroSelected}
                                     onClick={() => onHeroClick?.("self")}
+                                    animClass={heroAnimations[myPlayerIndexRef.current ?? 0]}
                                 />
+                                </div>
 
                                 <div>
                                     <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} />
@@ -515,6 +839,18 @@ const locale = useLocale();
                                     </button>
                                 </div>
 
+                                {/* Log de résolution */}
+                                <div className="border border-blue-400/20 rounded p-2 flex flex-col gap-0.5 max-h-40 overflow-y-auto custom-scrollbar shrink-0">
+                                    <div className="text-[9px] uppercase text-blue-300/40 tracking-wider mb-0.5">{p('feedback.last_turn')}</div>
+                                    {resolutionLog.length === 0 ? (
+                                        <div className="text-blue-300/25 italic text-xs">—</div>
+                                    ) : (
+                                        resolutionLog.map((msg, i) => (
+                                            <div key={i} className="text-xs text-blue-100/70 leading-tight">{msg}</div>
+                                        ))
+                                    )}
+                                </div>
+
                                 {/* Chat */}
                                 <div className="flex-1 min-h-0">
                                     <ChatPanel roomId={CurrentRoomId} />
@@ -533,6 +869,7 @@ const locale = useLocale();
                         <div className="flex flex-col md:hidden pt-14 h-[calc(100vh-3.5rem)] overflow-hidden">
 
                         {/* Opponent HeroStrip */}
+                        <div id="hero-strip-opponent">
                         <HeroStrip
                             label="Opponent"
                             playerClass={opponentStats?.class}
@@ -543,7 +880,9 @@ const locale = useLocale();
                             isSelected={isOpponentHeroSelected}
                             onClick={() => onHeroClick("opponent")}
                             isOpponent
+                            animClass={heroAnimations[1 - (myPlayerIndexRef.current ?? 0)]}
                         />
+                        </div>
 
                         <OpponentBoard
                             cards={opponentSlots}
@@ -551,6 +890,7 @@ const locale = useLocale();
                             potentialTargets={potentialTargets}
                             selectedTargets={selectedTargets.map(st => st.target)}
                             onClick={pushSelectedTarget}
+                            cardAnimations={cardAnimations}
                         />
 
                         <PlayerBoard
@@ -559,9 +899,11 @@ const locale = useLocale();
                             potentialTargets={potentialTargets}
                             selectedTargets={selectedTargets.map(st => st.target)}
                             onClick={pushSelectedTarget}
+                            cardAnimations={cardAnimations}
                         />
 
                         {/* Player HeroStrip */}
+                        <div id="hero-strip-player">
                         <HeroStrip
                             label="You"
                             playerClass={meStats?.class}
@@ -573,7 +915,9 @@ const locale = useLocale();
                             isHighlighted={highlightPlayerHero}
                             isSelected={isPlayerHeroSelected}
                             onClick={() => onHeroClick("self")}
+                            animClass={heroAnimations[myPlayerIndexRef.current ?? 0]}
                         />
+                        </div>
 
                         <PlayerHand
                             cards={playerHandCards}
@@ -648,6 +992,14 @@ const locale = useLocale();
                     </>
                 )}
             </>
+        )}
+
+        {resolutionMsg && (
+        <div key={resolutionMsg.id} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none
+                        bg-black/85 text-white/95 px-6 py-3 rounded border border-blue-400/50
+                        text-sm md:text-base text-center max-w-xs md:max-w-sm animate-fb-play-bottom">
+            {resolutionMsg.text}
+        </div>
         )}
 
         {gameOverMessage && (

@@ -17,6 +17,7 @@ interface CardSlotProps {
   onClick?: (card: Card | null) => void;
   isHighlighted?: boolean;
   isSelected?: boolean;
+  animClass?: string;
 }
 
 export default function CardSlot({
@@ -27,6 +28,7 @@ export default function CardSlot({
   onClick,
   isHighlighted = false,
   isSelected = false,
+  animClass = '',
 }: CardSlotProps) {
   const [showPreview, setShowPreview] = useState(false);
 
@@ -40,6 +42,7 @@ export default function CardSlot({
     isOpponentSlot && "opacity-80",
     isHighlighted && "ring-2 ring-yellow-400/80 scale-105",
     isSelected && "ring-4 ring-orange-500 scale-105 shadow-lg shadow-orange-500/50",
+    animClass,
   );
 
   const emptySlotClass = clsx(

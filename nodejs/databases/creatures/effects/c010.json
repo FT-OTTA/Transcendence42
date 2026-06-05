@@ -1,0 +1,10 @@
+{
+    "effects": [
+        {
+            "effect": "dmg",
+            "value": 8,
+            "target": "all",
+            "targetType": { "creature": true, "building": true,"hero": true }
+        }
+    ]
+}

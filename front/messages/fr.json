@@ -101,6 +101,31 @@
         "opponent": "Adversaire",
         "you": "Vous",
         "draw": "Égalité",
+        "debug_mode": "Activer le mode debug (toutes les cartes sont disponibles + runes infinies)",
+        "feedback": {
+            "last_turn": "Dernier tour",
+            "card_played_msg": "{player} joue {name}",
+            "dmg_card_by": "{source} inflige {value} dégâts à {name}",
+            "dmg_hero_by": "{source} inflige {value} dégâts au héros",
+            "zone_fight": "{a} affronte {b}",
+            "card_damaged": "{name} prend {value} dégâts",
+            "card_dies": "{name} est détruit par {attacker} !",
+            "hit_hero_me": "{attacker} frappe ton héros pour {value}",
+            "hit_hero_opponent": "{attacker} frappe le héros adverse pour {value}",
+            "dmg_card": "{name} subit {value} dégâts",
+            "destroy": "{name} est détruit !",
+            "destroy_by": "{name} est détruit par {source} !",
+            "dmg_hero": "{name} subit {value} dégâts",
+            "ad_mod": "{name} {value} ATK",
+            "def_mod": "{name} {value} DEF",
+            "addef_mod": "{name} {value} ATK/DEF",
+            "draw_card": "{name} pioche {value} cartes",
+            "armor_gain": "{name} {value} armure",
+            "runes_gain": "{name} {value} runes",
+            "freeze": "{name} est gelé",
+            "swap": "{a} ↔ {b}"
+        }
+    }
         "debug_mode": "Activer le mode debug (toutes les cartes sont disponibles + runes infinies)"
     },
   "Privacy": {

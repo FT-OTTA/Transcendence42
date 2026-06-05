@@ -1,11 +1,10 @@
 {
     "effects": [
         {
-            "effect": "runes",
-            "value": 1,
+            "effect": "win",
             "target": "self_hero",
             "targetType": { "hero": true },
-            "timing": "start_of_turn"
+            "timing": "on_deal_damage"
         }
     ]
 }

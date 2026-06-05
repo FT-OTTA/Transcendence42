@@ -14,81 +14,89 @@ export function dealsDmg(player1: Hero, player2: Hero, x: number): void {
     }
 }
 
-function resolveTiming(card: Card, timing: EffectTime, target: Hero, game: Game) {
+function resolveTiming(card: Card, timing: EffectTime, target: Hero, game: Game, emit?: (event: string, data: any) => void) {
     for (const effect of card.effects) {
         if (effect.timing === timing) {
-            resolveEffect(card.owner, effect, { cardId: card.idInGame }, game, timing, target)        }
+            resolveEffect(card.owner, effect, { cardId: card.idInGame }, game, timing, target, undefined, undefined, emit)
+        }
     }
 }
 
-export function resolveCombat(game: Game) {
+export function resolveCombat(game: Game, emit?: (event: string, data: any) => void) {
     console.log("Résolution du combat...")
-    for (let i = 1; i <= 8 ; i++) {
+    for (let i = 1; i <= 8; i++) {
         const zone = `bf${i}` as BfZone;
         let card0 = game.players[0].battlefield[zone];
         let card1 = game.players[1].battlefield[zone];
-        if (card0 &&card0.type === "creature" && card0.state === "sick") {
-            card0 = undefined;
-        }
-        if (card1 && card1.type === "creature" && card1.state === "sick") {
-            card1 = undefined;
-        }
+
+        if (card0 && card0.type === "creature" && card0.state === "sick") card0 = undefined;
+        if (card1 && card1.type === "creature" && card1.state === "sick") card1 = undefined;
+
         if (card0 === undefined) {
-            if (card1 === undefined)
-                continue;
-            else if (card1.type === "creature"){
+            if (card1 === undefined) continue;
+            else if (card1.type === "creature") {
                 dealsDmg(card1.owner, game.players[0], card1.currForce);
-                resolveTiming(card1, "on_deal_damage", game.players[0], game);
-
+                emit?.('combat_event', { type: 'hit_hero', attackerId: card1.idInGame, targetPlayer: 0, value: card1.currForce, zone });
+                resolveTiming(card1, "on_deal_damage", game.players[0], game, emit);
             }
-
         }
         else if (card1 === undefined) {
-            if (card0.type === "creature"){
+            if (card0.type === "creature") {
                 dealsDmg(card0.owner, game.players[1], card0.currForce);
-                resolveTiming(card0, "on_deal_damage", game.players[1], game);
-
+                emit?.('combat_event', { type: 'hit_hero', attackerId: card0.idInGame, targetPlayer: 1, value: card0.currForce, zone });
+                resolveTiming(card0, "on_deal_damage", game.players[1], game, emit);
             }
         }
-        else if (card0.type == "creature" && card1.type == "creature"){
-            // 1 tabasse 0
+        else if (card0.type === "creature" && card1.type === "creature") {
+            emit?.('combat_event', { type: 'zone_fight', card0Id: card0.idInGame, card1Id: card1.idInGame, zone });
+            // card1 frappe card0
             if (card0.currEndurance - card1.currForce > 0) {
-                card0.currEndurance -= card1.currForce
+                card0.currEndurance -= card1.currForce;
+                emit?.('combat_event', { type: 'card_damaged', cardId: card0.idInGame, value: card1.currForce, zone });
             } else {
                 dealsDmg(card1.owner, game.players[0], card1.currForce - card0.currEndurance);
-                resolveTiming(card1, "on_deal_damage", game.players[0], game);
-                card0.currEndurance = 0;  // ✅ la créature est morte
+                emit?.('combat_event', { type: 'card_dies', cardId: card0.idInGame, attackerId: card1.idInGame, zone });
+                emit?.('combat_event', { type: 'hit_hero', attackerId: card1.idInGame, targetPlayer: 0, value: card1.currForce - card0.currEndurance, zone });
+                card0.currEndurance = 0;
+                resolveTiming(card1, "on_deal_damage", game.players[0], game, emit);
             }
 
-            // 0 tabasse 1
+            // card0 frappe card1
             if (card1.currEndurance - card0.currForce > 0) {
-                card1.currEndurance -= card0.currForce
+                card1.currEndurance -= card0.currForce;
+                emit?.('combat_event', { type: 'card_damaged', cardId: card1.idInGame, value: card0.currForce, zone });
             } else {
                 dealsDmg(card0.owner, game.players[1], card0.currForce - card1.currEndurance);
-                resolveTiming(card0, "on_deal_damage", game.players[1], game);
-                card1.currEndurance = 0;  // ✅ la créature est morte
+                emit?.('combat_event', { type: 'card_dies', cardId: card1.idInGame, attackerId: card0.idInGame, zone });
+                emit?.('combat_event', { type: 'hit_hero', attackerId: card0.idInGame, targetPlayer: 1, value: card0.currForce - card1.currEndurance, zone });
+                card1.currEndurance = 0;
+                resolveTiming(card0, "on_deal_damage", game.players[1], game, emit);
             }
         }
-        else if (card0.type == "creature" && card1.type == "building") {
-            // card0 attaque le building
-            card1.currEndurance -= card0.currForce
+        else if (card0.type === "creature" && card1.type === "building") {
+            card1.currEndurance -= card0.currForce;
+            emit?.('combat_event', { type: 'card_damaged', cardId: card1.idInGame, value: card0.currForce, zone });
+            if (card1.currEndurance <= 0)
+                emit?.('combat_event', { type: 'card_dies', cardId: card1.idInGame, attackerId: card0.idInGame, zone });
         }
-        else if (card0.type == "building" && card1.type == "creature") {
-            // card1 attaque le building
-            card0.currEndurance -= card1.currForce
+        else if (card0.type === "building" && card1.type === "creature") {
+            card0.currEndurance -= card1.currForce;
+            emit?.('combat_event', { type: 'card_damaged', cardId: card0.idInGame, value: card1.currForce, zone });
+            if (card0.currEndurance <= 0)
+                emit?.('combat_event', { type: 'card_dies', cardId: card0.idInGame, attackerId: card1.idInGame, zone });
         }
-
-
-        else if (card1.type == "creature"){
-            game.players[0].dmgDealt += card1.currForce
+        else if (card1.type === "creature") {
+            game.players[0].dmgDealt += card1.currForce;
+            emit?.('combat_event', { type: 'hit_hero', attackerId: card1.idInGame, targetPlayer: 0, value: card1.currForce, zone });
         }
-        else if (card0.type == "creature"){
-            game.players[1].dmgDealt += card0.currForce
+        else if (card0.type === "creature") {
+            game.players[1].dmgDealt += card0.currForce;
+            emit?.('combat_event', { type: 'hit_hero', attackerId: card0.idInGame, targetPlayer: 1, value: card0.currForce, zone });
         }
     }
 }
 
-export function resolveBuildings(game:Game) {
+export function resolveBuildings(game:Game, emit?: (event: string, data: any) => void) {
     console.log("Résolution des bâtiments...")
     for (let i = 1 ; i <= 8; i++)
     {
@@ -99,12 +107,13 @@ export function resolveBuildings(game:Game) {
             if (building && building.type === "building") {
                 for (const effect of building.effects) {
                     // pourquoi y a pas besoin de l'argument fromtiming ici ?
-                    resolveEffect(player, effect, { cardId: building.idInGame }, game, "start_turn");
+                    resolveEffect(player, effect, { cardId: building.idInGame }, game, "start_turn", undefined, undefined, undefined, emit);
                 }
             }
         }
     }
 }
+
 function resolveValue(
     valueFrom: string | undefined,
     value: number | undefined,
@@ -137,6 +146,9 @@ function resolveValue(
 }
 
 function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | undefined {
+    // Creatures placed this turn (sick) are protected from random targeting
+    const isReady = (c: Card) => !(c.type === "creature" && c.state === "sick");
+
     let target: Hero | Card | undefined = undefined;
     if (eff.target === "self_hero") target = player;
     if (eff.target === "opponent_hero" && game) {
@@ -147,7 +159,7 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature") as Card[]));
+            pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature" && isReady(c)) as Card[]));
         if (eff.targetType?.building)
             pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "building") as Card[]));
         if (eff.targetType?.hero)
@@ -160,7 +172,7 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "creature") as Card[]);
+            pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "creature" && isReady(c)) as Card[]);
         if (eff.targetType?.building)
             pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "building") as Card[]);
         if (eff.targetType?.hero)
@@ -173,7 +185,7 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature") as Card[]));
+            pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature" && isReady(c)) as Card[]));
         if (eff.targetType?.building)
             pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "building") as Card[]));
         if (eff.targetType?.hero)
@@ -193,21 +205,19 @@ export function resolveEffect(
     fromTiming?: EffectTime,
     target?: Card | Hero,
     target2?: Card | Hero,
-    context?: EffectContext
-    ): boolean {
+    context?: EffectContext,
+    emit?: (event: string, data: any) => void
+): boolean {
 
     console.log("Resolving effect", { eff });
     if (eff.timing && eff.timing !== fromTiming) return true;
-    
-    // Override target selon l'effet
+
     target = resolveTarget(player, eff, game) ?? target;
-    const noTargetNeeded = !!eff.target && (["all_enemies", "all_allies", "all_board"] as string[]).includes(eff.target)
-    
+    const noTargetNeeded = !!eff.target && (["all_enemies", "all_allies", "all_board"] as string[]).includes(eff.target);
+
     if (!target && !noTargetNeeded) return false;
 
     let value = resolveValue(eff.valueFrom, eff.value, payload, target, target2, context);
-    console.log("Resolved value:", value, "from", eff.valueFrom);
-    console.log("target avant switch:", target?.kind, "noTargetNeeded:", noTargetNeeded)
 
     // Gestion des cibles multiples
     if (eff.target === "all_enemies" || eff.target === "all_allies" || eff.target === "all_board") {
@@ -222,7 +232,6 @@ export function resolveEffect(
             for (const p of game.players)
                 targets.push(...Object.values(p.battlefield).filter(Boolean) as Card[]);
 
-        // Filtre par targetType si défini
         if (eff.targetType) {
             targets = targets.filter(c => {
                 if (c.type === "creature" && eff.targetType?.creature) return true;
@@ -232,14 +241,13 @@ export function resolveEffect(
         }
 
         for (const t of targets)
-            resolveEffect(player, { ...eff, target: undefined }, payload, game, fromTiming, t, target2, context);
+            resolveEffect(player, { ...eff, target: undefined }, payload, game, fromTiming, t, target2, context, emit);
 
         return true;
     }
 
     target = target!;
 
-    // Filtre targetType pour cible unique
     if (target.kind === "card" && eff.targetType) {
         const tt = eff.targetType;
         if (target.type === "creature" && !tt.creature) return false;
@@ -251,36 +259,47 @@ export function resolveEffect(
         case "ad_mod":
             if (target.kind === "hero") return false;
             target.currForce += value;
+            emit?.('effect_event', { type: 'ad_mod', targetId: target.idInGame, value });
             break;
         case "def_mod":
             if (target.kind === "hero") return false;
             target.currEndurance += value;
+            emit?.('effect_event', { type: 'def_mod', targetId: target.idInGame, value });
             break;
         case "addef_mod":
             if (target.kind === "hero") return false;
             target.currForce += value;
             target.currEndurance += value;
+            emit?.('effect_event', { type: 'addef_mod', targetId: target.idInGame, value });
             break;
         case "draw":
             if (target.kind === "card") return false;
             playerDraw(target, value);
+            emit?.('effect_event', { type: 'draw', targetId: target.idInGame, value });
             break;
         case "dmg":
-            if (target.kind === "hero")
+            if (target.kind === "hero") {
                 dealsDmg(player, target, value);
-            else
+                emit?.('effect_event', { type: 'dmg_hero', targetId: target.idInGame, value, sourceId: payload.cardId });
+            } else {
                 target.currEndurance -= value;
+                emit?.('effect_event', { type: 'dmg_card', targetId: target.idInGame, value, sourceId: payload.cardId });
+                if (target.currEndurance <= 0)
+                    emit?.('effect_event', { type: 'destroy', targetId: target.idInGame, sourceId: payload.cardId });
+            }
             break;
         case "armor":
             if (target.kind === "card") return false;
             target.armor += value;
+            emit?.('effect_event', { type: 'armor', targetId: target.idInGame, value });
             break;
         case "runes":
             if (target.kind === "card") return false;
             target.curRunes += value;
+            emit?.('effect_event', { type: 'runes', targetId: target.idInGame, value });
             break;
-        case "swap": {
-            if (target.kind === "hero" || !target2 || target2.kind === "hero") return false;
+        case "swap":
+            if (target.kind === "hero" || !target2 || target2.kind === "hero") return false; {
             const zone1 = target.zone as BfZone;
             const zone2 = target2.zone as BfZone;
             target.owner.battlefield[zone1] = target2;
@@ -292,15 +311,18 @@ export function resolveEffect(
             target2.zone = zone1;
             for (const p of (game as any).players)
                 p.board = Object.values(p.battlefield).filter(Boolean);
+            emit?.('effect_event', { type: 'swap', targetId: target.idInGame, target2Id: target2.idInGame });
             break;
         }
         case "destroy":
             if (target.kind === "hero") return false;
             target.currEndurance = 0;
+            emit?.('effect_event', { type: 'destroy', targetId: target.idInGame });
             break;
         case "freeze":
             if (target.kind === "hero") return false;
             target.state = "sick";
+            emit?.('effect_event', { type: 'freeze', targetId: target.idInGame });
             break;
         case "win":
             if (!target || target.kind !== "hero") return false;

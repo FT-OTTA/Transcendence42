@@ -2,3 +2,6 @@ nodejs/node_modules/
 .env
 *.numbers
 logs
+docker-compose.yml
+front/Dockerfile
+.gitignore

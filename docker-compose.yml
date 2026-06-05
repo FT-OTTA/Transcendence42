@@ -97,7 +97,9 @@ services:
       retries: 10
 
   front:
-    build: ./front
+    build:
+      context: .
+      dockerfile: front/Dockerfile
     container_name: front
     env_file:
       - ./.env

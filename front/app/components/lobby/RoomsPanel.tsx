@@ -172,7 +172,7 @@ export default function RoomPanel() {
                             ) : null}
                             {isMyRoom(room) && ( room.p1 === me) ? (
                                 <button
-                                    onClick={() => deleteRoom(room.id, me)}
+                                    onClick={() => deleteRoom(room.id)}
                                     className="text-red-400 hover:text-red-200 transition ml-2"
                                 >
                                     ✖

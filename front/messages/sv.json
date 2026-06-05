@@ -78,7 +78,8 @@
       "fail_friend_fetch": "Det gick inte att hämta vänner.",
       "no_username": "Ange ett användarnamn.",
       "fail_add": "Det gick inte att lägga till vän.",
-      "already_in_room": "Du är redan i ett rum."
+      "already_in_room": "Du är redan i ett rum.",
+      "error_playground": "Ett fel inträffade vid anslutning till spelservern."
     },
 
     "Playground": {

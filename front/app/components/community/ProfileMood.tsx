@@ -23,7 +23,7 @@ export default function ProfileMood({ initialMood, username }: Props)
 		setIsOwner(storedUsername?.toLowerCase() === username.toLowerCase());
 		setLoading(false);
 	}, [username]);
-	
+
 	async function saveMood(newMood: string) {
 	const res =	await fetch(`/api/users/${username}`, {
 			method: "PATCH",
@@ -53,7 +53,7 @@ export default function ProfileMood({ initialMood, username }: Props)
 				autoFocus
 				value={currentMood}
 				onChange={(e) => setCurrentMood(e.target.value)}
-				onBlur={() => saveMood(currentMood)}
+			//	onBlur={() => saveMood(currentMood)}
 				onKeyDown={(e) => {
 					if (e.key === "Enter") {
 						saveMood(currentMood);
@@ -77,8 +77,8 @@ export default function ProfileMood({ initialMood, username }: Props)
 				size={14}
 				className="text-sky-400"
 				/>
-			
-			<p 
+
+			<p
 				className="text-white/60 italic cursor-pointer hover:text-white transition whitespace-normal break-words max-w-xs md:max-w-sm"
 				onClick={() => setEditing(true)}
 				>

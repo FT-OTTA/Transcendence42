@@ -125,7 +125,6 @@
       "freeze": "{name} is frozen",
       "swap": "{a} ↔ {b}"
     }
-    "debug_mode": "Enable debug mode (all cards available + infinite runes)"
   },
 
   "Privacy": {

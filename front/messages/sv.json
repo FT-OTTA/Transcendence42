@@ -125,8 +125,6 @@
         "freeze": "{name} är fryst",
         "swap": "{a} ↔ {b}"
       }
-    }
-      "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)"
     },
 
   "Privacy": {

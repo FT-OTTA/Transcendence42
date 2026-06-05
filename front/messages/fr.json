@@ -125,8 +125,6 @@
             "freeze": "{name} est gelé",
             "swap": "{a} ↔ {b}"
         }
-    }
-        "debug_mode": "Activer le mode debug (toutes les cartes sont disponibles + runes infinies)"
     },
   "Privacy": {
     "policy": "Politique de confidentialité",

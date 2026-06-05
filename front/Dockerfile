@@ -15,4 +15,4 @@ COPY nodejs/src/types ../nodejs/src/types/
 
 EXPOSE 3001
 
-CMD ["npm", "run", "dev","--", "-H", "0.0.0.0"]
+CMD ["npm", "run", "dev" ,"--", "-H", "0.0.0.0"]

@@ -103,20 +103,20 @@ export function onConnection(io: Server, socket: Socket): void {
         // console.log('Carte trouvée:', { card })
         if (!card) return
         if (player.curRunes < card.runeCost) return
-        player.curRunes -= card.runeCost
 
         const emit = (event: string, data: any) => {
             session.sockets.forEach(s => s.emit(event, data));
         };
 
-
         if (card.timing === 'immediate') {
+            player.curRunes -= card.runeCost
             playCard(card, { cardId: data.cardId, zone: data.zone, targets: data.targets }, session.game, emit)
         } else {
             const zone = data.zone as BfZone
-            if (session.game.players[playerIndex].battlefield[zone]) return
+            if (card.type !== "spell" && (!zone || session.game.players[playerIndex].battlefield[zone])) return
             const existing = session.submittedCards.get(socket.id) ?? []
             if (existing.some(({ payload }: any) => payload.zone === zone)) return
+            player.curRunes -= card.runeCost
             existing.push({ card, payload: data })
             session.submittedCards.set(socket.id, existing)
             card.owner.hand = card.owner.hand.filter((c: Card) => c.idInGame !== card.idInGame)
@@ -209,6 +209,14 @@ export function onConnection(io: Server, socket: Socket): void {
         console.log('Joueur déconnecté :', socket.id)
     })
 
+    socket.on('join_chat', (roomId: number) => {
+        socket.join(`chat-${roomId}`);
+    });
+
+    socket.on('leave_chat', (roomId: number) => {
+        socket.leave(`chat-${roomId}`);
+    });
+
     socket.on('send_message', async (data) => {
         try{
             const { username, content, roomId } = data;
@@ -230,7 +238,11 @@ export function onConnection(io: Server, socket: Socket): void {
                     sender: true,
                 }
             });
-            io.emit('new_message', message);
+            if (roomId) {
+                io.to(`chat-${roomId}`).emit('new_message', message);
+            } else {
+                io.emit('new_message', message);
+            }
         }
         catch (error)
         {

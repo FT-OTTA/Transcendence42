@@ -117,13 +117,21 @@
         "destroy_by": "{name} förstörs av {source}!",
         "dmg_hero": "{name} tar {value} skada",
         "ad_mod": "{name} {value} ATK",
+        "ad_mod_by": "{name} {value} ATK ({source})",
         "def_mod": "{name} {value} DEF",
+        "def_mod_by": "{name} {value} DEF ({source})",
         "addef_mod": "{name} {value} ATK/DEF",
+        "addef_mod_by": "{name} {value} ATK/DEF ({source})",
         "draw_card": "{name} drar {value} kort",
+        "draw_card_by": "{name} drar {value} kort ({source})",
         "armor_gain": "{name} {value} rustning",
+        "armor_gain_by": "{name} {value} rustning från {source}",
         "runes_gain": "{name} {value} runor",
+        "runes_gain_by": "{name} {value} runor från {source}",
         "freeze": "{name} är fryst",
-        "swap": "{a} ↔ {b}"
+        "freeze_by": "{name} är fryst av {source}",
+        "swap": "{a} ↔ {b}",
+        "swap_by": "{source}: {a} ↔ {b}"
       }
     },
 

@@ -117,13 +117,21 @@
             "destroy_by": "{name} est détruit par {source} !",
             "dmg_hero": "{name} subit {value} dégâts",
             "ad_mod": "{name} {value} ATK",
+            "ad_mod_by": "{name} {value} ATK ({source})",
             "def_mod": "{name} {value} DEF",
+            "def_mod_by": "{name} {value} DEF ({source})",
             "addef_mod": "{name} {value} ATK/DEF",
+            "addef_mod_by": "{name} {value} ATK/DEF ({source})",
             "draw_card": "{name} pioche {value} cartes",
+            "draw_card_by": "{name} pioche {value} cartes ({source})",
             "armor_gain": "{name} {value} armure",
+            "armor_gain_by": "{name} {value} armure de {source}",
             "runes_gain": "{name} {value} runes",
+            "runes_gain_by": "{name} {value} runes de {source}",
             "freeze": "{name} est gelé",
-            "swap": "{a} ↔ {b}"
+            "freeze_by": "{name} est gelé par {source}",
+            "swap": "{a} ↔ {b}",
+            "swap_by": "{source} : {a} ↔ {b}"
         }
     },
   "Privacy": {

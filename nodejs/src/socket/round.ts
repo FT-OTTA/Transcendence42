@@ -13,7 +13,10 @@ export async function emitGameOver(session: GameSession) {
     session.sockets.forEach((s, id) => {
         s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
     })
-    await prisma.room.delete({ where: { id: session.roomId } })
+    session.spectators.forEach(s => {
+        s.emit('game_over', { winner: winnerIndex })
+    })
+    await prisma.room.deleteMany({ where: { id: session.roomId } })
     try {
         await prisma.gameResult.create({
         data: {
@@ -23,7 +26,9 @@ export async function emitGameOver(session: GameSession) {
             player2Id: session.game.players[1].userId,
             player1Class: session.game.players[0].class,
             player2Class: session.game.players[1].class,
-            turns: session.game.turnNumber
+            turns: session.game.turnNumber,
+            player1Score: session.game.players[0].dmgDealt,
+            player2Score: session.game.players[1].dmgDealt,
             }
         })
     } catch (error) {
@@ -43,6 +48,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
     session.timer = null
     const emit = (event: string, data: any) => {
         session.sockets.forEach(s => s.emit(event, data));
+        session.spectators.forEach(s => s.emit(event, data));
     };
 
     for (const [socketId, cards] of session.submittedCards) {

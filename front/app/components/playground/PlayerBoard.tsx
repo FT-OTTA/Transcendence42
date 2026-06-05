@@ -14,9 +14,10 @@ interface PlayerBoardProps {
   selectedTargets?: (Card | Hero)[];
   onPlay?: (slotIndex: number) => void;
   onClick?: (card: Card) => void;
+  cardAnimations?: Record<string, string>;
 }
 
-export default function PlayerBoard({ cards, potentialTargets, selectedTargets, onPlay, onClick }: PlayerBoardProps) {
+export default function PlayerBoard({ cards, potentialTargets, selectedTargets, onPlay, onClick, cardAnimations }: PlayerBoardProps) {
   const [hoveredCard, setHoveredCard] = useState<Card | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [mobilePreview, setMobilePreview] = useState<Card | null>(null);
@@ -50,6 +51,7 @@ export default function PlayerBoard({ cards, potentialTargets, selectedTargets, 
               }}
               isHighlighted={potentialTargets?.some(c => c.idInGame === card?.idInGame)}
               isSelected={selectedTargets?.some(c => c.idInGame === card?.idInGame)}
+              animClass={card ? (cardAnimations?.[card.idInGame] ?? '') : ''}
             />
           </div>
         ))}

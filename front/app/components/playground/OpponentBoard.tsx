@@ -15,9 +15,10 @@ interface OpponentBoardProps {
   potentialTargets?: (Card | Hero)[];
   selectedTargets?: (Card | Hero)[];
   onClick?: (card: Card) => void;
+  cardAnimations?: Record<string, string>;
 }
 
-export default function OpponentBoard({ cards, label="Opponent", onPlay, potentialTargets, selectedTargets, onClick }: OpponentBoardProps) {
+export default function OpponentBoard({ cards, label="Opponent", onPlay, potentialTargets, selectedTargets, onClick, cardAnimations }: OpponentBoardProps) {
   const opponentSlots = Array.from({ length: 8 }, (_, i) => `opponent-${i}`);
   const [hoveredCard, setHoveredCard] = useState<Card | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
@@ -44,6 +45,7 @@ export default function OpponentBoard({ cards, label="Opponent", onPlay, potenti
               isHighlighted={potentialTargets?.some(c => c.idInGame === cards[index]?.idInGame)}
               isSelected={selectedTargets?.some(c => c.idInGame === cards[index]?.idInGame)}
               onClick={() => onClick?.(cards[index] as Card)}
+              animClass={cards[index] ? (cardAnimations?.[cards[index]!.idInGame] ?? '') : ''}
             />
           </div>
         ))}

@@ -48,6 +48,7 @@ export function resolveCombat(game: Game, emit?: (event: string, data: any) => v
             }
         }
         else if (card0.type === "creature" && card1.type === "creature") {
+            emit?.('combat_event', { type: 'zone_fight', card0Id: card0.idInGame, card1Id: card1.idInGame, zone });
             // card1 frappe card0
             if (card0.currEndurance - card1.currForce > 0) {
                 card0.currEndurance -= card1.currForce;
@@ -145,6 +146,9 @@ function resolveValue(
 }
 
 function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | undefined {
+    // Creatures placed this turn (sick) are protected from random targeting
+    const isReady = (c: Card) => !(c.type === "creature" && c.state === "sick");
+
     let target: Hero | Card | undefined = undefined;
     if (eff.target === "self_hero") target = player;
     if (eff.target === "opponent_hero" && game) {
@@ -155,7 +159,7 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature") as Card[]));
+            pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature" && isReady(c)) as Card[]));
         if (eff.targetType?.building)
             pool.push(...opponents.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "building") as Card[]));
         if (eff.targetType?.hero)
@@ -168,7 +172,7 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "creature") as Card[]);
+            pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "creature" && isReady(c)) as Card[]);
         if (eff.targetType?.building)
             pool.push(...Object.values(player.battlefield).filter(c => c && c.type === "building") as Card[]);
         if (eff.targetType?.hero)
@@ -181,7 +185,7 @@ function resolveTarget(player: Hero, eff: Effect, game: Game): Hero | Card | und
         let pool: (Card | Hero)[] = [];
 
         if (eff.targetType?.creature)
-            pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature") as Card[]));
+            pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "creature" && isReady(c)) as Card[]));
         if (eff.targetType?.building)
             pool.push(...game.players.flatMap(p => Object.values(p.battlefield).filter(c => c && c.type === "building") as Card[]));
         if (eff.targetType?.hero)
@@ -280,6 +284,8 @@ export function resolveEffect(
             } else {
                 target.currEndurance -= value;
                 emit?.('effect_event', { type: 'dmg_card', targetId: target.idInGame, value });
+                if (target.currEndurance <= 0)
+                    emit?.('effect_event', { type: 'destroy', targetId: target.idInGame });
             }
             break;
         case "armor":

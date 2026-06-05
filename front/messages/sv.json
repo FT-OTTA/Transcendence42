@@ -98,6 +98,25 @@
       "opponent": "Motståndare",
       "you": "Du",
       "draw": "Dra",
-      "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)"
+      "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)",
+      "feedback": {
+        "last_turn": "Förra rundan",
+        "zone_fight": "{a} möter {b}",
+        "card_damaged": "{name} tar {value} skada",
+        "card_dies": "{name} förstörs av {attacker}!",
+        "hit_hero_me": "{attacker} slår din hjälte för {value}",
+        "hit_hero_opponent": "{attacker} slår motståndarens hjälte för {value}",
+        "dmg_card": "{name} tar {value} skada",
+        "destroy": "{name} förstörs!",
+        "dmg_hero": "{name} tar {value} skada",
+        "ad_mod": "{name} +{value} ATK",
+        "def_mod": "{name} +{value} DEF",
+        "addef_mod": "{name} +{value} ATK/DEF",
+        "draw_card": "{name} drar {value} kort",
+        "armor_gain": "{name} +{value} rustning",
+        "runes_gain": "{name} +{value} runor",
+        "freeze": "{name} är fryst",
+        "swap": "{a} ↔ {b}"
+      }
     }
 }

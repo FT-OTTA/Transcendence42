@@ -5,6 +5,13 @@ import { requireAuth } from "../login/RequireAuth";
 import { customScrollBar } from "../scrollBar";
 import { useTranslations } from "next-intl";
 import { socket } from "@/lib/socket";
+import { cinzel } from "../../fonts";
+import clsx from "clsx";
+
+const titleClass = clsx(
+    cinzel.className,
+    "text-blue-400 text-center text-xl py-2"
+)
 
 type FriendStatus = "online" | "offline" | "in room" | "playing";
 
@@ -223,15 +230,15 @@ export default function FriendsPanel() {
 
 return (
     <>
-        <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm">
+        <div className="h-full min-h-0 p-3 flex flex-col bg-black/30 backdrop-blur-sm rounded-sm">
 
-            <h2 className="text-xl mb-2 text-center py-2">
+            <h2 className={titleClass}>
                 {l("friends")}
             </h2>
 
             <button
                 onClick={() => setShowAddPopup(true)}
-                className="border border-blue-300 py-2 hover:bg-blue-300 hover:text-black transition"
+                className="border border-blue-300/30 rounded-md py-2 hover:bg-blue-300 hover:text-black transition"
             >
                 + {l("add_friend")}
             </button>

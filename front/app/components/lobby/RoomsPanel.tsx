@@ -7,7 +7,13 @@ import { customScrollBar } from "../scrollBar";
 import { useTranslations } from "next-intl";
 import { socket } from "@/lib/socket";
 import { useLocale } from 'next-intl';
-import clsx from 'clsx';
+import { cinzel } from "../../fonts";
+import clsx from "clsx";
+
+const titleClass = clsx(
+    cinzel.className,
+    "text-blue-400 text-center text-xl py-2"
+)
 
 type Room = {
     id: number;
@@ -112,9 +118,9 @@ export default function RoomPanel() {
     const isFull = (room: Room) => room.p2 !== null;
 
     return (
-        <div className="h-full min-h-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
+        <div className="h-full min-h-0 bg-black/30 backdrop-blur-sm rounded-sm p-4 flex flex-col overflow-hidden">
 
-            <h2 className="text-xl mb-2 text-center">{l("rooms")}</h2>
+            <h2 className={titleClass}>{l("rooms")}</h2>
 
             {error && (
                 <p className="text-sm text-red-400 text-center border border-red-400/40 bg-red-500/10 py-2 px-3 rounded-sm">
@@ -188,8 +194,8 @@ export default function RoomPanel() {
                 className={clsx(
                     "border py-2 transition",
                     myRoom
-                        ? "border-amber-300 hover:bg-amber-300 hover:text-black"
-                        : "border-blue-300 hover:bg-blue-300 hover:text-black"
+                        ? "border-amber-300/30 rounded-md hover:bg-amber-300 hover:text-black"
+                        : "border-blue-300/30 rounded-md hover:bg-blue-300 hover:text-black"
                 )}
                 onClick={myRoom
                     ? () => router.push(`/${locale}/playground/${myRoom.id}`)

@@ -44,10 +44,8 @@ export default function ProfilePanel() {
         ).sort((a, b) => (b[1] as number) - (a[1] as number))[0][0];
 
     return (
-        <div className="h-auto shrink-0 border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm md:h-1/3 flex flex-col p-4">
-        
-            <h2 className="text-xl mb-2 text-center py-2">{l("profile")}</h2>
-        
+        <div className="h-auto shrink-0 bg-black/30 backdrop-blur-sm rounded-sm md:h-1/3 flex flex-col p-4">
+                
             <div className="flex gap-4 items-start">
                 
                 <AvatarFrame avatarUrl={avatarUrl} />

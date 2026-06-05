@@ -13,7 +13,15 @@ export function playCard(card: Card, payload: PlayCardPayload, game: Game, emit:
     // console.log("starts with bf:", payload.zone?.startsWith("bf"))
 
     card.owner.hand = card.owner.hand.filter(c => c.idInGame !== card.idInGame);
-    emit?.('card_played', { cardId: card.idInGame, zone: payload.zone, cardName: card.cardName_en, cardType: card.type, player: card.owner.username });
+    emit?.('card_played', {
+        cardId: card.idInGame,
+        zone: payload.zone,
+        name_en: (card as any).cardName_en ?? card.name_en,
+        name_fr: (card as any).cardName_fr ?? (card as any).cardName_en ?? card.name_en,
+        name_sv: (card as any).cardName_sv ?? (card as any).cardName_en ?? card.name_en,
+        cardType: card.type,
+        player: card.owner.username
+    });
 
 
     if (card.type === "building" || card.type === "creature")

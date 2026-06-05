@@ -280,12 +280,12 @@ export function resolveEffect(
         case "dmg":
             if (target.kind === "hero") {
                 dealsDmg(player, target, value);
-                emit?.('effect_event', { type: 'dmg_hero', targetId: target.idInGame, value });
+                emit?.('effect_event', { type: 'dmg_hero', targetId: target.idInGame, value, sourceId: payload.cardId });
             } else {
                 target.currEndurance -= value;
-                emit?.('effect_event', { type: 'dmg_card', targetId: target.idInGame, value });
+                emit?.('effect_event', { type: 'dmg_card', targetId: target.idInGame, value, sourceId: payload.cardId });
                 if (target.currEndurance <= 0)
-                    emit?.('effect_event', { type: 'destroy', targetId: target.idInGame });
+                    emit?.('effect_event', { type: 'destroy', targetId: target.idInGame, sourceId: payload.cardId });
             }
             break;
         case "armor":

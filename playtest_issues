@@ -1,11 +1,16 @@
-
-1-
-? prend 3 dégâts
-? prend 2 dégâts
-Caillou de runes animé affronte Swap
-Caillou de runes animé est détruit par Swap !
-le combat a l'air nique quand un truc existe plus il apparait en ?
-
 2-
 Fin de partie pop avant le feedback du tour
 Les conditions se font elle au bon moment ? Teddy hit pas pris en compte au 8eme tour
+
+3-
+Deux chibromax peuvent detruire la meme creature
+
+4-
+Le combat doit se faire apres les effets en checkant bien que les trucs morts 
+ne tapent pas et ne bloquent plus
+
+5-
+Somehow certaines cartes ou on clique sur confirm play ne sont pas jouees pour une raison
+obscure
+
+6- des ? se balladent dans les feed "dernier tour"

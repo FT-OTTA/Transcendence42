@@ -5,7 +5,7 @@
             "value": 1,
             "target": "self_hero",
             "targetType": { "hero": true },
-            "timing": "start_of_turn"
+            "timing": "start_turn"
         }
     ]
 }

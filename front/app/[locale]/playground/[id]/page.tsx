@@ -57,40 +57,66 @@ function buildEventMessage(
     if (event.source === 'card_played')
         return t('feedback.card_played_msg', { player: d.player, name: sourceNames?.get(String(d.cardId)) ?? d.name_en });
     if (event.source === 'combat') {
-        if (d.type === 'zone_fight')   return t('feedback.zone_fight', { a: n(d.card0Id), b: n(d.card1Id) });
-        if (d.type === 'card_damaged') return t('feedback.card_damaged', { name: n(d.cardId), value: d.value });
-        if (d.type === 'card_dies')    return t('feedback.card_dies', { name: n(d.cardId), attacker: n(d.attackerId) });
+        if (d.type === 'zone_fight')   return t('feedback.zone_fight', { a: src(d.card0Id), b: src(d.card1Id) });
+        if (d.type === 'card_damaged') return t('feedback.card_damaged', { name: src(d.cardId), value: d.value });
+        if (d.type === 'card_dies')    return t('feedback.card_dies', { name: src(d.cardId), attacker: src(d.attackerId) });
         if (d.type === 'hit_hero') {
             const key = d.targetPlayer === myIdx ? 'feedback.hit_hero_me' : 'feedback.hit_hero_opponent';
-            return t(key, { attacker: n(d.attackerId), value: d.value });
+            return t(key, { attacker: src(d.attackerId), value: d.value });
         }
     } else {
         if (d.type === 'dmg_card') {
             const s = d.sourceId ? src(d.sourceId) : null;
             return s && s !== '?'
-                ? t('feedback.dmg_card_by', { source: s, name: n(d.targetId), value: d.value })
-                : t('feedback.dmg_card', { name: n(d.targetId), value: d.value });
+                ? t('feedback.dmg_card_by', { source: s, name: src(d.targetId), value: d.value })
+                : t('feedback.dmg_card', { name: src(d.targetId), value: d.value });
         }
         if (d.type === 'destroy') {
-            const source = d.sourceId ? n(d.sourceId) : null;
+            const source = d.sourceId ? src(d.sourceId) : null;
             return source && source !== '?'
-                ? t('feedback.destroy_by', { name: n(d.targetId), source })
-                : t('feedback.destroy', { name: n(d.targetId) });
+                ? t('feedback.destroy_by', { name: src(d.targetId), source })
+                : t('feedback.destroy', { name: src(d.targetId) });
         }
         if (d.type === 'dmg_hero') {
             const s = d.sourceId ? src(d.sourceId) : null;
             return s && s !== '?'
                 ? t('feedback.dmg_hero_by', { source: s, value: d.value })
-                : t('feedback.dmg_hero', { name: n(d.targetId), value: d.value });
+                : t('feedback.dmg_hero', { name: src(d.targetId), value: d.value });
         }
-        if (d.type === 'ad_mod')    return t('feedback.ad_mod', { name: n(d.targetId), value: fmt(d.value) });
-        if (d.type === 'def_mod')   return t('feedback.def_mod', { name: n(d.targetId), value: fmt(d.value) });
-        if (d.type === 'addef_mod') return t('feedback.addef_mod', { name: n(d.targetId), value: fmt(d.value) });
-        if (d.type === 'draw')      return t('feedback.draw_card', { name: n(d.targetId), value: d.value });
-        if (d.type === 'armor')     return t('feedback.armor_gain', { name: n(d.targetId), value: fmt(d.value) });
-        if (d.type === 'runes')     return t('feedback.runes_gain', { name: n(d.targetId), value: fmt(d.value) });
-        if (d.type === 'freeze')    return t('feedback.freeze', { name: n(d.targetId) });
-        if (d.type === 'swap')      return t('feedback.swap', { a: n(d.targetId), b: n(d.target2Id) });
+        if (d.type === 'ad_mod') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?' ? t('feedback.ad_mod_by', { name: src(d.targetId), value: fmt(d.value), source: s }) : t('feedback.ad_mod', { name: src(d.targetId), value: fmt(d.value) });
+        }
+        if (d.type === 'def_mod') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?' ? t('feedback.def_mod_by', { name: src(d.targetId), value: fmt(d.value), source: s }) : t('feedback.def_mod', { name: src(d.targetId), value: fmt(d.value) });
+        }
+        if (d.type === 'addef_mod') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?' ? t('feedback.addef_mod_by', { name: src(d.targetId), value: fmt(d.value), source: s }) : t('feedback.addef_mod', { name: src(d.targetId), value: fmt(d.value) });
+        }
+        if (d.type === 'draw') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?' ? t('feedback.draw_card_by', { name: src(d.targetId), value: d.value, source: s }) : t('feedback.draw_card', { name: src(d.targetId), value: d.value });
+        }
+        if (d.type === 'armor') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?' ? t('feedback.armor_gain_by', { name: src(d.targetId), value: fmt(d.value), source: s }) : t('feedback.armor_gain', { name: src(d.targetId), value: fmt(d.value) });
+        }
+        if (d.type === 'runes') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?'
+                ? t('feedback.runes_gain_by', { name: src(d.targetId), value: fmt(d.value), source: s })
+                : t('feedback.runes_gain', { name: src(d.targetId), value: fmt(d.value) });
+        }
+        if (d.type === 'freeze') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?' ? t('feedback.freeze_by', { name: src(d.targetId), source: s }) : t('feedback.freeze', { name: src(d.targetId) });
+        }
+        if (d.type === 'swap') {
+            const s = d.sourceId ? src(d.sourceId) : null;
+            return s && s !== '?' ? t('feedback.swap_by', { a: src(d.targetId), b: src(d.target2Id), source: s }) : t('feedback.swap', { a: src(d.targetId), b: src(d.target2Id) });
+        }
     }
     return '';
 }
@@ -180,11 +206,12 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
     setTimeout(() => setFloats(prev => prev.filter(f => f.id !== id)), 650);
   }
 
-  function findCardSlotEl(idInGame: string): Element | null {
+  function findCardSlotEl(idInGame: string | number): Element | null {
+    const sid = String(idInGame);
     const g = gameRef.current;
     const myIdx = myPlayerIndexRef.current;
     if (!g || myIdx === null) return null;
-    const eq = (a: any) => String(a) === idInGame;
+    const eq = (a: any) => String(a) === sid;
     for (let i = 0; i < 8; i++) {
         const zone = `bf${i + 1}`;
         if (eq(g.players[myIdx]?.battlefield?.[zone]?.idInGame))
@@ -201,7 +228,7 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
   }
 
   const searchParams = useSearchParams()
-  const isSpectator = searchParams.get('spectate') === 'true'
+  const [isSpectator] = useState(() => searchParams.get('spectate') === 'true')
   const roomId = id
   const socketDep = isSpectator ? 'spectator' : selectedHero
 
@@ -225,6 +252,13 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
         if (queue.length === 0) { onDone(); return; }
 
         let t = 0;
+        const myIdx = myPlayerIndexRef.current; // null for spectators
+
+        // Convert server player index (0/1) to display index (0=meStats, 1=opponentStats)
+        const toDisplay = (serverIdx: number): 0 | 1 =>
+            (myIdx === null ? serverIdx === 0 : serverIdx === myIdx) ? 0 : 1;
+
+        const setters = [setMeStats, setOpponentStats] as const;
 
         const shakeHero = (idx: 0 | 1, at: number) => {
             setTimeout(() => setHeroAnimations(prev => { const n = [...prev] as [string, string]; n[idx] = ''; return n; }), at);
@@ -260,56 +294,162 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
                     })), at);
                     t += 1800;
                 } else if (d.type === 'card_damaged') {
-                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.cardId), `-${d.value}`, 'text-red-400'), at);
+                    setTimeout(() => {
+                        spawnFloatAt(findCardSlotEl(d.cardId), `-${d.value}`, 'text-red-400');
+                        const tid = String(d.cardId);
+                        const patch = (prev: (Card | null)[]) => {
+                            const i = prev.findIndex(c => c && String(c.idInGame) === tid);
+                            if (i === -1) return prev;
+                            const next = [...prev];
+                            next[i] = { ...next[i]!, currEndurance: next[i]!.currEndurance - d.value };
+                            return next;
+                        };
+                        setPlayerSlots(patch);
+                        setOpponentSlots(patch);
+                    }, at);
                     t += 2000;
                 } else if (d.type === 'card_dies') {
-                    setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.cardId]: 'animate-fb-death' })), at);
+                    setTimeout(() => {
+                        setCardAnimations(prev => ({ ...prev, [d.cardId]: 'animate-fb-death' }));
+                        const tid = String(d.cardId);
+                        const patch = (prev: (Card | null)[]) => {
+                            const i = prev.findIndex(c => c && String(c.idInGame) === tid);
+                            if (i === -1) return prev;
+                            const next = [...prev];
+                            next[i] = { ...next[i]!, currEndurance: 0 };
+                            return next;
+                        };
+                        setPlayerSlots(patch);
+                        setOpponentSlots(patch);
+                    }, at);
                     t += 2500;
                 } else if (d.type === 'hit_hero') {
                     setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.attackerId]: 'animate-fb-combat' })), at);
                     shakeHero(d.targetPlayer as 0 | 1, at);
-                    setTimeout(() => spawnFloatOnHero(d.targetPlayer, `-${d.value}`, 'text-red-400'), at);
+                    { const dispIdx = toDisplay(d.targetPlayer);
+                      const capArmor = d.newArmor ?? 0; const capDmg = d.actualDmg ?? 0;
+                      setTimeout(() => {
+                        spawnFloatOnHero(d.targetPlayer, `-${d.value}`, 'text-red-400');
+                        setters[dispIdx]((prev: any) => prev ? { ...prev, armor: capArmor } : prev);
+                        setters[1 - dispIdx]((prev: any) => prev ? { ...prev, dmgDealt: prev.dmgDealt + capDmg } : prev);
+                      }, at);
+                    }
                     t += 2000;
                 }
             } else {
                 if (d.type === 'dmg_card') {
-                    setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.targetId]: 'animate-fb-combat' })), at);
-                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), `-${d.value}`, 'text-red-400'), at);
+                    setTimeout(() => {
+                        setCardAnimations(prev => ({ ...prev, [d.targetId]: 'animate-fb-combat' }));
+                        spawnFloatAt(findCardSlotEl(d.targetId), `-${d.value}`, 'text-red-400');
+                        const tid = String(d.targetId);
+                        const patch = (prev: (Card | null)[]) => {
+                            const i = prev.findIndex(c => c && String(c.idInGame) === tid);
+                            if (i === -1) return prev;
+                            const next = [...prev];
+                            next[i] = { ...next[i]!, currEndurance: next[i]!.currEndurance - d.value };
+                            return next;
+                        };
+                        setPlayerSlots(patch);
+                        setOpponentSlots(patch);
+                    }, at);
                     t += 2000;
                 } else if (d.type === 'destroy') {
-                    setTimeout(() => setCardAnimations(prev => ({ ...prev, [d.targetId]: 'animate-fb-death' })), at);
+                    setTimeout(() => {
+                        setCardAnimations(prev => ({ ...prev, [d.targetId]: 'animate-fb-death' }));
+                        const tid = String(d.targetId);
+                        const patch = (prev: (Card | null)[]) => {
+                            const i = prev.findIndex(c => c && String(c.idInGame) === tid);
+                            if (i === -1) return prev;
+                            const next = [...prev];
+                            next[i] = { ...next[i]!, currEndurance: 0 };
+                            return next;
+                        };
+                        setPlayerSlots(patch);
+                        setOpponentSlots(patch);
+                    }, at);
                     t += 2500;
                 } else if (d.type === 'dmg_hero') {
                     const g = gameRef.current;
                     if (g) {
-                        const idx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
-                        if (idx === 0 || idx === 1) {
-                            shakeHero(idx, at);
-                            setTimeout(() => spawnFloatOnHero(idx, `-${d.value}`, 'text-red-400'), at);
+                        const serverIdx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
+                        if (serverIdx === 0 || serverIdx === 1) {
+                            shakeHero(serverIdx, at);
+                            const dispIdx = toDisplay(serverIdx);
+                            const capArmor = d.newArmor ?? 0; const capDmg = d.actualDmg ?? 0;
+                            setTimeout(() => {
+                                spawnFloatOnHero(serverIdx, `-${d.value}`, 'text-red-400');
+                                setters[dispIdx]((prev: any) => prev ? { ...prev, armor: capArmor } : prev);
+                                setters[1 - dispIdx]((prev: any) => prev ? { ...prev, dmgDealt: prev.dmgDealt + capDmg } : prev);
+                            }, at);
                         }
                     }
                     t += 1800;
                 } else if (d.type === 'ad_mod') {
-                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), `${fmt(d.value)} ATK`, 'text-orange-400'), at);
+                    setTimeout(() => {
+                        spawnFloatAt(findCardSlotEl(d.targetId), `${fmt(d.value)} ATK`, 'text-orange-400');
+                        const tid = String(d.targetId);
+                        const patch = (prev: (Card | null)[]) => {
+                            const i = prev.findIndex(c => c && String(c.idInGame) === tid);
+                            if (i === -1) return prev;
+                            const next = [...prev];
+                            next[i] = { ...next[i]!, currForce: next[i]!.currForce + d.value };
+                            return next;
+                        };
+                        setPlayerSlots(patch);
+                        setOpponentSlots(patch);
+                    }, at);
                     t += 1200;
                 } else if (d.type === 'def_mod') {
-                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), `${fmt(d.value)} DEF`, 'text-sky-300'), at);
+                    setTimeout(() => {
+                        spawnFloatAt(findCardSlotEl(d.targetId), `${fmt(d.value)} DEF`, 'text-sky-300');
+                        const tid = String(d.targetId);
+                        const patch = (prev: (Card | null)[]) => {
+                            const i = prev.findIndex(c => c && String(c.idInGame) === tid);
+                            if (i === -1) return prev;
+                            const next = [...prev];
+                            next[i] = { ...next[i]!, currEndurance: next[i]!.currEndurance + d.value };
+                            return next;
+                        };
+                        setPlayerSlots(patch);
+                        setOpponentSlots(patch);
+                    }, at);
                     t += 1200;
                 } else if (d.type === 'addef_mod') {
-                    setTimeout(() => spawnFloatAt(findCardSlotEl(d.targetId), fmt(d.value), 'text-purple-400'), at);
+                    setTimeout(() => {
+                        spawnFloatAt(findCardSlotEl(d.targetId), fmt(d.value), 'text-purple-400');
+                        const tid = String(d.targetId);
+                        const patch = (prev: (Card | null)[]) => {
+                            const i = prev.findIndex(c => c && String(c.idInGame) === tid);
+                            if (i === -1) return prev;
+                            const next = [...prev];
+                            next[i] = { ...next[i]!, currForce: next[i]!.currForce + d.value, currEndurance: next[i]!.currEndurance + d.value };
+                            return next;
+                        };
+                        setPlayerSlots(patch);
+                        setOpponentSlots(patch);
+                    }, at);
                     t += 1200;
                 } else if (d.type === 'armor') {
                     const g = gameRef.current;
                     if (g) {
-                        const idx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
-                        if (idx === 0 || idx === 1) setTimeout(() => spawnFloatOnHero(idx, fmt(d.value), 'text-cyan-300'), at);
+                        const serverIdx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
+                        if (serverIdx === 0 || serverIdx === 1) {
+                            const dispIdx = toDisplay(serverIdx);
+                            const capArmor = d.newArmor ?? 0;
+                            setTimeout(() => {
+                                spawnFloatOnHero(serverIdx, fmt(d.value), 'text-cyan-300');
+                                setters[dispIdx]((prev: any) => prev ? { ...prev, armor: capArmor } : prev);
+                            }, at);
+                        }
                     }
                     t += 1200;
                 } else if (d.type === 'runes') {
                     const g = gameRef.current;
                     if (g) {
                         const idx = g.players.findIndex((p: any) => p.idInGame === d.targetId);
-                        if (idx === 0 || idx === 1) setTimeout(() => spawnFloatOnHero(idx, fmt(d.value), 'text-yellow-400'), at);
+                        if (idx === 0 || idx === 1) {
+                            setTimeout(() => spawnFloatOnHero(idx, fmt(d.value), 'text-yellow-400'), at);
+                        }
                     }
                     t += 1200;
                 } else if (d.type === 'draw') {
@@ -423,12 +563,21 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
     });
 
     newSocket.on('game_over', (data) => {
-        const msg = data.message ?? (
-            data.winner === -1 ? p("draw") :
-            data.winner === myPlayerIndexRef.current ? "Vous avez gagné !" : "Vous avez perdu !"
-        )
-        setGameOverMessage(msg)
+        let msg: string;
+        if (data.message) {
+            msg = data.message;
+        } else if (data.winner === -1) {
+            msg = p("draw");
+        } else if (isSpectator) {
+            const winnerName = gameRef.current?.players[data.winner]?.username ?? `Player ${data.winner + 1}`;
+            msg = `${winnerName} gagne !`;
+        } else {
+            msg = data.winner === myPlayerIndexRef.current ? "Vous avez gagné !" : "Vous avez perdu !";
+        }
         localStorage.removeItem('currentGame')
+        const queue = [...eventQueueRef.current];
+        eventQueueRef.current = [];
+        scheduleAnimQueue(queue, () => setGameOverMessage(msg));
     });
     newSocket.on('error', (data) => {
         setIsLoading(false);
@@ -459,16 +608,20 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
 
     newSocket.on('game_update', (data) => {
         if (isSpectator) {
-            // vue spectateur — on prend les deux joueurs directement
-            setGame(data.game)
-            gameRef.current = data.game;
-            setMeStats(data.game.players[0])
-            setOpponentStats(data.game.players[1])
-            setTurnNumber(data.game.turnNumber)
-            setPlayerSlots(battlefieldToSlots(data.game.players[0].battlefield))
-            setOpponentSlots(battlefieldToSlots(data.game.players[1].battlefield))
-            setIsLoading(false)
-            return
+            const queue = [...eventQueueRef.current];
+            eventQueueRef.current = [];
+            const applySpectator = () => {
+                setGame(data.game);
+                gameRef.current = data.game;
+                setMeStats(data.game.players[0]);
+                setOpponentStats(data.game.players[1]);
+                setTurnNumber(data.game.turnNumber);
+                setPlayerSlots(battlefieldToSlots(data.game.players[0].battlefield));
+                setOpponentSlots(battlefieldToSlots(data.game.players[1].battlefield));
+                setIsLoading(false);
+            };
+            scheduleAnimQueue(queue, applySpectator);
+            return;
         }
 
         if (myPlayerIndexRef.current === null) return;
@@ -521,6 +674,7 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
   }
   function handleConfirmSpell() {
     if (!selectedCard) return;
+    if (selectedCard.type !== "spell" && pendingSlotIndex === null) return;
 
     socketRef.current?.emit('play_card', {
         cardId: selectedCard.idInGame,
@@ -730,7 +884,12 @@ const locale = useLocale();
                     </div>
 
                     ) : isSpectator ? (
-                        <SpectatorBoard players={game?.players ?? []} turnNumber={game?.turnNumber ?? 0} />
+                        <div className="flex flex-col h-screen">
+                            <SpectatorBoard players={game?.players ?? []} turnNumber={game?.turnNumber ?? 0} />
+                            <div className="fixed bottom-0 left-0 right-0 h-48 border-t border-blue-400/20 bg-black/60 backdrop-blur-sm">
+                                <ChatPanel roomId={CurrentRoomId} />
+                            </div>
+                        </div>
                     ) : isError ? (
                         <div className="pt-20 text-center text-red-500">
                             {e("error_playground")}
@@ -746,7 +905,7 @@ const locale = useLocale();
 
                                 <div id="hero-strip-opponent">
                                 <HeroStrip
-                                    label={p("opponent")}
+                                    label={opponentStats?.username ?? p("opponent")}
                                     playerClass={opponentStats?.class}
                                     armor={opponentStats?.armor ?? 0}
                                     dmgDealt={opponentStats?.dmgDealt ?? 0}
@@ -794,7 +953,7 @@ const locale = useLocale();
                                 </div>
 
                                 <div>
-                                    <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} />
+                                    <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard || (selectedCard.type !== "spell" && pendingSlotIndex === null)} />
                                 </div>
 
                                 <PlayerHand
@@ -871,7 +1030,7 @@ const locale = useLocale();
                         {/* Opponent HeroStrip */}
                         <div id="hero-strip-opponent">
                         <HeroStrip
-                            label="Opponent"
+                            label={opponentStats?.username ?? "Opponent"}
                             playerClass={opponentStats?.class}
                             armor={opponentStats?.armor ?? 0}
                             dmgDealt={opponentStats?.dmgDealt ?? 0}
@@ -937,7 +1096,7 @@ const locale = useLocale();
 
                             {/* Confirm Play */}
                             <div className="shrink-0 px-4 py-2">
-                                <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard} />
+                                <ConfirmPlay onClick={handleConfirmSpell} disabled={!selectedCard || (selectedCard.type !== "spell" && pendingSlotIndex === null)} />
                             </div>
                             {/* End Turn centré */}
                             <div className="flex justify-center py-1 shrink-0">

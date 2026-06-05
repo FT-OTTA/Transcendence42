@@ -117,13 +117,21 @@
       "destroy_by": "{name} is destroyed by {source}!",
       "dmg_hero": "{name} takes {value} damage",
       "ad_mod": "{name} {value} ATK",
+      "ad_mod_by": "{name} {value} ATK ({source})",
       "def_mod": "{name} {value} DEF",
+      "def_mod_by": "{name} {value} DEF ({source})",
       "addef_mod": "{name} {value} ATK/DEF",
+      "addef_mod_by": "{name} {value} ATK/DEF ({source})",
       "draw_card": "{name} draws {value} cards",
+      "draw_card_by": "{name} draws {value} cards ({source})",
       "armor_gain": "{name} {value} armor",
+      "armor_gain_by": "{name} {value} armor from {source}",
       "runes_gain": "{name} {value} runes",
+      "runes_gain_by": "{name} {value} runes from {source}",
       "freeze": "{name} is frozen",
-      "swap": "{a} ↔ {b}"
+      "freeze_by": "{name} is frozen by {source}",
+      "swap": "{a} ↔ {b}",
+      "swap_by": "{source}: {a} ↔ {b}"
     }
   },
 

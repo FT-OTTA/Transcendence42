@@ -67,7 +67,8 @@
       "profile": "Profil",
       "rooms": "Salles",
       "rejoin": "Reprendre",
-      "remove": "Supprimer"
+      "remove": "Supprimer",
+      "login_to_play": "Connectez-vous pour jouer"
     },
 
     "Error": {

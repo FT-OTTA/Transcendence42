@@ -67,7 +67,8 @@
     "profile": "Profile",
     "rooms": "Rooms",
     "rejoin": "Rejoin",
-    "remove": "Remove"
+    "remove": "Remove",
+    "login_to_play": "Login to Play"
   },
 
   "Error": {

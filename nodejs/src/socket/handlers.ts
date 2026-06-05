@@ -40,8 +40,11 @@ export function onConnection(io: Server, socket: Socket): void {
         // Reconnexion à une session existante
         const existingSession = findSessionByRoomId(Number(data.roomId))
         if (existingSession) {
+            let user =  await prisma.user.findUnique({
+                where: { id: userId }
+            });
             const playerIndex = existingSession.game.players.findIndex(
-                (p: any) => p.username === data.username
+                (p: any) => p.username === user.username // Don't trust user
             )
             if (playerIndex !== -1) {
                 existingSession.sockets[playerIndex] = socket

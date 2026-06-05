@@ -67,7 +67,8 @@
       "profile": "Profil",
       "rooms": "Rum",
       "rejoin": "Återanslut",
-      "remove": "Ta bort"
+      "remove": "Ta bort",
+      "login_to_play": "Logga in för att spela"
     },
 
     "Error": {

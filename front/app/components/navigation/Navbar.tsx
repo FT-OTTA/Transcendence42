@@ -27,7 +27,7 @@ export default function Navbar()
 	const t = useTranslations('Navbar');
 	return (
 		<div>
-			<div className="hidden md:flex">
+			<div className="hidden md:flex relative z-[9999]">
 				<div>
 					<nav className={ NavbarClassDesktop }>
 						<div >

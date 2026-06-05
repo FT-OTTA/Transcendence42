@@ -27,10 +27,7 @@ export default async function CommunityProfilePage({
 		className=" overflow-x-hidden md:overflow-y-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center">
 
 			<Navbar />
-			<div className="md:py-5" />
-
-			<LoggedInBadge/>
-
+			<div className="md:py-5" />	
 
 			<div className="max-w-6xl mx-auto px-4 py-4">
 				<ProfileSearchBar />

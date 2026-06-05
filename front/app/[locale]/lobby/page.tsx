@@ -25,14 +25,12 @@ export default function LobbyPage() {
 
     return (
     <main
-      className=" overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen box-border p-4 flex flex-col text-white/80">
-        
-        {mounted && <Navbar />}
-        
-          <div className="hidden md:grid flex flex-col flex-1 overflow-hidden min-h-0 overflow-hidden grid-cols-1 md:grid-cols-4 gap-4 pt-4">
+      className="overflow-x-hidden min-h-screen bg-[url('/homepage_bg.png')] bg-cover bg-center h-screen box-border flex flex-col text-white/80">
+        <header className="md:h-10 shrink-0">
+          {mounted && <Navbar />}
+        </header>
+          <div className="top-25 hidden md:grid flex flex-col flex-1 overflow-hidden min-h-0 overflow-hidden grid-cols-1 md:grid-cols-4 gap-4 pt-4">
             
-            {mounted && <LoggedInBadge/>}
-
             <div className="flex flex-col gap-4 h-full min-h-0">
                 {mounted && <ProfilePanel />}
                 {mounted && <FriendsPanel />}
@@ -65,30 +63,30 @@ export default function LobbyPage() {
 
           </div>
 
-        {activePanel && (
-          <div
+          {activePanel && (
+            <div
             className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 p-4"
             onClick={() => setActivePanel(null)}
-          >
-            {activePanel === "friends" && (
-              <div 
+            >
+              {activePanel === "friends" && (
+                <div 
                 className="w-full max-w-md h-[80vh] min-h-0 flex flex-col"
                 onClick={(e) => e.stopPropagation()}
-              >
-                {mounted && <FriendsPanel />}
-              </div>
-            )}
-        
-            {activePanel === "chat" && (
-              <div 
+                >
+                  {mounted && <FriendsPanel />}
+                </div>
+              )}
+          
+              {activePanel === "chat" && (
+                <div 
                 className="w-full max-w-md h-[80vh] min-h-0 flex flex-col"
                 onClick={(e) => e.stopPropagation()}
-              >
-                {mounted && <ChatPanel />}
-              </div>
-            )}
-          </div>
-        )}
+                >
+                  {mounted && <ChatPanel />}
+                </div>
+              )}
+            </div>
+          )}
         <Footer/>
     </main>
     );

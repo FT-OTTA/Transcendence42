@@ -60,3 +60,56 @@ Once both players have finished, they can end their turn, triggering the **resol
 * Creatures engage in combat and deal damage.
 
 After the eighth turn, the player with the highest score wins the game.
+
+
+
+# Instructions
+
+## Requirements
+**OTTA** is a container-based Docker-compose network, all the software it requires is installed by Docker inside the images. Therefore only the following tools (already present on every machine at 42) are required:
+- Docker (Podman emulating Docker at 42)
+- Docker compose
+- Git
+- Make
+
+On ubuntu:
+`sudo apt update && sudo apt install -y docker.io docker-compose-plugin git make`
+
+## Environment file
+
+A number of environment variables are needed for this project to run. In the root directory, create a .env file with the following template:
+
+```env
+# MySQL
+MYSQL_ROOT_PASSWORD=
+MYSQL_DATABASE=
+MYSQL_USER=
+MYSQL_PASSWORD=
+
+# Node
+NODE_ENV=development
+
+# JWT
+JWT_SECRET=
+
+# PRISMA
+DATABASE_URL="mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}"
+
+ELASTIC_PASSWORD=
+KIBANA_SYSTEM_PASSWORD=
+GRAFANA_ADMIN_PASSWORD=
+
+```
+
+## Deployment
+
+Once that's done, build and start the network with `make`. Once started, the project's frontend can be accessed at http://localhost:3001. It is also deployed on the open web at https://transcendence42-production.up.railway.app/
+
+Useful debugging commands:
+- `docker ps` prints all containers state and basic info
+- `docker logs [CONTAINER]` prints a containers logs since startup.
+- `docker exec -it [CONTAINER] sh` opens an interactive shell within a container
+
+
+# Ressources
+

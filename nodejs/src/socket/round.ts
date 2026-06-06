@@ -88,9 +88,6 @@ export async function resolveRound(session: GameSession): Promise<void> {
         session.sockets.forEach((s, id) => {
             s.emit('turn_start', { game: getPlayerPerspective(session.game, id) })
         })
-        for (const player of session.game.players)
-            for (const card of Object.values(player.battlefield))
-                if (card && card.state === "sick") card.state = "ready";
     }
 }
 

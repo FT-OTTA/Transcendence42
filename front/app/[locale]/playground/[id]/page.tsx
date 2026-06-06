@@ -668,7 +668,12 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
   }, [socketDep]);
 
   const playerHandCards = useMemo(() => hand, [hand]);
-  const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
+  const displaySlots = playerSlots.map((card, i) => {
+    if (card) return card;
+    const pending = pendingSlots[i];
+    if (!pending) return null;
+    return pending.type === 'creature' ? { ...pending, state: 'sick' as const } : pending;
+  });
 
 
   function handleConcede(){

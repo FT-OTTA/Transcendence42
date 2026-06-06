@@ -359,23 +359,9 @@ export function onConnection(io: Server, socket: Socket): void {
     socket.on('disconnect', async () => {
         console.log('User disconnected :', socket.id);
 
-        // Gère la game en cours
-        const session = findSession(socket.id)
-        if (session) {
-            const playerIndex = session.sockets.findIndex(s => s.id === socket.id)
-            const winnerIndex = 1 - playerIndex
-            session.game.status = 'game_over'
-            session.game.winner = session.game.players[winnerIndex]
-            await emitGameOver(session)
-        }
-
         if (socket.username) {
             activeUsers.delete(socket.username);
             io.emit("status_changed", { username: socket.username, isOnline: false });
-            await prisma.user.update({
-            where: { username: socket.username },
-            data: { currentRoomId: null, currentHeroId: null }
-            })
         }
     });
 }

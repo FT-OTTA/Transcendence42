@@ -57,7 +57,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
         for (const { card, payload } of cards) {
             if (!card) continue
-            playCard(card, payload, session.game, emit)
+            playCard(card, payload, session.game, emit, 'end_of_turn')
         }
     }
     session.submittedCards.clear()
@@ -88,6 +88,9 @@ export async function resolveRound(session: GameSession): Promise<void> {
         session.sockets.forEach((s, id) => {
             s.emit('turn_start', { game: getPlayerPerspective(session.game, id) })
         })
+        for (const player of session.game.players)
+            for (const card of Object.values(player.battlefield))
+                if (card && card.state === "sick") card.state = "ready";
     }
 }
 

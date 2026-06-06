@@ -115,7 +115,7 @@ export function onConnection(io: Server, socket: Socket): void {
             const zone = data.zone as BfZone
             if (card.type !== "spell" && (!zone || session.game.players[playerIndex].battlefield[zone])) return
             const existing = session.submittedCards.get(socket.id) ?? []
-            if (existing.some(({ payload }: any) => payload.zone === zone)) return
+            if (card.type !== "spell" && existing.some(({ payload }: any) => payload.zone === zone)) return
             player.curRunes -= card.runeCost
             existing.push({ card, payload: data })
             session.submittedCards.set(socket.id, existing)
@@ -355,12 +355,27 @@ export function onConnection(io: Server, socket: Socket): void {
         socket.emit("online_users_list", Array.from(activeUsers.keys()));
     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconeccted :', socket.id);
+
+    socket.on('disconnect', async () => {
+        console.log('User disconnected :', socket.id);
+
+        // Gère la game en cours
+        const session = findSession(socket.id)
+        if (session) {
+            const playerIndex = session.sockets.findIndex(s => s.id === socket.id)
+            const winnerIndex = 1 - playerIndex
+            session.game.status = 'game_over'
+            session.game.winner = session.game.players[winnerIndex]
+            await emitGameOver(session)
+        }
 
         if (socket.username) {
             activeUsers.delete(socket.username);
             io.emit("status_changed", { username: socket.username, isOnline: false });
+            await prisma.user.update({
+            where: { username: socket.username },
+            data: { currentRoomId: null, currentHeroId: null }
+            })
         }
     });
 }

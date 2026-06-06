@@ -67,7 +67,7 @@ async function importCreatures() {
             update: data, // Si elle existe, on met à jour tout
             create: data
         })
-        console.log(`Créature importée : ${row['Name']}`)
+        console.log(`Créature importée : ${row['Name_fr']}`)
     }
 }
 
@@ -96,7 +96,7 @@ async function importBuildings() {
             update: data,
             create: data
         })
-        console.log(`Bâtiment importé : ${row['Name']}`)
+        console.log(`Bâtiment importé : ${row['Name_fr']}`)
     }
 }
 
@@ -128,7 +128,7 @@ async function importSpells() {
             update: data,
             create: data
         })
-        console.log(`Sort importé : ${row['Name']}`)
+        console.log(`Sort importé : ${row['Name_fr']}`)
     }
 }
 
@@ -153,7 +153,7 @@ async function importHeroes() {
             update: data,
             create: data
         })
-        console.log(`Héros importé : ${row['Class']}`)
+        console.log(`Héros importé : ${row['Class_fr']}`)
     }
 }
 

@@ -30,36 +30,36 @@ services:
       - otta
     restart: unless-stopped
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
-    container_name: cadvisor
-    privileged: true
-    devices:
-      - /dev/kmsg:/dev/kmsg
-    command:
-      - --docker_only=true
-      - --disable_root_cgroup_stats=true
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    networks:
-      - otta
-    restart: unless-stopped
+  # cadvisor:
+  #   image: gcr.io/cadvisor/cadvisor:v0.49.1
+  #   container_name: cadvisor
+  #   privileged: true
+  #   devices:
+  #     - /dev/kmsg:/dev/kmsg
+  #   command:
+  #     - --docker_only=true
+  #     - --disable_root_cgroup_stats=true
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:ro
+  #     - /sys:/sys:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  #   networks:
+  #     - otta
+  #   restart: unless-stopped
 
   elasticsearch:
     image: elasticsearch:8.11.0
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m  # pour la machine de beauman TO REMOVE
-    mem_limit: 1g # pour la machine de beauman TO REMOVE
-    deploy: # pour la machine de beauman TO REMOVE
-      resources: # pour la machine de beauman TO REMOVE
-        limits: # pour la machine de beauman TO REMOVE
-          memory: 1g # pour la machine de beauman TO REMOVE
+    #   - ES_JAVA_OPTS=-Xms512m -Xmx512m  # pour la machine de beauman TO REMOVE
+    # mem_limit: 1g # pour la machine de beauman TO REMOVE
+    # deploy: # pour la machine de beauman TO REMOVE
+    #   resources: # pour la machine de beauman TO REMOVE
+    #     limits: # pour la machine de beauman TO REMOVE
+    #       memory: 1g # pour la machine de beauman TO REMOVE
     ports:
       - "9200:9200"
     networks:
@@ -69,19 +69,25 @@ services:
     image: logstash:8.11.0
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
-    environment:
-      - LS_JAVA_OPTS=-Xms256m -Xmx256m  # pour la machine de beauman TO REMOVE
-    mem_limit: 512m # pour la machine de beauman TO REMOVE
-    deploy: # pour la machine de beauman TO REMOVE
-      resources:
-        limits:
-          memory: 512m # pour la machine de beauman TO REMOVE #
+    # environment:
+    #   - LS_JAVA_OPTS=-Xms256m -Xmx256m  # pour la machine de beauman TO REMOVE
+    # mem_limit: 512m # pour la machine de beauman TO REMOVE
+    # deploy: # pour la machine de beauman TO REMOVE
+    #   resources:
+    #     limits:
+    #       memory: 512m # pour la machine de beauman TO REMOVE #
     ports:
       - "5044:5044"
     depends_on:
       - elasticsearch
     networks:
       - otta
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9600"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   kibana:
     image: kibana:8.11.0
@@ -143,6 +149,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      logstash:
+        condition: service_healthy
     networks:
       - otta
     restart: unless-stopped
@@ -181,11 +189,11 @@ services:
       context: .
       dockerfile: front/Dockerfile
     container_name: front
-    # volumes:
-    #   - ./front:/app/front
-    #   - /app/front/node_modules
-    #   - /app/front/.next
-    # command: npm run dev -- -H 0.0.0.0
+    volumes:
+      - ./front:/app/front
+      - /app/front/node_modules
+      - /app/front/.next
+    command: npm run dev -- -H 0.0.0.0
     env_file:
       - ./.env
     networks:

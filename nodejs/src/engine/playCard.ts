@@ -1,5 +1,5 @@
 import type { Card, PlayCardPayload } from '../types/card.ts'
-import { EffectContext } from '../types/effects.ts';
+import { EffectContext, EffectTime } from '../types/effects.ts';
 import type { Game } from '../types/gamesession.ts'
 import { Hero } from '../types/hero.ts';
 import type { BfZone } from '../types/zones.ts'
@@ -7,7 +7,7 @@ import { resolveEffect } from "./resolveEffects.ts";
 import { findById } from './utils.ts'
 
 
-export function playCard(card: Card, payload: PlayCardPayload, game: Game, emit: (event: string, data: any) => void): void {
+export function playCard(card: Card, payload: PlayCardPayload, game: Game, emit: (event: string, data: any) => void, fromTiming?: EffectTime): void {
     // console.log("Playing card", { card, payload });
     // console.log("zone reçue:", payload.zone)
     // console.log("starts with bf:", payload.zone?.startsWith("bf"))
@@ -62,7 +62,7 @@ export function playCard(card: Card, payload: PlayCardPayload, game: Game, emit:
 
             
             console.log("Resolving effect", { effect, target, target2 ,context });
-            resolveEffect(card.owner, effect, payload, game, undefined, target, target2, context, emit);
+            resolveEffect(card.owner, effect, payload, game, fromTiming, target, target2, context, emit);
         }
     }
 }

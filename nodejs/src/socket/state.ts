@@ -26,3 +26,6 @@ export function addSpectator(session: GameSession, socket: Socket) {
 export function removeSpectator(session: GameSession, socketId: string) {
     session.spectators = session.spectators.filter(s => s.id !== socketId)
 }
+export function removeSession(roomId: number) {
+    sessions = sessions.filter(s => s.roomId !== roomId)
+}

@@ -7,6 +7,7 @@ import { startTurn } from '../engine/startTurn.ts'
 import { checkBoardState, checkVictory } from '../engine/checks.ts'
 import { getPlayerPerspective } from './perspective.ts'
 import { prisma } from '../../prisma/prisma.ts'
+import { removeSession } from './state.ts'
 
 export async function emitGameOver(session: GameSession) {
     const winnerIndex = session.game.winner ? session.game.players.indexOf(session.game.winner) : -1
@@ -17,6 +18,7 @@ export async function emitGameOver(session: GameSession) {
         s.emit('game_over', { winner: winnerIndex })
     })
     await prisma.room.deleteMany({ where: { id: session.roomId } })
+    removeSession(session.roomId)
     try {
         await prisma.gameResult.create({
         data: {

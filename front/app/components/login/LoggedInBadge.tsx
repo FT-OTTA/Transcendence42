@@ -25,6 +25,7 @@ export default function LoggedInBadge() {
     {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
+        localStorage.removeItem("currentGame");
         window.location.reload();
     }
 

@@ -14,7 +14,7 @@ import { io, Socket } from 'socket.io-client';
 import { useParams, useSearchParams } from 'next/navigation';
 import LargeCardView from '@/app/components/playground/LargeCardView';
 import { Hero } from 'otta-shared-types/hero';
-import { usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useLocale } from 'next-intl';
 import { useTranslations } from "next-intl";
 import HeroStrip from '@/app/components/playground/HeroStripProps';
@@ -141,6 +141,11 @@ export default function PlaygroundPage() {
       return null
   })
   const [hydrated, setHydrated] = useState(false)
+  const router = useRouter()
+  useEffect(() => {
+  const token = localStorage.getItem('token')
+  if (!token) router.push(`/${locale}/lobby`)
+    }, [])
 
 // useEffect de restauration qui se déclenche à l'arrivée sur la page, et à chaque changement de pathname (permet de réinitialiser la sélection du héros si on quitte la page et qu'on y revient, ou si on recharge la page)
   useEffect(() => {
@@ -663,7 +668,12 @@ const isPlayerHeroSelected = selectedTargets.some(t => t.target.kind === "hero" 
   }, [socketDep]);
 
   const playerHandCards = useMemo(() => hand, [hand]);
-  const displaySlots = playerSlots.map((card, i) => card ?? pendingSlots[i]);
+  const displaySlots = playerSlots.map((card, i) => {
+    if (card) return card;
+    const pending = pendingSlots[i];
+    if (!pending) return null;
+    return pending.type === 'creature' ? { ...pending, state: 'sick' as const } : pending;
+  });
 
 
   function handleConcede(){
@@ -735,11 +745,6 @@ function getTargetCountForEffect(effect: any) {
   return 0;
 }
 
-function getRequiredTargetCount(card: Card) {
-  return Array.isArray(card.effects)
-    ? card.effects.reduce((count: number, e: any) => count + getTargetCountForEffect(e), 0)
-    : 0;
-}
 
 function getNextEffectIndex(card: Card, targets: Array<{ target: Card | Hero; effectIndex: number }>) {
   const effects = card.effects;

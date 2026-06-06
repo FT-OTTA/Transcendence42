@@ -57,7 +57,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
         for (const { card, payload } of cards) {
             if (!card) continue
-            playCard(card, payload, session.game, emit)
+            playCard(card, payload, session.game, emit, 'end_of_turn')
         }
     }
     session.submittedCards.clear()

@@ -32,6 +32,7 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
     const e = useTranslations("Error");
     
     const scrollRef = useRef<HTMLDivElement | null> (null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const isNearBottom = () => {
         const check = scrollRef.current;
@@ -102,6 +103,11 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
         });
 
         setMessageInput("");
+
+        if (textareaRef.current)
+        {
+            textareaRef.current.style.height = "auto";
+        }
     }
 
     useEffect(() => {
@@ -145,16 +151,16 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
                         key={msg.id}
                         className={`flex ${msg.isSelf ? "justify-end" : "justify-start"}`}
                     >
-                        <div
-                            className={`max-w-[75%] rounded-lg py-1 px-2 border text-xs ${
-                                msg.isSelf
-                                    ? "bg-blue-400/20 border-blue-300/10 text-blue-100"
-                                    : "bg-black/40 border-blue-300/10 text-blue-200"
-                            }`}
-                        >
-                            <p className="text-xs opacity-60 mb-1">{msg.name}</p>
-                            <p>{msg.message}</p>
-                        </div>
+                    <div
+                        className={`min-w-0 max-w-[75%] rounded-lg py-1 px-2 border text-xs ${
+                            msg.isSelf
+                                ? "bg-blue-400/20 border-blue-300/10 text-blue-100"
+                                : "bg-black/40 border-blue-300/10 text-blue-200"
+                        }`}
+                    >
+                        <p className="text-xs opacity-60 mb-1">{msg.name}</p>
+                        <p className="break-words whitespace-pre-wrap">{msg.message}</p>
+                    </div>
                     </div>
                 ))}
             </div>
@@ -165,14 +171,20 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
                         {e(error)}
                     </p>
                 )}
-                <div className="flex gap-1">
-                    <input
-                        className="w-full p-2 border border-blue-300/30 rounded-md bg-transparent text-blue-200 outline-none"
-                        type="text"
+                <div className="flex gap-1 items-end">
+                    <textarea
+                        ref={textareaRef}
+                        className="w-full p-2 border border-blue-300/30 rounded-md bg-transparent text-blue-200 outline-none resize-none overflow-hidden"
+                        rows={1}
                         value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
+                        onChange={(e) => {
+                            setMessageInput(e.target.value);
+                            e.target.style.height = "auto";
+                            e.target.style.height = e.target.scrollHeight + "px";
+                        }}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter") {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
                                 sendMessage();
                             }
                         }}
@@ -180,7 +192,7 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
                     />
                     <button
                         onClick={sendMessage}
-                        className="px-2 border border-blue-300/30 rounded-xl hover:bg-blue-300 hover:text-black transition"
+                        className="px-2 border border-blue-300/30 rounded-xl hover:bg-blue-300 hover:text-black transition self-end pb-2"
                     >
                         {">"}
                     </button>

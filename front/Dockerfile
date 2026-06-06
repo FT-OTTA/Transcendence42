@@ -11,8 +11,8 @@ RUN npm i
 COPY front ./
 COPY nodejs/src/types ../nodejs/src/types/
 
-RUN npm run build
+# RUN npm run build
 
 EXPOSE 3001
 
-CMD ["npm", "start" ,"--", "-H", "0.0.0.0"]
+CMD ["npm", "run", "dev" ,"--", "-H", "0.0.0.0"]

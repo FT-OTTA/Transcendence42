@@ -5,7 +5,7 @@ import type { GameSession } from '../types/gamesession.ts'
 import { instantiateGame } from './gameFactory.ts'
 import { launchGame, resolveRound } from './round.ts'
 import { getPlayerPerspective, getSpectatorPerspective } from './perspective.ts'
-import { waitingPlayers, sessions, addSession, findSession, findSessionByRoomId, addSpectator, removeSpectator, filterWaitingPlayers } from './state.ts'
+import { waitingPlayers, sessions, addSession, findSession, findSessionByRoomId, addSpectator, removeSpectator, filterWaitingPlayers, removePlayersFromRoom } from './state.ts'
 import { playCard } from '../engine/playCard.ts'
 import { emitGameOver } from './round.ts'
 import { prisma } from '../../prisma/prisma.ts'
@@ -57,6 +57,12 @@ export function onConnection(io: Server, socket: Socket): void {
         }
 
         const roomId = Number(data.roomId)
+
+        const room = await prisma.room.findUnique({ where: { id: roomId } })
+        if (!room) {
+            socket.emit('error', { message: 'Room not found' })
+            return
+        }
 
         // Évite les doublons
         const alreadyWaiting = waitingPlayers.some(
@@ -166,9 +172,17 @@ export function onConnection(io: Server, socket: Socket): void {
                 return;
             }
 
-            await prisma.room.delete({
-                where: { id: roomId }
-            });
+            const activeSession = findSessionByRoomId(roomId)
+            if (activeSession) {
+                clearTimeout(activeSession.timer!)
+                activeSession.timer = null
+                activeSession.game.status = 'game_over'
+                activeSession.game.winner = undefined
+                await emitGameOver(activeSession)
+            } else {
+                await prisma.room.delete({ where: { id: roomId } })
+                removePlayersFromRoom(roomId)
+            }
         } catch (error) {
             console.error(error);
             socket.emit('room_error', {

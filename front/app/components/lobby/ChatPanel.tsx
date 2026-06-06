@@ -119,6 +119,7 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
         }
 
         const handleNewMessage = (msg: any) => {
+            if (msg.roomId !== roomId) return;
             const formatted: Message = {
                 id: msg.id,
                 name: msg.sender.username,

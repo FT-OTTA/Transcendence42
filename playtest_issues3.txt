@@ -1,0 +1,6 @@
+11-
+druid starts with 3 runes displayed but can spend 2 only (front issue)
+
+12-
+score doesn't work properly when something deals damage to armor score is
+incremented while it shouldnt (front issue)

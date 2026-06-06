@@ -109,12 +109,10 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
         const username = localStorage.getItem("username");
 
         if (roomId) {
-            socket.emit('join_room', { roomId });
+            socket.emit('join_chat', roomId);
         }
 
         const handleNewMessage = (msg: any) => {
-            if (msg.roomId !== roomId) return;
-
             const formatted: Message = {
                 id: msg.id,
                 name: msg.sender.username,
@@ -130,7 +128,7 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
         return () => {
             socket.off('new_message', handleNewMessage);
             if (roomId) {
-                socket.emit('leave_room', { roomId });
+                socket.emit('leave_chat', roomId);
             }
         };
     }, [roomId]);

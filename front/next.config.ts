@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
    // eslint: {
     //    ignoreDuringBuilds: true,
     //}
+    compiler: {
+        removeConsole: true,
+    }
 };
 
 const withNextIntl = createNextIntlPlugin();

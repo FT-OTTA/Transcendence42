@@ -131,7 +131,7 @@ Useful debugging commands:
 
 ## AI Usage
 
-AI (Claude, chatGPT and Github Copilot) was used to generate boilerplate, help with debugging, test design decisions and draft parts of the documentation. All AI-generated code has been carefully reviewed and tested before inclusion (vie de ma mère).
+AI (Claude, chatGPT and Github Copilot) was used to generate boilerplate, help with debugging, test design decisions and draft parts of the documentation. All AI-generated code has been carefully reviewed and tested before inclusion.
 
 # Team information
 
@@ -376,12 +376,18 @@ Total points: 2 + 2 + 2 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 = 23
 
 ## Tbeauman — Product Owner
 
-## Tcoeffet — Product Owner
+...
+
+## Tcoeffet — Project Manager
+
+...
+
 
 ## Ande-vat — Technical Lead
 
 - Made early architectural decisions: Next.js + Express + MySQL + Prisma + Socket.io + Docker Compose.
 - Set up the initial project structure, Docker Compose network, and NGINX configuration.
-- Conducted code reviews on all critical pull requests.
-- [ADD SPECIFIC FEATURES/CODE WORKED ON]
+- Conducted code reviews on critical pull requests, ensured best practices in code.
+- Features worked on: Project structure, Playground, game engine, Lobby, Websockets, Routes.
 
+## Obajja — Developer

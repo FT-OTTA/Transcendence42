@@ -297,27 +297,27 @@ Static game data — playable hero classes, each with a predefined deck and a pa
 
 # Features list
 
-User registration & login: Email/password authentication. Secure password management with hashed and salted passwords
+User registration & login: Email/password authentication. Secure password management with hashed and salted passwords (tbeauman)
 
-User profiles: Profile pages with avatar, stats, and match history
+User profiles: Profile pages with avatar, stats, and match history  (obajja, tcoeffet)
 
-Friend system: Add/remove friends, view online status
+Friend system: Add/remove friends, view online status (tbeauman, obajja)
 
-Real-time chat: Lobby and in-game direct messaging between users via WebSockets
+Real-time chat: Lobby and in-game direct messaging between users via WebSockets (obajja, ande-vat)
 
-Game lobby: Room creation, deletion and joining.
+Game lobby: Room creation, deletion and joining. (ande-vat, obajja)
 
-Game engine: Fully implemented turn based card game as described above
+Game engine: Fully implemented turn based card game as described above (ande-vat, tbeauman)
 
-Remote multiplayer: Two players on separate machines playing in real-time
+Remote multiplayer: Two players on separate machines playing in real-time (ande-vat, tbeauman)
 
-Game statistics: Win/loss tracking, and match history per user
+Game statistics: Win/loss tracking, and match history per user (tbeauman, tcoeffet)
 
-Internationalization: UI available in French, English and Swedish with a language switcher
+Internationalization: UI available in French, English and Swedish with a language switcher (obajja) 
 
-ELK log management: Centralized logs via Elasticsearch, Logstash, and Kibana
+ELK log management: Centralized logs via Elasticsearch, Logstash, and Kibana (tbeauman)
 
-Prometheus + Grafana: System metrics collection and monitoring dashboard and visualization
+Prometheus + Grafana: System metrics collection and monitoring dashboard and visualization (obajja)
 
 
 # Modules
@@ -326,9 +326,11 @@ Prometheus + Grafana: System metrics collection and monitoring dashboard and vis
 	- Frontend framework (React/Nextjs)
 	- Backend framework (Express)
 This module is the core of any transcendance project, it's basically the core of any website, we used react for the frontend as the tech lead was already familiar with it, and express felt like a natural choice for the backend.
+Major contributors: everyone
 
-- Implement real-time features using WebSockets or similar technology.
+- Implement real-time features using WebSockets or similar technology. (2 pts)
 	Websockets (socket.io) are a critical part of the project, they're used for all the real-time features (chat and gameplay).
+Major contributors: everyone
 
 - Major: Allow users to interact with other users. (2 pts)
 Minimum requirements implemented:
@@ -336,39 +338,55 @@ Minimum requirements implemented:
 	- Profile system: Custom avatars and mood phrases.
 	- Friends system: Add/remove friend button
 This module was added because it felt natural in an online game to have user accounts. It is implemented in the API through three routes: /friends/add and /friends/remove (post), to add and remove friends and friends/:username which returns the friends list for an user.
+Major contributors: everyone
 
 - Minor: Use an ORM for the database. (1 pt)
 Every interaction with the database in the backend is done with Prisma ORM, a popular Javascript ORM compatible with Typescript. ORMs are used to make database interactions feel more natural and avoir writing SQL directly.
+Major contributors: everyone
 
 - Minor: Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components). (1 pt)
 Graphical assets were designed for the project, as well as custom CSS styles. They're available in the /nodejs/illustrations/ folder.
+Major contributors: tcoeffet
 
 - Minor: Support for multiple languages (at least 3 languages) (1 pt)
 We implemented i18n using the Next-intl package. For the languages, we chose French, English and Swedish.
+Major contributors: obajja
+
 
 - Minor: Support for additional browsers. (1pt)
 The website's features at least on every chromium-based browser (Google chrome, Brave, etc..) as well as Firefox. React and next handles multi-browser support natively, only minor css styling issues appeared. The specific changes made are detailed in MultiBrowser.md
+Major contributors: obajja
+
 
 - File upload and management system:
 	Profile pictures can be uploaded to the server and are used as a profile personalization option
+Major contributors: tcoeffet, tbeauman
 
 - Major: Standard user management and authentication. (2pts)
 	Customizable usernames, mood phrases, profile pictures; add/remove friends. Profile page at /community.
+Major contributors: tbeauman, tcoeffet
 
 - Major: Implement a complete web-based game where users can play against each other. (2 pts)
 	Otta is a real-time multiplayer turn-based game (see rules above). All real-time features (chat, gameplay) are implemented with websocket.
+Major contributors: tbeauman, ande-vat
 
 - Major: Remote players — Enable two players on separate computers to play the same game in real-time. (2 pts)
 Network latency is not an issue in a turn-based game, but it it handled by giving generous timeout delays to each player to play their turn. Reconnections are handled properly in case of a user leaving a game, they can rejoin as long as the game is ongoing.
+Major contributors: tbeauman, ande-vat
 
 -  Minor: Implement spectator mode for games. (1 pt)
 	Each game provides a ?spectate endpoint, allowing other users to connect to and watch the game. Game-critical data (players hands, pending moves) is hidden to them and they can follow the boards state in real time.
+Major contributors: tbeauman
 
 - Major: Game staticstics and match history. (2 pts)
 	Individual games are posted in the database, win/losses/draws are tracked per user and stats are displayed in the /community page.
+Major contributors: tcoeffet, tbeauman
+
 - Major: Infrastructure for log management using ELK (Elasticsearch, Logstash, Kibana). (2 pts)
+Major contributors: tbeauman
 
 - Major: Monitoring system with Prometheus and Grafana. (2 pts)
+Major contributors: obajja
 
 Total points: 2 + 2 + 2 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 = 23
 

@@ -1,5 +1,0 @@
-Datasource "db": MySQL database "otta" at "mysql:3360"
-
-Error: P1001: Can't reach database server at `mysql:3360`
-
-Please make sure your database server is running at `mysql:3360`.

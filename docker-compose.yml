@@ -103,7 +103,6 @@ services:
     networks:
       - otta
     restart: unless-stopped
-
   nodejs:
     build: ./nodejs
     container_name: nodejs

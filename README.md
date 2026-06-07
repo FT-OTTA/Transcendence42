@@ -375,7 +375,11 @@ Total points: 2 + 2 + 2 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 = 23
 # Individual contributions
 
 ## Tbeauman — Product Owner
-
+- Created several routes of the Express server to access db including auth, cards, users, heroes.
+- Created the playset of Cards.
+- Made the game engine to fit the designed rules and connected it to the front playground
+- Set up the Elasticsearch / Logstash / Kibana and logs to the db accesses.
+- Features worked on: Project structure, Playground, Match History, ELK, Lobby, Routes, Websockets, Game Design
 ...
 
 ## Tcoeffet — Project Manager

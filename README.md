@@ -103,7 +103,7 @@ GRAFANA_ADMIN_PASSWORD=
 
 ## Deployment
 
-Once that's done, build and start the network with `make`. Once started, the project's frontend can be accessed at https://localhost:8443. It is also deployed on the open web at https://transcendence42-production.up.railway.app/
+Once that's done, build and start the network with `make`. Once started, the project's frontend can be accessed at https://localhost:8443. To access Grafana go to https://localhost:3002, log in using the .env's password and go to /dashboards to view the dashboard.
 
 Useful debugging commands:
 - `docker ps` prints all containers state and basic info
@@ -135,14 +135,28 @@ AI (Claude, chatGPT and Github Copilot) was used to generate boilerplate, help w
 
 # Team information
 
-- Tbeauman: Product owner
+### Tbeauman: Product Owner
 
-- Tcoeffet: Project Manager
+* Final decision-maker on all project-related matters.
+* Overall project direction and vision.
+* DevOps.
 
-- Ande-vat: Technical lead
-	- Early design/tech stack decisions, code reviews, readme redaction
+### Tcoeffet: Project Manager
 
-- Obajja: Developer
+* Team organization.
+* Meeting planning and coordination.
+* Management of the team's communication channels.
+* Project roadmap management.
+
+### Ande-vat: Technical Lead
+
+* Early design/tech stack decisions, code reviews, README writing.
+
+### Obajja: Developer
+
+* Chief Happiness Manager.
+* Occasional support across all aspects of the project.
+* Setup and maintenance of various services.
 
 # Project management
 
@@ -402,7 +416,13 @@ Total points: 2 + 2 + 2 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 = 23
 
 ## Tcoeffet — Project Manager
 
-...
+- Managed team organization, GitHub workflow, roadmap planning, and weekly meetings.
+- Designed the website mockup in Figma.
+- Created graphical assets (fonts, color palette, icons, etc.).
+- Designed the frontend visual identity.
+- Defined UI/UX guidelines and in-game feedback design.
+- Developed the landing page and user profile page.
+- Contributed to game design (rules, balancing, etc.).
 
 
 ## Ande-vat — Technical Lead
@@ -413,3 +433,12 @@ Total points: 2 + 2 + 2 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 = 23
 - Features worked on: Project structure, Playground, game engine, Lobby, Websockets, Routes.
 
 ## Obajja — Developer
+
+- Worked as main support to the other roles.
+- Developed the lobby page, the login authentication and their corresponding components.
+- Created tables, routes and sockets to make the lobby page fully functional.
+- Made the friend list functional, room creation, join, and chat.
+- Worked on Grafana's and Prometheus setup, dashboard and data sources handling.
+- Translated the site in French, English and Swedish.
+- Worked on multi-browser support.
+- Features worked on: Project structure, Lobby, Grafana, WebSockets, Routes.

@@ -11,15 +11,3 @@ scrape_configs:
     static_configs:
       - targets: ['nodejs:3000']
     metrics_path: '/metrics'
-
-  - job_name: 'nginx'
-    static_configs:
-      - targets: ['nginx-exporter:9113']
-
-  - job_name: 'mysql'
-    static_configs:
-      - targets: ['mysql-exporter:9104']
-
-  - job_name: 'cadvisor'
-    static_configs:
-      - targets: ['cadvisor:8080']

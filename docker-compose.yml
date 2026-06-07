@@ -30,25 +30,6 @@ services:
       - otta
     restart: unless-stopped
 
-  # cadvisor:
-  #   image: gcr.io/cadvisor/cadvisor:v0.49.1
-  #   container_name: cadvisor
-  #   privileged: true
-  #   devices:
-  #     - /dev/kmsg:/dev/kmsg
-  #   command:
-  #     - --docker_only=true
-  #     - --disable_root_cgroup_stats=true
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:ro
-  #     - /sys:/sys:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  #   networks:
-  #     - otta
-  #   restart: unless-stopped
-
   elasticsearch:
     image: elasticsearch:8.11.0
     environment:
@@ -129,17 +110,6 @@ services:
     networks:
       - otta
     restart: unless-stopped
-  
-  nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    container_name: nginx-exporter
-    command:
-      - -nginx.scrape-uri=http://nginx:9113/metrics
-    networks:
-      - otta
-    depends_on:
-      - nginx
-    restart: unless-stopped
 
   nodejs:
     build: ./nodejs
@@ -171,19 +141,6 @@ services:
       timeout: 5s
       retries: 10
   
-  mysql-exporter:
-    image: prom/mysqld-exporter:latest
-    container_name: mysql-exporter
-    command:
-      - "--mysqld.username=root:${MYSQL_ROOT_PASSWORD}"
-      - "--mysqld.address=mysql:3306"
-    networks:
-      - otta
-    depends_on:
-      mysql:
-        condition: service_healthy
-    restart: unless-stopped
-
   front:
     build:
       context: .

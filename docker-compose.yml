@@ -123,13 +123,16 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
-      - nodejs
-      - front
-      - kibana
+      nodejs:
+        condition: service_healthy
+      front:
+        condition: service_started
+      kibana:
+        condition: service_started
     networks:
       - otta
     restart: unless-stopped
-  
+
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
     container_name: nginx-exporter
@@ -146,6 +149,8 @@ services:
     container_name: nodejs
     env_file:
       - ./.env
+    volumes:
+      - ./nodejs/databases/users/avatars:/app/databases/users/avatars
     depends_on:
       mysql:
         condition: service_healthy
@@ -154,6 +159,12 @@ services:
     networks:
       - otta
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('net').createConnection(3000).on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
 
   mysql:
     build: ./mysql

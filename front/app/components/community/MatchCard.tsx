@@ -18,6 +18,7 @@ type MatchProps = {
 	score?: string;
 	result: string;
 	heroClass: string;
+	oppoClass: string;
 };
 
 export default function MatchCard({opponent, opponentClass, score, result, heroClass}:MatchProps)

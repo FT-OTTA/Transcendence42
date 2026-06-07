@@ -347,7 +347,7 @@ Graphical assets were designed for the project, as well as custom CSS styles. Th
 We implemented i18n using the Next-intl package. For the languages, we chose French, English and Swedish.
 
 - Minor: Support for additional browsers. (1pt)
-The website's features at least on every chromium-based browser (Google chrome, Brave, etc..) as well as Firefox. React and next handles multi-browser support natively, no additional work has been needed on that part.
+The website's features at least on every chromium-based browser (Google chrome, Brave, etc..) as well as Firefox. React and next handles multi-browser support natively, only minor css styling issues appeared. The specific changes made are detailed in MultiBrowser.md
 
 - File upload and management system:
 	Profile pictures can be uploaded to the server and are used as a profile personalization option

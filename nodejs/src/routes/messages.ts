@@ -34,7 +34,7 @@ router.get("/room/:id", async (req, res) => {
     const roomId = Number(req.params.id);
 
     const messages = await prisma.message.findMany({
-        where: { 
+        where: {
             roomId
         },
         include: {
@@ -48,7 +48,7 @@ router.get("/room/:id", async (req, res) => {
     return res.json(messages);
 
 });
-
+/*
 router.post("/", async (req, res) => {
     const { username, content, roomId } = req.body;
 
@@ -73,6 +73,6 @@ router.post("/", async (req, res) => {
     });
 
     return res.json(message);
-});
+}); */
 
 export default router

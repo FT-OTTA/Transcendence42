@@ -6,7 +6,7 @@ import MatchHistory from "../../components/community/MatchHistory"
 import ProfileSearchBar from "../../components/community/ProfileSearchBar"
 import LoggedInBadge from "../../components/login/LoggedInBadge"
 import GameCard from "@/app/components/playground/GameCard";
-
+import Footer from "@/app/components/footer/footer";
 
 export default function Community() {
 	return (
@@ -36,6 +36,7 @@ export default function Community() {
 					</div>
 				</div>
 			</section>
+			<Footer/>
 		</main>
 	);
 }

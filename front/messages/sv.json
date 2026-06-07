@@ -67,7 +67,8 @@
       "profile": "Profil",
       "rooms": "Rum",
       "rejoin": "Återanslut",
-      "remove": "Ta bort"
+      "remove": "Ta bort",
+      "login_to_play": "Logga in för att spela"
     },
 
     "Error": {
@@ -77,7 +78,9 @@
       "game_server_error": "Det gick inte att ansluta till spelservern.",
       "fail_friend_fetch": "Det gick inte att hämta vänner.",
       "no_username": "Ange ett användarnamn.",
-      "fail_add": "Det gick inte att lägga till vän."
+      "fail_add": "Det gick inte att lägga till vän.",
+      "already_in_room": "Du är redan i ett rum.",
+      "error_playground": "Ett fel inträffade vid anslutning till spelservern."
     },
 
     "Playground": {
@@ -98,6 +101,71 @@
       "opponent": "Motståndare",
       "you": "Du",
       "draw": "Dra",
-      "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)"
-    }
+      "debug_mode": "Aktivera felsökningsläge (alla kort tillgängliga + oändligt antal runor)",
+      "feedback": {
+        "last_turn": "Förra rundan",
+        "card_played_msg": "{player} spelar {name}",
+        "dmg_card_by": "{source} ger {value} skada till {name}",
+        "dmg_hero_by": "{source} ger {value} skada till hjälten",
+        "zone_fight": "{a} möter {b}",
+        "card_damaged": "{name} tar {value} skada",
+        "card_dies": "{name} förstörs av {attacker}!",
+        "hit_hero_me": "{attacker} slår din hjälte för {value}",
+        "hit_hero_opponent": "{attacker} slår motståndarens hjälte för {value}",
+        "dmg_card": "{name} tar {value} skada",
+        "destroy": "{name} förstörs!",
+        "destroy_by": "{name} förstörs av {source}!",
+        "dmg_hero": "{name} tar {value} skada",
+        "ad_mod": "{name} {value} ATK",
+        "ad_mod_by": "{name} {value} ATK ({source})",
+        "def_mod": "{name} {value} DEF",
+        "def_mod_by": "{name} {value} DEF ({source})",
+        "addef_mod": "{name} {value} ATK/DEF",
+        "addef_mod_by": "{name} {value} ATK/DEF ({source})",
+        "draw_card": "{name} drar {value} kort",
+        "draw_card_by": "{name} drar {value} kort ({source})",
+        "armor_gain": "{name} {value} rustning",
+        "armor_gain_by": "{name} {value} rustning från {source}",
+        "runes_gain": "{name} {value} runor",
+        "runes_gain_by": "{name} {value} runor från {source}",
+        "freeze": "{name} är fryst",
+        "freeze_by": "{name} är fryst av {source}",
+        "swap": "{a} ↔ {b}",
+        "swap_by": "{source}: {a} ↔ {b}"
+      }
+    },
+
+  "Privacy": {
+    "policy": "Integritetspolicy",
+    "last_update": "Senast uppdaterad: Juni 2026",
+    "collected_title": "1. Data vi samlar in",
+    "collected_usage": "Vi samlar in ditt användarnamn och din e-postadress enbart för att skapa konto, autentisera dig och spara dina framsteg i spelet.",
+    "usage_title": "2. Hur vi använder data",
+    "usage_usage": "Dina data används strikt för att tillhandahålla speltjänsterna. Vi säljer, hyr inte ut eller delar dina personuppgifter med tredje part för marknadsföringsändamål."
+  },
+
+  "TOS": {
+    "title": "Användarvillkor",
+    "lastUpdated": "Senast uppdaterad: Juni 2026",
+    "welcome": "Välkommen till vår kortspelsapplikation. Genom att registrera ett konto eller använda vår plattform godkänner du att du binds av dessa användarvillkor.",
+    "section1Title": "1. Skapande av konto & säkerhet",
+    "section1Content": "För somliga funktioner eller för att spela spelet måste du skapa ett konto. Du är helt ansvarig för att hålla dina inloggningsuppgifter konfidentiella och för alla aktiviteter som sker under ditt konto.",
+    "section2Title": "2. Användarbeteende & rent spel",
+    "section2Content": "Du samtycker till att använda denna applikation på ett rättvist och respektfullt sätt. Följande beteenden är strängt förbjudna och kommer att leda till omedelbar avstängning eller uppsägning av kontot:",
+    "section2List": {
+      "cheating": "Fusk, utnyttjande av buggar eller användning av obehörig programvara/botar från tredje part.",
+      "harassment": "Trakassera, missbruka eller använda kränkande språk mot andra spelare.",
+      "disruption": "Försök att störa eller dekompilera applikationens infrastruktur."
+    },
+    "section3Title": "3. Immateriella rättigheter",
+    "section3Content": "Alla speldesigner, grafik, mekanik och kod är detta projekts immateriella egendom. Du får inte kopiera, distribuera eller modifiera någon del av spelet utan uttryckligt tillstånd.",
+    "section4Title": "4. Ansvarsbegränsning",
+    "section4Content": "Denna applikation tillhandahålls i \"befintligt skick\" för utvärdering och underhållningsändamål. Vi ger inga garantier gällande serverdrifttid, datapersistens eller ditt kontos absoluta säkerhet."
+  },
+
+  "Footer": {
+    "privacy": "Integritetspolicy",
+    "terms": "Användarvillkor",
+    "rights": "Med ensamrätt."
+  }
 }

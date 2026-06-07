@@ -5,7 +5,7 @@ import type { GameSession } from '../types/gamesession.ts'
 import { instantiateGame } from './gameFactory.ts'
 import { launchGame, resolveRound } from './round.ts'
 import { getPlayerPerspective, getSpectatorPerspective } from './perspective.ts'
-import { waitingPlayers, sessions, addSession, findSession, findSessionByRoomId, addSpectator, removeSpectator, filterWaitingPlayers } from './state.ts'
+import { waitingPlayers, sessions, addSession, findSession, findSessionByRoomId, addSpectator, removeSpectator, filterWaitingPlayers, removePlayersFromRoom } from './state.ts'
 import { playCard } from '../engine/playCard.ts'
 import { emitGameOver } from './round.ts'
 import { prisma } from '../../prisma/prisma.ts'
@@ -31,13 +31,20 @@ export function onConnection(io: Server, socket: Socket): void {
                 const decoded = jwt.verify(data.token, JWT_SECRET) as any
                 userId = decoded.userId
             } catch {}
+        } else {
+            console.log('No token provided for join_game')
+            socket.emit('error', { message: 'Authentication required' })
+            return
         }
 
         // Reconnexion à une session existante
         const existingSession = findSessionByRoomId(Number(data.roomId))
         if (existingSession) {
+            let user =  await prisma.user.findUnique({
+                where: { id: userId }
+            });
             const playerIndex = existingSession.game.players.findIndex(
-                (p: any) => p.username === data.username
+                (p: any) => p.username === user.username // Don't trust user
             )
             if (playerIndex !== -1) {
                 existingSession.sockets[playerIndex] = socket
@@ -50,6 +57,12 @@ export function onConnection(io: Server, socket: Socket): void {
         }
 
         const roomId = Number(data.roomId)
+
+        const room = await prisma.room.findUnique({ where: { id: roomId } })
+        if (!room) {
+            socket.emit('error', { message: 'Room not found' })
+            return
+        }
 
         // Évite les doublons
         const alreadyWaiting = waitingPlayers.some(
@@ -96,15 +109,20 @@ export function onConnection(io: Server, socket: Socket): void {
         // console.log('Carte trouvée:', { card })
         if (!card) return
         if (player.curRunes < card.runeCost) return
-        player.curRunes -= card.runeCost
+
+        const emit = (event: string, data: any) => {
+            session.sockets.forEach(s => s.emit(event, data));
+        };
 
         if (card.timing === 'immediate') {
-            playCard(card, { cardId: data.cardId, zone: data.zone, targets: data.targets }, session.game)
+            player.curRunes -= card.runeCost
+            playCard(card, { cardId: data.cardId, zone: data.zone, targets: data.targets }, session.game, emit)
         } else {
             const zone = data.zone as BfZone
-            if (session.game.players[playerIndex].battlefield[zone]) return
+            if (card.type !== "spell" && (!zone || session.game.players[playerIndex].battlefield[zone])) return
             const existing = session.submittedCards.get(socket.id) ?? []
-            if (existing.some(({ payload }: any) => payload.zone === zone)) return
+            if (card.type !== "spell" && existing.some(({ payload }: any) => payload.zone === zone)) return
+            player.curRunes -= card.runeCost
             existing.push({ card, payload: data })
             session.submittedCards.set(socket.id, existing)
             card.owner.hand = card.owner.hand.filter((c: Card) => c.idInGame !== card.idInGame)
@@ -121,7 +139,6 @@ export function onConnection(io: Server, socket: Socket): void {
             session.readyPlayers.add(socket.id)
             if (session.readyPlayers.size === session.sockets.length) {
                 session.readyPlayers.clear()
-
                 resolveRound(session)
                 session.sockets.forEach((s, id) => {
                     s.emit('game_update', { game: getPlayerPerspective(session.game, id) })
@@ -131,7 +148,49 @@ export function onConnection(io: Server, socket: Socket): void {
             })
         }
     })
+    socket.on('delete_room', async (data) => {
+        try {
+            const roomId = data.roomId
+            const username = data.username;
+            console.log('Request delete room', { roomId, username })
+            if (!roomId || !username)
+                return;
 
+            const room = await prisma.room.findUnique({
+                where: { id: roomId }
+            });
+            if (!room)
+                return;
+            console.log('Room found:', { room })
+            const user = await prisma.user.findUnique({
+                where: { id: room.player1Id }
+            });
+            if (user.username !== username) {
+                socket.emit('room_error', {
+                    message: 'Only the room creator can delete the room'
+                });
+                return;
+            }
+
+            const activeSession = findSessionByRoomId(roomId)
+            if (activeSession) {
+                clearTimeout(activeSession.timer!)
+                activeSession.timer = null
+                activeSession.game.status = 'game_over'
+                activeSession.game.winner = undefined
+                await emitGameOver(activeSession)
+            } else {
+                await prisma.room.delete({ where: { id: roomId } })
+                removePlayersFromRoom(roomId)
+            }
+        } catch (error) {
+            console.error(error);
+            socket.emit('room_error', {
+                message: 'Failed to delete room'
+            });
+        }
+        io.emit('room_deleted', data.roomId);
+    })
     socket.on('spectate', (roomId: number) => {
         console.log('Spectate roomId:', roomId, typeof roomId)
         console.log('Sessions:', sessions.map(s => ({ roomId: s.roomId, type: typeof s.roomId })))
@@ -164,6 +223,14 @@ export function onConnection(io: Server, socket: Socket): void {
         console.log('Joueur déconnecté :', socket.id)
     })
 
+    socket.on('join_chat', (roomId: number) => {
+        socket.join(`chat-${roomId}`);
+    });
+
+    socket.on('leave_chat', (roomId: number) => {
+        socket.leave(`chat-${roomId}`);
+    });
+
     socket.on('send_message', async (data) => {
         try{
             const { username, content, roomId } = data;
@@ -185,7 +252,11 @@ export function onConnection(io: Server, socket: Socket): void {
                     sender: true,
                 }
             });
-            io.emit('new_message', message);
+            if (roomId) {
+                io.to(`chat-${roomId}`).emit('new_message', message);
+            } else {
+                io.emit('new_message', message);
+            }
         }
         catch (error)
         {
@@ -298,8 +369,9 @@ export function onConnection(io: Server, socket: Socket): void {
         socket.emit("online_users_list", Array.from(activeUsers.keys()));
     });
 
-    socket.on('disconnect', () => {
-        console.log('User disconeccted :', socket.id);
+
+    socket.on('disconnect', async () => {
+        console.log('User disconnected :', socket.id);
 
         if (socket.username) {
             activeUsers.delete(socket.username);

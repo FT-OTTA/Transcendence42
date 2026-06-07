@@ -1,4 +1,4 @@
-FROM mysql:latest
+FROM docker.io/library/mysql:latest
 
 COPY init.sql /docker-entrypoint-initdb.d/init.sql
 

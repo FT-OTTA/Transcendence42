@@ -1,6 +1,6 @@
 datasource db {
   provider = "mysql"
-  url      = "mysql://user:prout@mysql:3306/otta"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -85,10 +85,10 @@ model GameResult {
     player2Id Int
     player1Class String
     player2Class String
-    scorep1    Int @default(0)
-    scorep2    Int @default(0)
 
-    turns     Int
+    turns        Int
+    player1Score Int @default(0)
+    player2Score Int @default(0)
 
     winner    User? @relation("GameWinner", fields: [winnerId], references: [id])
     loser     User? @relation("GameLoser", fields: [loserId], references: [id])
@@ -132,7 +132,7 @@ model Message {
   sender     User @relation(fields: [senderId], references: [id])
 
   roomId    Int?
-  room      Room? @relation(fields: [roomId], references: [id])
+  room      Room? @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
 }
 

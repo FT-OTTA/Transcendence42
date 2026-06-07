@@ -30,6 +30,7 @@ export default function MatchHistory({ username }: { username: string }) {
 					<MatchCard
 					key={index}
 					opponent={match.opponent}
+					opponentClass={match.opponentClass}
 					score={match.score}
 					result={match.result}
 					heroClass={match.heroClass}

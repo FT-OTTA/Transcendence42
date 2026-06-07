@@ -5,6 +5,13 @@ import { requireAuth } from "../login/RequireAuth";
 import { customScrollBar } from "../scrollBar";
 import { socket } from "@/lib/socket";
 import { useTranslations } from "next-intl";
+import { cinzel } from "../../fonts";
+import clsx from "clsx";
+
+const titleClass = clsx(
+    cinzel.className,
+    "text-blue-400 text-center text-xl py-2"
+)
 
 type Message = {
     id: number;
@@ -25,6 +32,7 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
     const e = useTranslations("Error");
     
     const scrollRef = useRef<HTMLDivElement | null> (null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const isNearBottom = () => {
         const check = scrollRef.current;
@@ -95,6 +103,11 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
         });
 
         setMessageInput("");
+
+        if (textareaRef.current)
+        {
+            textareaRef.current.style.height = "auto";
+        }
     }
 
     useEffect(() => {
@@ -102,12 +115,11 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
         const username = localStorage.getItem("username");
 
         if (roomId) {
-            socket.emit('join_room', { roomId });
+            socket.emit('join_chat', roomId);
         }
 
         const handleNewMessage = (msg: any) => {
             if (msg.roomId !== roomId) return;
-
             const formatted: Message = {
                 id: msg.id,
                 name: msg.sender.username,
@@ -123,33 +135,33 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
         return () => {
             socket.off('new_message', handleNewMessage);
             if (roomId) {
-                socket.emit('leave_room', { roomId });
+                socket.emit('leave_chat', roomId);
             }
         };
     }, [roomId]);
 
     return (
-        <div className="h-full min-h-0 p-3 flex flex-col border border-blue-300 bg-black/30 backdrop-blur-sm rounded-sm ">
-            <h2 className="text-xl mb-2 text-center py-2">{l("chat")}</h2>
+        <div className="h-full min-h-0 p-3 flex flex-col bg-black/30 backdrop-blur-sm rounded-sm ">
+            <h2 className={titleClass}>{l("chat")}</h2>
 
             <div 
                 ref={scrollRef}
-                className={`${customScrollBar} flex flex-col gap-2 flex-1 min-h-0 overflow-y-auto py-6 pr-1 px-2`}>
+                className={`${customScrollBar} flex flex-col flex-1 min-h-0 overflow-y-auto pr-1 px-2`}>
                 {chatMessages.map((msg) => (
                     <div
                         key={msg.id}
                         className={`flex ${msg.isSelf ? "justify-end" : "justify-start"}`}
                     >
-                        <div
-                            className={`max-w-[75%] rounded-sm p-3 border ${
-                                msg.isSelf
-                                    ? "bg-blue-400/20 border-blue-300 text-blue-100"
-                                    : "bg-black/40 border-blue-300/40 text-blue-200"
-                            }`}
-                        >
-                            <p className="text-xs opacity-60 mb-1">{msg.name}</p>
-                            <p>{msg.message}</p>
-                        </div>
+                    <div
+                        className={`min-w-0 max-w-[75%] rounded-lg py-1 px-2 border text-xs ${
+                            msg.isSelf
+                                ? "bg-blue-400/20 border-blue-300/10 text-blue-100"
+                                : "bg-black/40 border-blue-300/10 text-blue-200"
+                        }`}
+                    >
+                        <p className="text-xs opacity-60 mb-1">{msg.name}</p>
+                        <p className="break-words whitespace-pre-wrap">{msg.message}</p>
+                    </div>
                     </div>
                 ))}
             </div>
@@ -160,14 +172,20 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
                         {e(error)}
                     </p>
                 )}
-                <div className="flex gap-2">
-                    <input
-                        className="w-full p-2 border border-blue-300 bg-transparent text-blue-200 outline-none"
-                        type="text"
+                <div className="flex gap-1 items-end">
+                    <textarea
+                        ref={textareaRef}
+                        className="w-full p-2 border border-blue-300/30 rounded-md bg-transparent text-blue-200 outline-none resize-none overflow-hidden"
+                        rows={1}
                         value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
+                        onChange={(e) => {
+                            setMessageInput(e.target.value);
+                            e.target.style.height = "auto";
+                            e.target.style.height = e.target.scrollHeight + "px";
+                        }}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter") {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
                                 sendMessage();
                             }
                         }}
@@ -175,9 +193,9 @@ export default function ChatPanel({ roomId = null }: ChatPanelProps) {
                     />
                     <button
                         onClick={sendMessage}
-                        className="px-4 border border-blue-300 hover:bg-blue-300 hover:text-black transition"
+                        className="px-2 border border-blue-300/30 rounded-xl hover:bg-blue-300 hover:text-black transition self-end pb-2"
                     >
-                        {l("send")}
+                        {">"}
                     </button>
                 </div>
             </div>

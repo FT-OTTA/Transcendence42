@@ -7,13 +7,18 @@ import { startTurn } from '../engine/startTurn.ts'
 import { checkBoardState, checkVictory } from '../engine/checks.ts'
 import { getPlayerPerspective } from './perspective.ts'
 import { prisma } from '../../prisma/prisma.ts'
+import { removeSession } from './state.ts'
 
 export async function emitGameOver(session: GameSession) {
     const winnerIndex = session.game.winner ? session.game.players.indexOf(session.game.winner) : -1
     session.sockets.forEach((s, id) => {
         s.emit('game_over', { game: getPlayerPerspective(session.game, id), winner: winnerIndex })
     })
-    await prisma.room.delete({ where: { id: session.roomId } })
+    session.spectators.forEach(s => {
+        s.emit('game_over', { winner: winnerIndex })
+    })
+    await prisma.room.deleteMany({ where: { id: session.roomId } })
+    removeSession(session.roomId)
     try {
         await prisma.gameResult.create({
         data: {
@@ -24,8 +29,8 @@ export async function emitGameOver(session: GameSession) {
             player1Class: session.game.players[0].class,
             player2Class: session.game.players[1].class,
             turns: session.game.turnNumber,
-            scorep1: session.game.players[0].dmgDealt,
-            scorep2: session.game.players[1].dmgDealt,
+            player1Score: session.game.players[0].dmgDealt,
+            player2Score: session.game.players[1].dmgDealt,
             }
         })
     } catch (error) {
@@ -43,6 +48,10 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
     clearTimeout(session.timer!)
     session.timer = null
+    const emit = (event: string, data: any) => {
+        session.sockets.forEach(s => s.emit(event, data));
+        session.spectators.forEach(s => s.emit(event, data));
+    };
 
     for (const [socketId, cards] of session.submittedCards) {
         const playerIndex = session.sockets.findIndex(s => s.id === socketId)
@@ -50,7 +59,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
         for (const { card, payload } of cards) {
             if (!card) continue
-            playCard(card, payload, session.game)
+            playCard(card, payload, session.game, emit, 'end_of_turn')
         }
     }
     session.submittedCards.clear()
@@ -61,7 +70,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
         return;
     }
 
-    resolveCombat(session.game)
+    resolveCombat(session.game, emit)
 
     if (checkBoardState(session.game) === "game_over") {
         await emitGameOver(session)
@@ -75,7 +84,7 @@ export async function resolveRound(session: GameSession): Promise<void> {
         session.game.winner = winner ?? undefined
         await emitGameOver(session)
     } else {
-        startTurn(session.game)
+        startTurn(session.game, emit)
         checkBoardState(session.game);
         session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
         session.sockets.forEach((s, id) => {
@@ -86,7 +95,11 @@ export async function resolveRound(session: GameSession): Promise<void> {
 
 export function launchGame(session: GameSession): void {
     console.log('Lancement de game pour sockets', session.sockets.map(s => s.id))
-    startTurn(session.game)
+    const emit = (event: string, data: any) => {
+        session.sockets.forEach(s => s.emit(event, data));
+    };
+
+    startTurn(session.game, emit)
     session.timer = setTimeout(() => resolveRound(session), session.game.clock_per_turn * 1000)
     session.sockets.forEach((s, id) => {
         s.emit('game_start', { game: getPlayerPerspective(session.game, id), playerIndex: id })

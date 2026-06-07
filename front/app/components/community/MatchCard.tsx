@@ -14,13 +14,14 @@ const MatchCardClass = clsx
 
 type MatchProps = {
 	opponent: string;
-	score: string;
+	opponentClass?: string;
+	score?: string;
 	result: string;
 	heroClass: string;
 	oppoClass: string;
 };
 
-export default function MatchCard({opponent, score, result, heroClass, oppoClass}:MatchProps)
+export default function MatchCard({opponent, opponentClass, score, result, heroClass}:MatchProps)
 {
 
 	const resultColor =
@@ -34,22 +35,16 @@ export default function MatchCard({opponent, score, result, heroClass, oppoClass
 		<div className={MatchCardClass}>
 			<div className={clsx("text-center", resultColor)}>
 				{ result }
+				{heroClass && <div className="text-xs opacity-60">({heroClass})</div>}
 			</div>
 
 			<div className={clsx("text-center", resultColor)}>
-				{ opponent }
+				<div>{ opponent }</div>
+				{opponentClass && <div className="text-xs opacity-60">({opponentClass})</div>}
 			</div>
 
 			<div className={clsx("text-center", resultColor)}>
 				{ score }
-			</div>
-
-			<div className={clsx("text-center", resultColor)}>
-				as { heroClass }
-			</div>
-
-			<div className={clsx("text-center", resultColor)}>
-				as { oppoClass }
 			</div>
 		</div>
 	);

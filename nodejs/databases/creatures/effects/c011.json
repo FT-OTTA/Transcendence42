@@ -1,0 +1,10 @@
+{
+    "effects": [
+        {
+            "effect": "addef_mod",
+            "value": 2,
+            "target": "all_allies",
+            "targetType": { "creature": true }
+        }
+    ]
+}

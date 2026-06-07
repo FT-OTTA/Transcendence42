@@ -13,6 +13,7 @@ interface HeroStripProps {
   isSelected?: boolean;
   onClick?: () => void;
   isOpponent?: boolean;
+  animClass?: string;
 }
 
 const strip = clsx(
@@ -38,6 +39,7 @@ export default function HeroStrip({
   isSelected = false,
   onClick,
   isOpponent = false,
+  animClass = '',
 }: HeroStripProps) {
   const isClickable = isHighlighted || isSelected;
   
@@ -53,7 +55,7 @@ export default function HeroStrip({
   );
 
   return (
-    <div className={stripClass} onClick={() => isClickable && onClick?.()}>
+    <div className={clsx(stripClass, animClass)} onClick={() => isClickable && onClick?.()}>
 
       <div className="flex flex-col min-w-[60px]">
         <span className={clsx(

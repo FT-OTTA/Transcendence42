@@ -36,14 +36,15 @@ router.post('/register', async (req: Request, res: Response) => {
             { expiresIn: '7d' }
         )
 
+        sendLog({ action: 'User:register', status: 'SUCCESS', userId: user.id, username })
         res.status(201).json({ token, username: username })
     } catch (error: any) {
         // Gestion spécifique de l'erreur "Unique constraint failed" de Prisma (P2002)
         if (error.code === 'P2002') {
-            sendLog({ action: "User:create", status: "ERROR", error: "username already taken" });
+            sendLog({ action: "User:register", status: "FAILURE", error: "username already taken" });
             return res.status(409).json({ error: 'Username déjà pris' })
         }
-        sendLog({ action: "User:create", status: "ERROR", error: "unknwown" });
+        sendLog({ action: "User:register", status: "FAILURE", error: "unknwown" });
         res.status(500).json({ error: 'Erreur lors de la création du compte' })
     }
 })
@@ -63,12 +64,14 @@ router.post('/login', async (req: Request, res: Response) => {
         })
 
         if (!user) {
+            sendLog({ action: 'User:login', status: "FAILURE", reason: 'user not found', username, ip: req.ip })
             return res.status(401).json({ error: 'Identifiants incorrects' })
         }
 
         // Vérifier le mot de passe
         const valid = await bcrypt.compare(password, user.passwordHash)
         if (!valid) {
+            sendLog({ action: 'User:login', status: "FAILURE", reason: 'wrong password', username, ip: req.ip })
             return res.status(401).json({ error: 'Identifiants incorrects' })
         }
 
@@ -77,9 +80,11 @@ router.post('/login', async (req: Request, res: Response) => {
             JWT_SECRET,
             { expiresIn: '7d' }
         )
+        sendLog({ action: 'User:login', status: "SUCCES", username, ip: req.ip })
 
         res.json({ token, username: user.username })
     } catch (error) {
+        sendLog({ action: 'User:login', status: "ERROR", username, ip: req.ip })
         res.status(500).json({ error: 'Erreur serveur' })
     }
 })

@@ -1,14 +1,8 @@
 {
     "effects": [
         {
-            "effect": "runes",
-            "value": 1,
-            "target": "self_hero",
-            "targetType": { "hero": true }
-        },
-        {
             "effect": "draw",
-            "value": 2,
+            "value": 1,
             "target": "self_hero",
             "targetType": { "hero": true }
 

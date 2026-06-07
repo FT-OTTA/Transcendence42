@@ -25,6 +25,7 @@ export default function LoggedInBadge() {
     {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
+        localStorage.removeItem("currentGame");
         window.location.reload();
     }
 
@@ -32,8 +33,10 @@ export default function LoggedInBadge() {
         const storedUsername = await requireAuth();
 
         if (!storedUsername)
+        {
+            setUsername(null);
             return;
-
+        }
         try {
             const res = await fetch(
                 `/api/users/${storedUsername}`
@@ -42,6 +45,7 @@ export default function LoggedInBadge() {
             if (!res.ok) {
                 localStorage.removeItem("token");
                 localStorage.removeItem("username");
+                setUsername(null);
             }
             else {
                 setUsername(storedUsername);
@@ -49,15 +53,12 @@ export default function LoggedInBadge() {
             }
         } catch (err) {
             console.error(err);
+            setUsername(null);
         }   
     }
 
     useEffect(() => {
         setMounted(true);
-        const localUser = localStorage.getItem("username");
-        if (localUser) {
-            setUsername(localUser);
-        }
         uservalidation();
     }, []);
 
@@ -67,11 +68,7 @@ export default function LoggedInBadge() {
     if (!username) {
         return (
             <>
-                <div className="fixed top-13 right-2 z-40 flex flex-col px-4 py-3 rounded-sm text-sm text-blue-200/70">
-                    <span className="text-[11px] uppercase tracking-wider opacity-50">
-                        {l("log_status")}
-                    </span>
-
+                <div className="right-2 fixed z-40 flex flex-col px-4 py-3 rounded-sm text-sm text-blue-200/70">
                     <button
                         onClick={() => setShowLogin(true)}
                         className="w-full text-xs px-3 py-1.5 border border-blue-300/20 text-blue-200/60 hover:text-blue-100 hover:border-blue-300/50 transition"
@@ -85,9 +82,9 @@ export default function LoggedInBadge() {
                       className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50"
                       onClick={() => setShowLogin(false)}
                     >
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <LoginCard />
-                      </div>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <LoginCard />
+                        </div>
                     </div>
                 )}
             </>
@@ -95,7 +92,7 @@ export default function LoggedInBadge() {
     }
 
     return (
-        <div className="fixed top-13 right-2 z-40 flex flex-col px-4 py-3 rounded-sm text-sm text-blue-200/70">
+        <div className="right-2 fixed right-2 z-40 flex flex-col px-4 top-1 rounded-sm text-sm text-blue-200/70">
             <div className="flex items-center gap-2 leading-tight">
                 <span className="text-[11px] uppercase tracking-wider opacity-50">
                     {l("login_as")}
@@ -108,7 +105,8 @@ export default function LoggedInBadge() {
 
             <button
                 onClick={logout}
-                className="w-full text-xs px-3 py-1.5 border border-blue-300/20 text-blue-200/60 hover:text-blue-100 hover:border-blue-300/50 transition">
+                className="text-xs px-3 py-1 border border-blue-300/20 text-blue-200/60 hover:text-blue-100 hover:border-blue-300/50 transition"
+            >
                 {l("log_out")}
             </button>
         </div>

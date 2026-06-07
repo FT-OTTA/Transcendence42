@@ -27,21 +27,22 @@ export default function Navbar()
 	const t = useTranslations('Navbar');
 	return (
 		<div>
-			
-			<div className="hidden md:flex">
-					<LanguageSwitcher />
-			</div>
-			<div className="hidden md:flex">
-				<nav className={ NavbarClassDesktop }>
-					<NavItem text={t("home")} href="/" />
-					<NavItem text={t("community")} href="/community" />
-					<NavItem text={t("lobby")} href="/lobby" />
-				</nav>
-				<div className="right-0">
-					<LoggedInBadge/>
-				</div>
+			<div className="hidden md:flex relative z-[9999]">
+				<div>
+					<nav className={ NavbarClassDesktop }>
+						<div >
+								<LanguageSwitcher />
+						</div>
 
-				{/* <div className={ NavLine }/> */}
+						<NavItem text={t("home")} href="/" />
+						<NavItem text={t("community")} href="/community" />
+						<NavItem text={t("lobby")} href="/lobby" />
+						
+					</nav>
+					<div className="flex">
+						<LoggedInBadge/>
+					</div>
+				</div>
 			</div>
 
 		<MobileNavbar />

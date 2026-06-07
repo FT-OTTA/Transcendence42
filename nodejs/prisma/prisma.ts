@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { notificationEmitter } from '../src/events/notificationEmitter.ts'
+import { sendLog } from '../src/logs.ts'
 
 const basePrisma = new PrismaClient()
 
@@ -35,7 +36,18 @@ export const prisma = basePrisma.$extends({
                         operation,
                         data: result,
                     })
+
+                    sendLog({
+                        timestamp: new Date().toISOString(),
+                        model,
+                        operation,
+                        args,
+                        result,
+                    });
+
                 }
+
+
 
                 return result
             }

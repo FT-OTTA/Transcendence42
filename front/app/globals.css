@@ -50,6 +50,54 @@ body {
 	background: rgba(125, 211, 252, 0.45);
 }
 
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 211, 252, 0.25) transparent;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  [class*="backdrop-blur"] {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+  }
+}
+
+/* animations & styles */
+
+@keyframes fb-play-top {
+  0%   { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fb-play-top { animation: fb-play-top 500ms ease-out; }
+
+@keyframes fb-play-bottom {
+  0%   { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fb-play-bottom { animation: fb-play-bottom 500ms ease-out; }
+
+@keyframes fb-combat {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-4px, -4px); }
+  40%  { transform: translate(4px, 2px); }
+  60%  { transform: translate(-3px, 1px); }
+  80%  { transform: translate(2px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+.animate-fb-combat { animation: fb-combat 500ms ease-in-out; }
+
+@keyframes fb-death {
+  0%   { opacity: 1;   transform: scale(1);    filter: brightness(1) grayscale(0); }
+  30%  { opacity: 1;   transform: scale(1.05); filter: brightness(0.6) grayscale(0.5); } /* <-- retire ces deux lignes pour partir direct */
+  100% { opacity: 0;   transform: scale(0.7);  filter: brightness(0) grayscale(1); }
+}
+.animate-fb-death { animation: fb-death 400ms ease-in forwards; }
+
 .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
+
+@keyframes fb-float-up {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+.animate-fb-float-up { animation: fb-float-up 600ms ease-out forwards; }

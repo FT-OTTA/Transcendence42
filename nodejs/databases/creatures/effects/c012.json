@@ -1,0 +1,10 @@
+{
+    "effects": [
+        {
+            "effect": "win",
+            "target": "self_hero",
+            "targetType": { "hero": true },
+            "timing": "on_deal_damage"
+        }
+    ]
+}

@@ -103,7 +103,7 @@ GRAFANA_ADMIN_PASSWORD=
 
 ## Deployment
 
-Once that's done, build and start the network with `make`. Once started, the project's frontend can be accessed at http://localhost:3001. It is also deployed on the open web at https://transcendence42-production.up.railway.app/
+Once that's done, build and start the network with `make`. Once started, the project's frontend can be accessed at https://localhost:8443. It is also deployed on the open web at https://transcendence42-production.up.railway.app/
 
 Useful debugging commands:
 - `docker ps` prints all containers state and basic info
@@ -113,7 +113,25 @@ Useful debugging commands:
 
 # Ressources
 
-[Throw in relevant links for every tech used]
+## Technologies
+
+- [Next.js Documentation](https://nextjs.org/docs) — Frontend framework
+- [Express.js Documentation](https://expressjs.com/) — Backend framework
+- [Socket.io Documentation](https://socket.io/docs/v4/) — Real-time WebSocket communication
+- [Prisma ORM Documentation](https://www.prisma.io/docs) — Database ORM for TypeScript
+- [MySQL Documentation](https://dev.mysql.com/doc/) — Database
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs) — CSS utility framework
+- [next-intl Documentation](https://next-intl-docs.vercel.app/) — i18n for Next.js
+- [Docker Compose Documentation](https://docs.docker.com/compose/) — Containerization
+- [Elasticsearch Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html) — Log storage and indexing
+- [Logstash Documentation](https://www.elastic.co/guide/en/logstash/current/index.html) — Log collection and processing
+- [Kibana Documentation](https://www.elastic.co/guide/en/kibana/current/index.html) — Log visualization
+- [Prometheus Documentation](https://prometheus.io/docs/introduction/overview/) — Metrics collection
+- [Grafana Documentation](https://grafana.com/docs/grafana/latest/) — Metrics visualization and dashboards
+
+## AI Usage
+
+AI (Claude, chatGPT and Github Copilot) was used to generate boilerplate, help with debugging, test design decisions and draft parts of the documentation. All AI-generated code has been carefully reviewed and tested before inclusion (vie de ma mère).
 
 # Team information
 
@@ -122,7 +140,7 @@ Useful debugging commands:
 - Tcoeffet: Project Manager
 
 - Ande-vat: Technical lead
-	- Early design/tech stack decisions, code reviews
+	- Early design/tech stack decisions, code reviews, readme redaction
 
 - Obajja: Developer
 
@@ -147,19 +165,135 @@ We chose a MYSQL database with prisma ORM for Typescript integration, the exact 
 
 ## Infrastructure
 
-We use docker-compose for containerization and easy single-command deployment, the website is served through nginx and enforces https.
+We use docker-compose for containerization and easy single-command deployment, the website is served through nginx on port 8443 (Port 433 is unavailable on the machines at 42) and enforces https.
 
-## ELK stack
+## ELK Stack (Log Management)
+Elasticsearch, Logstash, and Kibana are integrated to provide centralized log management:
 
-Elasticsearch, logstash and kibana (ELK) are implemented to manage and vizualize logs
+- Logstash collects application logs from the backend containers, parses and transforms them into a structured format, then ships them to Elasticsearch.
+- Elasticsearch stores and indexes these logs, enabling fast full-text search and filtering across the entire log history.
+- Kibana provides a web dashboard for visualizing logs, building queries, and monitoring application activity in real time.
 
-## Prometheus + Grafana
-
----
+## Prometheus + Grafana (System Monitoring)
+Prometheus scrapes system and application metrics from running containers at regular intervals and stores them as time-series data. Grafana connects to Prometheus as a data source and renders these metrics in customizable dashboards, with support for alerting rules when metrics exceed defined thresholds. Together they provide visibility into container health, request rates, memory usage, and other operational metrics.
 
 # Database schema
 
----
+```
+┌──────────┐         ┌────────────┐         ┌──────────┐
+│   User   │─────────│ Friendship │─────────│   User   │
+└──────────┘         └────────────┘         └──────────┘
+      │
+      │          ┌────────────┐
+      ├──────────│    Room    │
+      │          └────────────┘
+      │                │
+      │                │
+      ├──────────┌─────────────┐       (User and stats management)
+      │          │   Message   │
+      │          └─────────────┘
+      │
+      │          ┌────────────┐
+      └──────────│ GameResult │
+                 └────────────┘
+
+┌──────┐     ┌──────┐
+│ Card │     │ Hero │   (static game data, not linked to User)
+└──────┘     └──────┘
+```
+## Tables
+
+### `User`
+| Field | Type | Notes |
+|-------|------|-------|
+| id | Int | PK, autoincrement |
+| createdAt | DateTime | default: now() |
+| username | String | unique |
+| password_hash | String | bcrypt hash |
+| moodphrase | String? | optional |
+| avatarUrl | String? | optional |
+
+### `GameResult`
+Stores the result of every completed match.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | Int | PK, autoincrement |
+| createdAt | DateTime | default: now() |
+| player1Id | Int | FK → User |
+| player2Id | Int | FK → User |
+| winnerId | Int? | FK → User, null = draw |
+| loserId | Int? | FK → User, null = draw |
+| player1Class | String | hero class used |
+| player2Class | String | hero class used |
+| turns | Int | number of turns played |
+| player1Score | Int | default: 0 |
+| player2Score | Int | default: 0 |
+
+### `Friendship`
+Many-to-many self-join on User, with a unique constraint preventing duplicates.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | Int | PK, autoincrement |
+| userId | Int | FK → User |
+| friendId | Int | FK → User |
+| @@unique | [userId, friendId] | no duplicate pairs |
+
+### `Room`
+Represents a game lobby room before and during a match.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | Int | PK, autoincrement |
+| player1Id | Int | FK → User (creator) |
+| player2Id | Int? | FK → User, null until someone joins |
+| status | String | default: "waiting" |
+| createdAt | DateTime | default: now() |
+
+### `Message`
+Chat messages scoped to a room. `roomId` is nullable for potential direct messages; cascade-deleted when the room is deleted.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | Int | PK, autoincrement |
+| content | Text | message body |
+| createdAt | DateTime | default: now() |
+| senderId | Int | FK → User |
+| roomId | Int? | FK → Room, onDelete: Cascade |
+
+### `Card`
+Static game data — all playable cards with multilingual fields for i18n support.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String | PK (e.g. "creature_001") |
+| name_en / name_fr / name_sv | String | localized names |
+| type_en / type_fr / type_sv | String | localized type labels |
+| effect_text_en / _fr / _sv | String | localized effect descriptions |
+| class | String | card category (creature / building / spell) |
+| force | Int? | Attack value, creatures only |
+| endurance | Int? | Defense value, creatures and buildings |
+| rune_cost | Int | cost to play |
+| effect | Text | effect logic identifier / JSON |
+| illustration | String | asset path |
+| target_number | Int? | number of targets, if applicable |
+| target_type | String? | what the card can target |
+| timing | String | default: "end_of_turn" |
+
+### `Hero`
+Static game data — playable hero classes, each with a predefined deck and a passive ability.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | String | PK |
+| name_en / name_fr / name_sv | String | localized names |
+| passive_text_en / _fr / _sv | String | localized passive descriptions |
+| base_armor | Int | starting defense value |
+| passive_json_path | String | path to passive effect handler |
+| illustration | String | asset path |
+| deck | Text | JSON array of card IDs forming the hero's deck |
+
 
 # Features list
 
@@ -240,4 +374,14 @@ Total points: 2 + 2 + 2 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 = 23
 
 # Individual contributions
 
+## Tbeauman — Product Owner
+
+## Tcoeffet — Product Owner
+
+## Ande-vat — Technical Lead
+
+- Made early architectural decisions: Next.js + Express + MySQL + Prisma + Socket.io + Docker Compose.
+- Set up the initial project structure, Docker Compose network, and NGINX configuration.
+- Conducted code reviews on all critical pull requests.
+- [ADD SPECIFIC FEATURES/CODE WORKED ON]
 

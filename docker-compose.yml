@@ -35,12 +35,8 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-    #   - ES_JAVA_OPTS=-Xms512m -Xmx512m  # pour la machine de beauman TO REMOVE
-    # mem_limit: 1g # pour la machine de beauman TO REMOVE
-    # deploy: # pour la machine de beauman TO REMOVE
-    #   resources: # pour la machine de beauman TO REMOVE
-    #     limits: # pour la machine de beauman TO REMOVE
-    #       memory: 1g # pour la machine de beauman TO REMOVE
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m  # pour la machine de beauman TO REMOVE
+    mem_limit: 1g # pour la machine de beauman TO REMOVE
     ports:
       - "9200:9200"
     networks:
@@ -50,13 +46,9 @@ services:
     image: logstash:8.11.0
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
-    # environment:
-    #   - LS_JAVA_OPTS=-Xms256m -Xmx256m  # pour la machine de beauman TO REMOVE
-    # mem_limit: 512m # pour la machine de beauman TO REMOVE
-    # deploy: # pour la machine de beauman TO REMOVE
-    #   resources:
-    #     limits:
-    #       memory: 512m # pour la machine de beauman TO REMOVE #
+    environment:
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m  # pour la machine de beauman TO REMOVE
+    mem_limit: 512m # pour la machine de beauman TO REMOVE
     ports:
       - "5044:5044"
     depends_on:
@@ -107,8 +99,6 @@ services:
       nodejs:
         condition: service_healthy
       front:
-        condition: service_started
-      kibana:
         condition: service_started
     networks:
       - otta

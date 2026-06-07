@@ -254,40 +254,24 @@ return (
                 {friends.map((friend) => (
                     <div
                         key={friend.name}
-                        className="flex flex-col gap-3 sm:grid sm:grid-cols-3 sm:gap-2 items-start sm:items-center border border-blue-300/40 p-3 sm:p-2"
+                        className="flex flex-col gap-2 border border-blue-300/40 p-3"
                     >
-                        <div className="flex items-center justify-between w-full sm:contents">
-                            <div className="font-semibold text-blue-100">
+                        <div className="flex items-center justify-between gap-2 min-w-0">
+                            <div className="font-semibold text-blue-100 truncate">
                                 {friend.name}
                             </div>
-
-                            <div
-                                className={`text-xs px-2 py-1 border rounded-sm w-fit ${statusStyles[friend.status]}`}
-                            >
+                            <div className={`text-xs px-2 py-1 border rounded-sm shrink-0 ${statusStyles[friend.status]}`}>
                                 {p(friend.status)}
                             </div>
                         </div>
-
-                        <div className="flex gap-2 w-full justify-end sm:col-start-3">
-
-                            {friend.status === "in room" && (
-                                <button className="flex-1 sm:flex-none text-center text-xs border border-green-300 px-2 py-1 text-green-300 hover:bg-green-300 hover:text-black">
-                                    {l("join")}
-                                </button>
-                            )}
-
-                            {friend.status === "playing" && (
-                                <button className="flex-1 sm:flex-none text-center text-xs border border-blue-400 px-2 py-1 text-blue-300 hover:bg-blue-300 hover:text-black">
-                                    {l("spectate")}
-                                </button>
-                            )}
-
-                            <button 
-                                onClick={ () => handleRemoveFriend(friend.name)}
-                                className="flex-1 sm:flex-none text-center text-xs border border-red-300 px-2 py-1 hover:bg-red-300 hover:text-black">
+                
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleRemoveFriend(friend.name)}
+                                className="flex-1 text-center text-xs border border-red-300 px-2 py-1 hover:bg-red-300 hover:text-black"
+                            >
                                 {l("remove")}
                             </button>
-
                         </div>
                     </div>
                 ))}

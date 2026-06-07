@@ -33,8 +33,10 @@ export default function LoggedInBadge() {
         const storedUsername = await requireAuth();
 
         if (!storedUsername)
+        {
+            setUsername(null);
             return;
-
+        }
         try {
             const res = await fetch(
                 `/api/users/${storedUsername}`
@@ -43,6 +45,7 @@ export default function LoggedInBadge() {
             if (!res.ok) {
                 localStorage.removeItem("token");
                 localStorage.removeItem("username");
+                setUsername(null);
             }
             else {
                 setUsername(storedUsername);
@@ -50,15 +53,12 @@ export default function LoggedInBadge() {
             }
         } catch (err) {
             console.error(err);
+            setUsername(null);
         }   
     }
 
     useEffect(() => {
         setMounted(true);
-        const localUser = localStorage.getItem("username");
-        if (localUser) {
-            setUsername(localUser);
-        }
         uservalidation();
     }, []);
 

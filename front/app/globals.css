@@ -50,6 +50,17 @@ body {
 	background: rgba(125, 211, 252, 0.45);
 }
 
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 211, 252, 0.25) transparent;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  [class*="backdrop-blur"] {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+  }
+}
+
 /* animations & styles */
 
 @keyframes fb-play-top {

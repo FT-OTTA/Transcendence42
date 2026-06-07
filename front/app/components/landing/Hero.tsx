@@ -16,9 +16,6 @@ export default function Hero({setIsLogin}: HeroProps)
 				<HeroTitle />
 				<StartButton setIsLogin={setIsLogin}/>
 			</div>
-        
-			<ScrollHint />
-      	
 		</section>
 	);
 }

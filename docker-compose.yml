@@ -35,12 +35,8 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-    #   - ES_JAVA_OPTS=-Xms512m -Xmx512m  # pour la machine de beauman TO REMOVE
-    # mem_limit: 1g # pour la machine de beauman TO REMOVE
-    # deploy: # pour la machine de beauman TO REMOVE
-    #   resources: # pour la machine de beauman TO REMOVE
-    #     limits: # pour la machine de beauman TO REMOVE
-    #       memory: 1g # pour la machine de beauman TO REMOVE
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m  # pour la machine de beauman TO REMOVE
+    mem_limit: 1g # pour la machine de beauman TO REMOVE
     ports:
       - "9200:9200"
     networks:
@@ -50,13 +46,9 @@ services:
     image: logstash:8.11.0
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
-    # environment:
-    #   - LS_JAVA_OPTS=-Xms256m -Xmx256m  # pour la machine de beauman TO REMOVE
-    # mem_limit: 512m # pour la machine de beauman TO REMOVE
-    # deploy: # pour la machine de beauman TO REMOVE
-    #   resources:
-    #     limits:
-    #       memory: 512m # pour la machine de beauman TO REMOVE #
+    environment:
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m  # pour la machine de beauman TO REMOVE
+    mem_limit: 512m # pour la machine de beauman TO REMOVE
     ports:
       - "5044:5044"
     depends_on:
@@ -68,7 +60,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 30s
+      start_period: 60s
 
   kibana:
     image: kibana:8.11.0
@@ -76,6 +68,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - SERVER_BASEPATH=/kibana
       - SERVER_REWRITEBASEPATH=true
+      - TELEMETRY_ENABLED=false
     ports:
       - "5601:5601"
     depends_on:
@@ -104,18 +97,20 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
-      - nodejs
-      - front
-      - kibana
+      nodejs:
+        condition: service_healthy
+      front:
+        condition: service_started
     networks:
       - otta
     restart: unless-stopped
-
   nodejs:
     build: ./nodejs
     container_name: nodejs
     env_file:
       - ./.env
+    volumes:
+      - ./nodejs/databases/users/avatars:/app/databases/users/avatars
     depends_on:
       mysql:
         condition: service_healthy
@@ -124,6 +119,12 @@ services:
     networks:
       - otta
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('net').createConnection(3000).on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
 
   mysql:
     build: ./mysql

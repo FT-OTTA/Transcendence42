@@ -67,7 +67,7 @@ async function importCreatures() {
             update: data, // Si elle existe, on met à jour tout
             create: data
         })
-        console.log(`Créature importée : ${row['Name_fr']}`)
+        console.log(`Créature importée : ${row['Name fr']}`)
     }
 }
 
@@ -96,7 +96,7 @@ async function importBuildings() {
             update: data,
             create: data
         })
-        console.log(`Bâtiment importé : ${row['Name_fr']}`)
+        console.log(`Bâtiment importé : ${row['Name fr']}`)
     }
 }
 
@@ -128,7 +128,7 @@ async function importSpells() {
             update: data,
             create: data
         })
-        console.log(`Sort importé : ${row['Name_fr']}`)
+        console.log(`Sort importé : ${row['Name fr']}`)
     }
 }
 
@@ -153,7 +153,7 @@ async function importHeroes() {
             update: data,
             create: data
         })
-        console.log(`Héros importé : ${row['Class_fr']}`)
+        console.log(`Héros importé : ${row['Class fr']}`)
     }
 }
 
@@ -167,7 +167,6 @@ async function importUsers() {
             update: {
                 username: row['Username'],
                 passwordHash: await bcrypt.hash("prout", SALT_ROUNDS),
-                moodphrase: row['MoodPhrase'],
             },
             create: {
                 id: parseInt(row['Id']),
@@ -182,8 +181,6 @@ async function importUsers() {
 }
 
 async function importFriendships() {
-    await prisma.friendship.deleteMany()
-    await prisma.$executeRaw`ALTER TABLE Room AUTO_INCREMENT = 1`;
     const rows = parseCSV('/app/databases/friends/FRIENDS.csv')
 
     for (const row of rows) {
@@ -296,7 +293,8 @@ async function main() {
         await importFriendships()
         await importMessages()
         // await importRooms()
-        await prisma.room.deleteMany() // On nettoie les rooms à part car elles sont liées à des données en temps réel (sockets)
+        await prisma.room.deleteMany()
+        await prisma.$executeRaw`ALTER TABLE Room AUTO_INCREMENT = 1`
         console.log('Import terminé ✅')
     } catch (e) {
         console.error("Erreur d'import :", e)
